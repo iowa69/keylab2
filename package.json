@@ -1,9 +1,9 @@
 {
   "name": "keylab2",
   "private": true,
-  "version": "2.0.0",
+  "version": "3.0.0",
   "type": "module",
-  "description": "A little keyboard. A world of wonder. A gentle play space for tiny explorers.",
+  "description": "An instant sensory playroom for little hands. Touch, swipe, smash keys, and discover.",
   "author": "Giovanni Lorenzin",
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {

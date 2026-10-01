@@ -10,11 +10,12 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Keylab 2 — A world of wonder',
+        name: 'Keylab 2 — Touch. Smash. Smile.',
         short_name: 'Keylab 2',
-        description: 'Six gentle play worlds for tiny fingers.',
-        theme_color: '#faf9f5',
-        background_color: '#faf9f5',
+        description:
+          'An instant sensory playroom for little hands. Touch, swipe, or press any key.',
+        theme_color: '#a2e0e1',
+        background_color: '#a2e0e1',
         display: 'standalone',
         start_url: './',
         scope: './',
@@ -26,6 +27,7 @@ export default defineConfig({
       },
       workbox: {
         clientsClaim: true,
+        skipWaiting: true,
         globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2}'],
         maximumFileSizeToCacheInBytes: 3000000,
       },

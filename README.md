@@ -1,41 +1,51 @@
 # Keylab 2
 
-**Little keys. Big discoveries.**
+**Touch. Smash. Smile.**
 
-A gentle, illustrated keyboard playground for little explorers, around ages 1–5. Pick a world, press a key, and see what happens. No scores, no wrong answers, no accounts, no ads.
+An instant, full-screen sensory playroom for babies and toddlers to explore together with a grown-up. Open the app and there is already something to play with. Touch it, drag it, swipe across it, or press a handful of keys.
 
-**[Come and play →](https://iowa69.github.io/keylab2/)**
+**[Open the playroom →](https://iowa69.github.io/keylab2/)**
 
-![Keylab 2 playground](docs/playground.png)
+![Bubble sea, ready for little hands](docs/playroom.png)
 
-A new, standalone companion to [Keylab](https://github.com/iowa69/keylab), with original vector illustrations, a storybook palette, touch controls, and little challenges.
+There is no homepage to navigate, no reading required, no on-screen typing exercise, no score, no right answer, and no reward ladder. A touch makes something happen. The introductory hint disappears after the first interaction. Toy selection and preferences live behind a grown-up gate.
 
-## Six little worlds
+## The toy box
 
-| World          | Explore                                                                | Little challenge                          |
-| -------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
-| Letter Garden  | Letters grow into colorful flowers. Optional spoken letters and words. | Find the highlighted letter.              |
-| Bubble Bay     | Make floating bubbles and tap to pop them.                             | Make a small collection of bubbles.       |
-| Number Space   | Press 1–9 to launch exactly that many smiling stars.                   | Find a number from 1–5.                   |
-| Melody Meadow  | Every key makes a gentle pentatonic note.                              | Play a little melody, one note at a time. |
-| Shape Party    | Circles, triangles, squares, stars, and hearts come to life.           | Make a handful of happy shapes.           |
-| Little Friends | Discover foxes, bunnies, bears, cats, frogs, and owls.                 | Invite a few friends to the meadow.       |
+| Toy                 | What little hands can do                                                                                       |
+| ------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Bubble sea**      | Hold and move a big bubble. Tap to pop it and release a smiling fish. Bubbles gently replenish.                |
+| **Bouncy friends**  | Pick up, drag, throw, and bounce soft shapes. They tumble into each other with gravity and elastic collisions. |
+| **Rainbow ribbons** | Paint flowing ribbons with multiple fingers. Keyboard presses paint big colorful swirls.                       |
+| **Peekaboo**        | Open an egg with a tap or any key. A fox, bunny, or bear peeks out, then gently hides again.                   |
+| **Little growers**  | Sprinkle water over little seeds. A few touches grow a smiling flower. Touch a grown flower to start again.    |
+| **Star song**       | Wake sleeping stars to hear pentatonic notes. Sweep between stars to join them with light.                     |
 
-Unexpected keys still make something lovely. There is no failure state. Free play has no progress counters or rewards to chase.
+All toys accept touch and arbitrary keyboard input. Swiping and dragging are real interactions, not just substitutes for clicking buttons. Scroll-wheel input also makes a response. There is no automatic toy switching.
 
-## For grown-ups
+## Grown-up controls
 
-- **Keyboard and touch:** physical keys, on-screen keys, and tapping the scene all work.
-- **Gentle sound:** synthesized audio, a restrained master volume, a compressor, and bounded voices. Start with your device volume low; software cannot guarantee a safe physical loudness.
-- **Calm mode:** stops decorative movement and confetti. System reduced-motion preferences are always respected.
-- **Optional narration:** uses an installed, local English speech voice. If none is available, the app remains silent; it never falls back to a network voice.
-- **Optional breaks:** 5, 10, or 15 minutes of visible, active play before a soft stretch reminder. Hidden tabs pause play.
-- **Grown-up settings:** hold for three seconds, then answer a simple arithmetic question. Preferences stay in local storage on the device.
-- **Fullscreen:** available from the playroom where supported. Escape pauses play. Browser and operating-system shortcuts cannot all be intercepted; this is a playground, not kiosk software. Best enjoyed together.
-- **Offline:** the production build precaches its code, illustrations, app icons, and locally bundled fonts. Wait for “Ready for offline play” on the first visit. Add to the home screen using your browser's install option.
-- **Privacy:** no analytics, cookies, accounts, advertising, camera, microphone, remote fonts, or third-party runtime requests. The hosting provider still receives ordinary requests when the website is loaded online.
+Hold **Grown-ups** in the top-right corner for three seconds, then answer **7 + 5**. A brief tap does not open a menu. Keyboard users can Tab to the control and hold Space or Enter.
 
-## Run locally
+- **Baby mode:** larger objects, fewer bubbles, generous touch targets, and flowers that bloom in two actions. The default.
+- **Toddler mode:** a little more to explore, with more bubbles, smaller objects, and an extra flower-growing step.
+- **Gentle sounds:** a distinct plop, boing, or musical note for each toy. Audio is synthesized locally, rate-limited, and compressed. Start with your device volume low; software cannot guarantee the physical loudness of speakers or headphones.
+- **Calmer movement:** removes ambient drifting and swaying and reduces particles. The toys still respond to direct play. System reduced-motion preferences enable this automatically.
+- **High contrast:** dark backgrounds with predominantly white and red toys.
+- **A little break:** optional reminders after 5, 10, or 15 minutes of active play. A sleepy screen pauses the toy. A grown-up resumes it through the gate. Time in settings or a hidden tab does not count.
+- **Fullscreen:** a grown-up can request fullscreen where supported. On mobile, Add to Home Screen gives the toy more room.
+
+The gate protects in-app controls. **A website cannot lock browser or operating-system controls.** Guided Access on iPhone/iPad or app pinning on Android provide device-level boundaries. Escape and other system keys may still leave browser fullscreen. This is a digital toy for shared play, not a claim about developmental or medical benefits.
+
+## Offline and privacy
+
+No accounts, ads, analytics, cameras, microphones, cookies, remote fonts, or third-party runtime requests. Preferences are saved in local storage on this device. The hosting provider still receives ordinary requests when the website loads online.
+
+The production build precaches the app, illustrations, icons, and locally bundled fonts. Load it once online; the grown-up panel reports when it is ready offline. There are no external image or audio dependencies.
+
+New versions install in the background. An active session is not forcibly reloaded. Reopen or refresh the page to use an installed update; the grown-up settings also offer a refresh when an update is detected. If upgrading from the original Keylab 2, allow the update to install and refresh again, or close the old tab and reopen the app.
+
+## Develop
 
 Requires Node.js 22.12+ or 24+ and npm.
 
@@ -44,44 +54,46 @@ npm ci
 npm run dev
 ```
 
-Open the URL Vite prints (normally `http://localhost:5173`).
-
 ```bash
-npm run build       # Type-check and build into dist/
-npm run preview     # Serve the production build, including offline support
-npm test            # Input, challenge, and settings unit tests
+npm run build       # TypeScript check + production build
+npm run preview     # Production preview, including offline support
+npm test            # Physics, toy behavior, resource bounds, preferences
 npx playwright install chromium
-npm run test:e2e    # Desktop and mobile browser tests; build first
+npm run test:e2e    # Real desktop/mobile browser tests; build first
+npm run format:check
 ```
 
-Service workers are disabled in development. Test offline behavior using the production preview on localhost or an HTTPS deployment.
+Service workers are disabled in development. Test offline behavior with the production preview on localhost or HTTPS.
 
-## Implementation
+## How it works
 
-React · TypeScript · Vite · original SVG illustrations · Web Audio · local Web Speech · Vite PWA · locally bundled Nunito and DM Sans · Lucide icons.
-
-The production app has no backend and requires no secrets or environment variables. The JavaScript entry is approximately 87 KB gzipped. Animations use CSS transforms. Live toys are capped at 36, repeat events are ignored, and old toys expire. Sound and speech requests are throttled to prevent queues during keyboard smashing.
+React handles the small grown-up interface. A custom Canvas 2D engine handles the entire play surface, with original procedural illustrations, direct multi-pointer manipulation, collision physics, trails, and bounded particles. Web Audio generates the sounds. Vite PWA handles offline caching. Nunito and DM Sans are bundled locally; interface icons come from Lucide.
 
 ```text
 src/
-  App.tsx                      Home and app preferences
-  components/Art.tsx           Original illustrated characters and worlds
-  components/Playground.tsx    Input, activities, challenge progression, pause
-  components/ParentDialog.tsx  Grown-up gate and settings
-  lib/audio.ts                Bounded synthesized sound and local narration
-  lib/worlds.ts                World definitions, challenges, input normalization
-  styles.css                   Responsive design and reduced-motion behavior
-tests/play.spec.ts             Desktop/mobile browser acceptance tests
+  App.tsx                    Full-screen play, protected controls, break state
+  playroom/
+    CanvasPlayroom.tsx       Canvas lifecycle, keyboard/touch/wheel, active time
+    engine.ts               Toy behavior, physics, multi-touch, resource limits
+    render.ts               Original procedural illustration and animation
+    GrownUps.tsx             Parent gate, toy box, and preferences
+    ToyIcon.tsx              Toy-box illustrations
+    settings.ts             Validated local preferences and migration
+    sound.ts                Bounded, locally synthesized feedback
+    offline.ts              Installation and update handling
+tests/playroom.spec.ts       Desktop/mobile browser acceptance tests
 ```
 
-Browser tests cover every world, touch controls, target progression, exact number counts, bubble popping, rapid input, pause, settings persistence, the break timer, responsive overflow, reduced motion, and a real offline reload. Tests run in Chromium with desktop and mobile device emulation; Safari and Firefox have not been separately verified.
+Objects, trails, trail points, particles, and simultaneous pointers have explicit upper bounds. Held-key repeat events are ignored. Physics time steps are bounded, coincident objects are separated, and cancelled touches release their objects. Pixel density is capped at 2×. Animation stops when the tab is hidden; play pauses while grown-up controls are open.
 
-## Deployment
+Tests cover immediate play in every toy, bubble replenishment, drag/throw, continuous painting, multi-touch cancellation, repeated flower growth, long key storms, rotation, high-contrast rendering, reduced motion, the grown-up gate, settings persistence, breaks, and a real offline reload. Browser tests run in Chromium, including mobile emulation. They are not a substitute for hands-on usability testing with children, or testing on physical Safari/Android devices.
 
-The included GitHub Actions workflow builds and tests the app, then deploys `dist/` to GitHub Pages on pushes to `main`. Set **Settings → Pages → Source** to **GitHub Actions**. Relative asset paths support both a repository subpath and a regular static host. Production updates wait for a fresh session instead of reloading a child's active play.
+## Publish
 
-## License and credits
+Pushes to `main` run formatting, unit tests, a production build, and browser tests before deploying to GitHub Pages. No backend or secret configuration is required. Relative assets support the `/keylab2/` repository path and regular static hosting.
 
-Copyright © 2026 Giovanni Lorenzin. All rights reserved. Made with love for Gabriel.
+## Credits and license
 
-Original code and illustrations in this project are governed by [LICENSE](LICENSE). Third-party packages retain their own licenses: React, Vite, Lucide and related tooling use their respective open-source licenses; Nunito and DM Sans are distributed under the SIL Open Font License. See the packages installed in `node_modules` for license text.
+A standalone companion to [Keylab](https://github.com/iowa69/keylab). The interaction direction takes inspiration from direct sensory play apps such as [BabyScroll](https://babyscroll.app/); all artwork and implementation here are original.
+
+Copyright © 2026 Giovanni Lorenzin. All rights reserved. Made with love for Gabriel. See [LICENSE](LICENSE). Third-party packages retain their own licenses; Nunito and DM Sans are distributed under the SIL Open Font License.
