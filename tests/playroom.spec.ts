@@ -31,6 +31,8 @@ test('opens straight into a playable toy, with no child menu', async ({ page }) 
   await page.goto('/');
   await expect(page.locator('canvas')).toHaveAttribute('data-toy', 'sea');
   await expect(page.locator('button')).toHaveCount(1);
+  // An accidental tap on the protected control must not swallow subsequent play keys.
+  await page.getByRole('button', { name: 'Hold for 3 seconds for grown-ups' }).click();
   await page.keyboard.press('a');
   await expect(page.locator('canvas')).toHaveAttribute('data-interactions', '1');
   await expect(page.getByText('Little hands. Big wonder.')).not.toBeVisible();

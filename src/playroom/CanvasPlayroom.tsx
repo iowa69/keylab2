@@ -135,7 +135,12 @@ export function CanvasPlayroom({
     };
     const keyboard = (event: KeyboardEvent) => {
       if (pausedRef.current || event.key === 'Tab') return;
-      if (event.target instanceof Element && event.target.closest('[data-parent]')) return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest('[data-parent]') &&
+        (event.key === ' ' || event.key === 'Enter')
+      )
+        return;
       if (event.cancelable) event.preventDefault();
       if (event.repeat || event.isComposing) return;
       e.keyboard();
