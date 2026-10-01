@@ -1,0 +1,427 @@
+.runner-game {
+  position: relative;
+  width: 100%;
+  height: clamp(510px, 76dvh, 880px);
+  min-height: 480px;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #b8e7ed;
+  color: #304757;
+  font-family: var(--round, 'Nunito', sans-serif);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.runner-world,
+.runner-world canvas,
+.runner-flat-world,
+.runner-play-surface {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.runner-world canvas {
+  display: block;
+}
+.runner-play-surface {
+  z-index: 2;
+  cursor: pointer;
+  outline-offset: -5px;
+}
+.runner-heading {
+  position: absolute;
+  z-index: 3;
+  left: 30px;
+  top: 27px;
+  pointer-events: none;
+}
+.runner-island-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 900;
+  background: #fffaf1c9;
+  border-radius: 30px;
+  padding: 7px 12px;
+}
+.runner-island-badge > span {
+  width: 22px;
+  height: 22px;
+  font-size: 19px;
+  line-height: 1;
+}
+.runner-heading h2 {
+  font-weight: 900;
+  font-size: clamp(25px, 3.3vw, 42px);
+  margin: 10px 0 3px;
+  letter-spacing: -1.4px;
+}
+.runner-heading p {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0;
+}
+.runner-goal {
+  position: absolute;
+  top: 27px;
+  right: 26px;
+  z-index: 3;
+  background: #fffaf0eb;
+  border: 2px solid #ffffff;
+  padding: 13px 17px 10px;
+  border-radius: 22px;
+  text-align: center;
+  box-shadow: 0 7px 0 #628a8d16;
+  pointer-events: none;
+}
+.runner-goal-stars {
+  display: flex;
+  gap: 3px;
+  font-size: 28px;
+  line-height: 1;
+}
+.runner-goal-stars > span {
+  color: #dedfd5;
+}
+.runner-goal-stars > span.is-collected {
+  color: #d99116;
+}
+.runner-goal-count {
+  display: block;
+  margin-top: 5px;
+  font-size: 21px;
+  font-weight: 900;
+}
+.runner-goal-count small {
+  font-size: 14px;
+  color: #64717b;
+  margin-left: 3px;
+}
+.runner-small-rainbow {
+  display: inline-block;
+  width: 27px;
+  height: 20px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+.runner-controls {
+  position: absolute;
+  z-index: 4;
+  bottom: 39px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: end;
+  gap: 20px;
+}
+.runner-controls button {
+  width: 88px;
+  height: 83px;
+  border: 3px solid #fffaf3;
+  border-radius: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #34576a;
+  background: #fffaf0ed;
+  box-shadow:
+    0 6px 0 #435d6539,
+    0 10px 24px #35445515;
+  touch-action: manipulation;
+  transition:
+    transform 100ms,
+    box-shadow 100ms;
+}
+.runner-controls button > span {
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 0.9;
+}
+.runner-controls button > small {
+  font-size: 12px;
+  font-weight: 900;
+  margin-top: 5px;
+}
+.runner-controls .runner-jump {
+  width: 106px;
+  height: 99px;
+  background: #ffdb86;
+  color: #695334;
+  border-color: #fff2cb;
+}
+.runner-controls .runner-jump > span {
+  font-size: 47px;
+}
+.runner-controls button:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #435d6539;
+}
+.runner-controls button:focus-visible {
+  outline: 4px solid #266b81;
+  outline-offset: 4px;
+}
+.runner-controls button:disabled {
+  opacity: 0.7;
+}
+.runner-key-hint {
+  position: absolute;
+  z-index: 3;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  white-space: nowrap;
+  font-weight: 900;
+  color: #50605c;
+  background: #fffae1a8;
+  padding: 3px 12px;
+  border-radius: 20px;
+  pointer-events: none;
+}
+.runner-paused {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #345164;
+  background: #fff8e5b8;
+  backdrop-filter: blur(4px);
+  font-size: 22px;
+  font-weight: 900;
+}
+.runner-paused span {
+  display: block;
+  width: 100px;
+  height: 65px;
+  font-size: 64px;
+}
+.runner-flat-world {
+  background: var(--runner-sky);
+}
+.runner-flat-sun {
+  position: absolute;
+  top: 17%;
+  left: 20%;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #ffe8a3;
+  box-shadow: 0 0 0 14px #ffe8a327;
+}
+.runner-flat-cloud {
+  position: absolute;
+  width: 130px;
+  height: 33px;
+  border-radius: 70px;
+  background: #fffcf3;
+}
+.runner-flat-cloud::before {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: -20px;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: inherit;
+}
+.runner-flat-cloud-one {
+  top: 26%;
+  right: 18%;
+}
+.runner-flat-cloud-two {
+  top: 12%;
+  right: 38%;
+  transform: scale(0.6);
+}
+.runner-flat-land {
+  position: absolute;
+  inset: 39% 0 0;
+  background: var(--runner-ground);
+  border-radius: 45% 45% 0 0 / 10% 10% 0 0;
+}
+.runner-flat-road {
+  position: absolute;
+  inset: 40% 5% 0;
+  background: var(--runner-road);
+  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+}
+.runner-flat-road::before,
+.runner-flat-road::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #fffbeb;
+  transform-origin: top;
+  left: 48%;
+  transform: rotate(17deg);
+}
+.runner-flat-road::after {
+  left: 52%;
+  transform: rotate(-17deg);
+}
+.runner-flat-tree {
+  width: 78px;
+  height: 88px;
+  position: absolute;
+  font-size: 72px;
+  transform-origin: bottom center;
+}
+.runner-flat-object {
+  width: 64px;
+  height: 64px;
+  position: absolute;
+  font-size: 58px;
+  line-height: 1;
+}
+.runner-flat-object > svg,
+.runner-flat-player > svg {
+  width: 100%;
+  height: 100%;
+}
+.runner-flat-player {
+  width: 110px;
+  height: 110px;
+  position: absolute;
+  top: 69%;
+  font-size: 78px;
+  line-height: 1;
+}
+.runner-flat-player > span {
+  position: absolute;
+  font-size: 37px;
+  top: -25px;
+  left: 19px;
+}
+.runner-flat-player > b {
+  font-weight: normal;
+}
+.runner-flat-gate {
+  width: 90px;
+  height: 60px;
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 52px;
+}
+.runner-flat-gate.is-open {
+  width: 200px;
+  height: 130px;
+  top: 41%;
+  font-size: 150px;
+}
+.runner-high-contrast .runner-heading,
+.runner-high-contrast .runner-goal {
+  color: #142a36;
+}
+.runner-high-contrast .runner-heading {
+  background: #fffbeaee;
+  border-radius: 16px;
+  padding: 12px;
+}
+.runner-high-contrast .runner-goal-stars > span {
+  color: #666d67;
+}
+.runner-high-contrast .runner-goal-stars > span.is-collected {
+  color: #986000;
+}
+@media (max-width: 600px) {
+  .runner-game {
+    height: max(520px, calc(100dvh - 135px));
+    min-height: 500px;
+    border-radius: 23px;
+  }
+  .runner-heading {
+    left: 17px;
+    top: 18px;
+  }
+  .runner-heading h2 {
+    font-size: 29px;
+    margin-top: 10px;
+  }
+  .runner-heading p {
+    font-size: 13px;
+    max-width: 165px;
+  }
+  .runner-island-badge {
+    font-size: 10px;
+    padding: 6px 9px;
+  }
+  .runner-goal {
+    right: 13px;
+    top: 20px;
+    border-radius: 18px;
+    padding: 9px 10px;
+  }
+  .runner-goal-stars {
+    font-size: 21px;
+    gap: 1px;
+  }
+  .runner-goal-count {
+    font-size: 18px;
+  }
+  .runner-controls {
+    gap: 14px;
+    bottom: 39px;
+  }
+  .runner-controls button {
+    width: 76px;
+    height: 77px;
+    border-radius: 22px;
+  }
+  .runner-controls .runner-jump {
+    width: 88px;
+    height: 89px;
+  }
+}
+@media (max-height: 600px) and (min-width: 650px) {
+  .runner-game {
+    height: max(355px, calc(100dvh - 90px));
+    min-height: 355px;
+  }
+  .runner-heading {
+    top: 16px;
+    left: 20px;
+  }
+  .runner-heading h2 {
+    font-size: 28px;
+  }
+  .runner-controls {
+    left: auto;
+    right: 20px;
+    transform: none;
+    bottom: 25px;
+    gap: 12px;
+  }
+  .runner-controls button {
+    width: 65px;
+    height: 66px;
+  }
+  .runner-controls .runner-jump {
+    width: 75px;
+    height: 78px;
+  }
+  .runner-key-hint {
+    left: auto;
+    right: 22px;
+    transform: none;
+    bottom: 4px;
+    font-size: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .runner-controls button {
+    transition: none;
+  }
+}

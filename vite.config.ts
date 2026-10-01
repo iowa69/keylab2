@@ -10,12 +10,11 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Keylab 2 — Touch. Smash. Smile.',
+        name: 'Keylab 2 — Little hands, big adventures',
         short_name: 'Keylab 2',
-        description:
-          'An instant sensory playroom for little hands. Touch, swipe, or press any key.',
-        theme_color: '#a2e0e1',
-        background_color: '#a2e0e1',
+        description: 'Build, drive, discover, make music, and choose your own little adventure.',
+        theme_color: '#faf7ee',
+        background_color: '#faf7ee',
         display: 'standalone',
         start_url: './',
         scope: './',

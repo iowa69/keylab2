@@ -1,0 +1,492 @@
+.picnic-game {
+  width: 100%;
+  height: clamp(465px, calc(100dvh - 155px), 650px);
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  color: #544b46;
+  background: #d8f1e5;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+  border-radius: inherit;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.picnic-order {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 9px 18px;
+  background: #fffcf0;
+  z-index: 2;
+  padding: 10px 18px 12px;
+  min-height: 83px;
+  box-shadow: 0 4px 0 #7775440b;
+  border-radius: 0 0 28px 28px;
+}
+.picnic-order-number {
+  font: 900 32px var(--round, sans-serif);
+  color: #57886f;
+  white-space: nowrap;
+}
+.picnic-order-number small {
+  font-size: 19px;
+  color: #829388;
+}
+.picnic-order-fruits {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.picnic-order-fruits > span {
+  position: relative;
+  width: 39px;
+  height: 43px;
+  border-radius: 12px;
+  background: #edece1;
+}
+.picnic-order-fruits > span svg {
+  width: 100%;
+  height: 100%;
+  opacity: 0.27;
+  filter: saturate(0.5);
+}
+.picnic-order-fruits > .collected {
+  background: #e0efdb;
+}
+.picnic-order-fruits > .collected svg {
+  opacity: 1;
+  filter: none;
+}
+.picnic-order-fruits i {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 18px;
+  height: 18px;
+  background: #69a980;
+  color: white;
+  font-size: 12px;
+  font-weight: 900;
+  border-radius: 50%;
+  text-align: center;
+  font-style: normal;
+}
+.picnic-order-label {
+  font: 800 14px var(--round, sans-serif);
+  color: #778774;
+}
+.picnic-stage {
+  position: relative;
+  flex: 1;
+  min-height: 225px;
+  overflow: hidden;
+  cursor: grab;
+}
+.picnic-stage:active {
+  cursor: grabbing;
+}
+.picnic-scenery {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.picnic-bear {
+  position: absolute;
+  left: 3%;
+  bottom: 9%;
+  width: clamp(88px, 13vw, 150px);
+  pointer-events: none;
+}
+.picnic-bear > svg {
+  width: 100%;
+  height: auto;
+}
+.picnic-bear-bubble {
+  position: absolute;
+  right: -22%;
+  top: -16%;
+  width: 48%;
+  aspect-ratio: 1;
+  background: #fffdf0;
+  border: 3px solid #dfc7aa;
+  border-radius: 50% 50% 50% 10%;
+  display: grid;
+  place-items: center;
+  rotate: -7deg;
+}
+.picnic-bear-bubble > svg {
+  width: 70%;
+  height: 80%;
+  rotate: 7deg;
+}
+.picnic-heart {
+  font-size: clamp(23px, 3vw, 42px);
+  color: #ed8090;
+}
+.picnic-falling-fruit {
+  position: absolute;
+  width: clamp(68px, 8vw, 90px);
+  height: clamp(74px, 9vw, 98px);
+  padding: 2px;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: 0;
+  border-radius: 45%;
+  z-index: 3;
+  touch-action: none;
+  cursor: pointer;
+  filter: drop-shadow(0 7px 3px #30593b15);
+}
+.picnic-falling-fruit svg {
+  width: 100%;
+  height: 100%;
+}
+.picnic-falling-fruit:hover {
+  filter: drop-shadow(0 0 9px #fffde7);
+}
+.picnic-falling-fruit:focus-visible {
+  outline: 4px solid #fff7ad;
+  outline-offset: 3px;
+}
+.picnic-basket {
+  position: absolute;
+  z-index: 4;
+  bottom: 0;
+  width: clamp(118px, 19vw, 186px);
+  transform: translateX(-50%);
+  transition: left 0.1s ease-out;
+  pointer-events: none;
+}
+.picnic-basket-art {
+  position: relative;
+  width: 100%;
+  padding-top: 14px;
+}
+.picnic-basket-art > svg {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.picnic-basket-fruit {
+  position: absolute;
+  left: 0;
+  top: -14%;
+  height: 55%;
+  width: 100%;
+}
+.picnic-basket-fruit > span {
+  position: absolute;
+  width: 33%;
+  height: 100%;
+}
+.picnic-basket-fruit > span svg {
+  width: 100%;
+  height: 100%;
+}
+.picnic-catch-sparkle {
+  position: absolute;
+  top: -45%;
+  right: 0;
+  color: #ffe99e;
+  font-size: 55px;
+  text-shadow: 0 2px #d39258;
+  animation: picnic-sparkle 0.5s ease-out both;
+}
+.picnic-caught .picnic-basket-art {
+  animation: picnic-pop 0.3s ease-out;
+}
+.picnic-finish {
+  position: absolute;
+  z-index: 6;
+  inset: 12% 6% 28%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+}
+.picnic-serve {
+  pointer-events: auto;
+  min-height: 78px;
+  min-width: 228px;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  background: #fff5b5;
+  color: #77572e;
+  border: 3px solid #e3ba74;
+  border-radius: 25px;
+  font: 900 21px var(--round, sans-serif);
+  box-shadow:
+    0 6px 0 #bd945866,
+    0 12px 30px #4c815b22;
+}
+.picnic-serve > span {
+  font-size: 33px;
+}
+.picnic-serve:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #bd945866;
+}
+.picnic-yum {
+  display: flex;
+  align-items: center;
+  gap: 21px;
+  font-size: 45px;
+  color: #f28095;
+  text-shadow: 0 3px #fff1d0;
+}
+.picnic-yum > span:nth-child(2) {
+  color: #ffd47e;
+  font-size: 61px;
+}
+.picnic-bear-happy {
+  animation: picnic-bear-bounce 1s ease-in-out infinite;
+}
+.picnic-basket-served {
+  left: 26% !important;
+  scale: 0.88;
+  transform-origin: bottom;
+}
+.picnic-delivery {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 8%;
+  width: 65px;
+  height: 72px;
+  pointer-events: none;
+  animation: picnic-deliver 1s ease-in-out both;
+}
+.picnic-delivery svg {
+  width: 100%;
+  height: 100%;
+}
+.picnic-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  min-height: 90px;
+  padding: 9px 20px 11px;
+  background: #fffaf0;
+  border-top: 3px solid #dfdec6;
+  z-index: 5;
+}
+.picnic-controls > button {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 67px;
+  flex-shrink: 0;
+  background: #d9eedc;
+  border: 2px solid #a8c7a9;
+  border-radius: 21px;
+  color: #4c8564;
+  box-shadow: 0 4px #9fbea650;
+}
+.picnic-controls > button svg {
+  width: 31px;
+  height: 31px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.picnic-controls > button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px #9fbea650;
+}
+.picnic-controls > button:disabled {
+  opacity: 0.38;
+}
+.picnic-control-hint {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.picnic-control-hint b {
+  font: 900 17px var(--round, sans-serif);
+  color: #617967;
+}
+.picnic-control-hint small {
+  font-size: 10px;
+  color: #929581;
+}
+.picnic-paused *,
+.picnic-calm * {
+  animation-play-state: paused !important;
+}
+.picnic-calm .picnic-basket {
+  transition: none;
+}
+.picnic-calm .picnic-delivery {
+  display: none;
+}
+@keyframes picnic-deliver {
+  30% {
+    bottom: 40%;
+  }
+  80% {
+    opacity: 1;
+  }
+  to {
+    left: 9%;
+    bottom: 24%;
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+@keyframes picnic-pop {
+  50% {
+    transform: scale(1.1, 0.9);
+  }
+}
+@keyframes picnic-sparkle {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.4);
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-15px) scale(1);
+    opacity: 0;
+  }
+}
+@keyframes picnic-bear-bounce {
+  50% {
+    translate: 0 -5px;
+  }
+}
+@media (max-width: 550px) {
+  .picnic-game {
+    min-height: 365px;
+  }
+  .picnic-order {
+    gap: 4px 12px;
+    padding: 6px 12px 8px;
+    min-height: 78px;
+  }
+  .picnic-order-number {
+    font-size: 28px;
+  }
+  .picnic-order-fruits {
+    gap: 4px;
+  }
+  .picnic-order-fruits > span {
+    width: 32px;
+    height: 36px;
+    border-radius: 9px;
+  }
+  .picnic-order-label {
+    flex-basis: 100%;
+    text-align: center;
+    font-size: 11px;
+  }
+  .picnic-controls {
+    gap: 13px;
+    min-height: 82px;
+    padding: 7px 12px 10px;
+  }
+  .picnic-controls > button {
+    width: 65px;
+    height: 64px;
+    border-radius: 18px;
+  }
+  .picnic-control-hint b {
+    font-size: 13px;
+  }
+  .picnic-control-hint small {
+    font-size: 8px;
+    max-width: 160px;
+    line-height: 1.45;
+  }
+  .picnic-stage {
+    min-height: 225px;
+  }
+  .picnic-bear {
+    bottom: 18%;
+    left: 1%;
+  }
+  .picnic-bear-bubble {
+    width: 45%;
+    right: -12%;
+  }
+  .picnic-falling-fruit {
+    width: 67px;
+    height: 74px;
+  }
+  .picnic-basket {
+    width: 132px;
+  }
+  .picnic-serve {
+    min-width: 208px;
+    min-height: 72px;
+    font-size: 18px;
+    gap: 12px;
+  }
+  .picnic-finish {
+    inset: 7% 3% 30%;
+  }
+  .picnic-basket-served {
+    left: 48% !important;
+  }
+}
+@media (max-height: 570px) and (orientation: landscape) {
+  .picnic-game {
+    min-height: 285px;
+    height: clamp(285px, calc(100dvh - 115px), 400px);
+  }
+  .picnic-order {
+    min-height: 57px;
+    padding: 3px 14px;
+  }
+  .picnic-order-fruits > span {
+    width: 29px;
+    height: 33px;
+  }
+  .picnic-stage {
+    min-height: 145px;
+  }
+  .picnic-controls {
+    min-height: 73px;
+    padding: 4px 18px;
+  }
+  .picnic-controls > button {
+    width: 64px;
+    height: 64px;
+  }
+  .picnic-bear {
+    width: 85px;
+    bottom: 2%;
+  }
+  .picnic-basket {
+    width: 110px;
+  }
+  .picnic-falling-fruit {
+    width: 64px;
+    height: 68px;
+  }
+  .picnic-serve {
+    min-height: 64px;
+    padding: 8px 20px;
+  }
+  .picnic-yum {
+    display: none;
+  }
+}
