@@ -41,6 +41,33 @@ test('space: steer, collect, hear a planet and continue exploring', async ({ pag
   await expect(page.getByTestId('space-game')).toHaveAttribute('data-phase', 'visit');
   await expect(page.getByText('2 / 8 worlds', { exact: true })).toBeVisible();
 });
+test('space: dragging from a star steers without collecting, while tapping still collects', async ({
+  page,
+}) => {
+  // Hold the moving scenery still while choosing the gesture's origin. This
+  // reproduces a star drifting under a child's finger without timing luck.
+  await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+  await open(page, 'Space explorers');
+  await page.clock.pauseAt(new Date('2026-01-01T01:00:00Z'));
+  await page.getByRole('button', { name: 'Explore Saturn', exact: true }).click();
+  const field = (await page.locator('.space-flight-field').boundingBox())!;
+  const star = page.getByRole('button', { name: 'Collect fuel star 1', exact: true });
+  const origin = (await star.boundingBox())!;
+  await page.mouse.move(origin.x + origin.width / 2, origin.y + origin.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(field.x + field.width * 0.8, field.y + field.height * 0.35, {
+    steps: 8,
+  });
+  await page.mouse.up();
+  await expect(page.getByTestId('space-game')).toHaveAttribute('data-fuel', '0');
+  await page.clock.runFor(400);
+  expect(Number(await page.getByTestId('space-rocket').getAttribute('data-x'))).toBeGreaterThan(65);
+  await star.click();
+  await expect(page.getByTestId('space-game')).toHaveAttribute('data-fuel', '1');
+  await page.getByRole('button', { name: 'Steer rocket left', exact: true }).click();
+  await page.clock.runFor(400);
+  expect(Number(await page.getByTestId('space-rocket').getAttribute('data-x'))).toBeLessThan(70);
+});
 test('space: hidden flight freezes and resumes without a time jump', async ({ page }) => {
   await open(page, 'Space explorers');
   await page.waitForTimeout(300);

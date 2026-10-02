@@ -55,17 +55,19 @@ export default function App() {
     [settings, reduced],
   );
   const paused = parents || rest || hidden;
-  const focusPlay = useCallback(
-    () =>
-      requestAnimationFrame(() => {
-        if (playarea.current?.offsetParent) playarea.current.focus({ preventScroll: true });
-        else
-          document
-            .querySelector<HTMLButtonElement>('.game-card[data-game]')
-            ?.focus({ preventScroll: true });
-      }),
-    [],
-  );
+  const focusPlay = useCallback((immediate = false) => {
+    const focus = () => {
+      if (playarea.current?.offsetParent) playarea.current.focus({ preventScroll: true });
+      else
+        document
+          .querySelector<HTMLButtonElement>('.game-card[data-game]')
+          ?.focus({ preventScroll: true });
+    };
+    // Releasing the parent lock must return keyboard play even between slow frames.
+    // Navigation still waits for React to show the destination before focusing it.
+    if (immediate) focus();
+    else requestAnimationFrame(focus);
+  }, []);
   useEffect(() => {
     savePreferences(settings);
     if (!settings.sound || settings.volume <= 0) hush();
@@ -269,7 +271,7 @@ export default function App() {
             }}
             onPointerUp={() => {
               stopHold();
-              if (!parents) focusPlay();
+              if (!parents) focusPlay(true);
             }}
             onPointerCancel={stopHold}
             onLostPointerCapture={stopHold}
@@ -282,7 +284,7 @@ export default function App() {
             }}
             onKeyUp={() => {
               stopHold();
-              if (!parents) focusPlay();
+              if (!parents) focusPlay(true);
             }}
           >
             <LockKeyhole size={17} />

@@ -230,7 +230,13 @@ export function SpaceGame({ settings, paused, onCelebrate }: GameProps) {
   const latest = useRef({ settings, paused, onCelebrate, destination, phase });
   latest.current = { settings, paused, onCelebrate, destination, phase };
   const field = useRef<HTMLDivElement>(null);
-  const pointer = useRef<number | null>(null);
+  const pointer = useRef<{
+    id: number;
+    x: number;
+    y: number;
+    dragging: boolean;
+  } | null>(null);
+  const suppressObjectClick = useRef(false);
   const messageUntil = useRef(0);
   function choose(index: number) {
     if (paused || document.hidden) return;
@@ -290,7 +296,11 @@ export function SpaceGame({ settings, paused, onCelebrate }: GameProps) {
     else assist();
   });
   useEffect(() => {
-    if (paused) pointer.current = null;
+    if (!paused) return;
+    const gesture = pointer.current;
+    pointer.current = null;
+    if (gesture && field.current?.hasPointerCapture(gesture.id))
+      field.current.releasePointerCapture(gesture.id);
   }, [paused]);
   useEffect(() => {
     let previous = performance.now(),
@@ -397,24 +407,50 @@ export function SpaceGame({ settings, paused, onCelebrate }: GameProps) {
         }
         tabIndex={phase === 'fly' ? 0 : -1}
         onPointerDown={(event) => {
-          if (
-            paused ||
-            phase !== 'fly' ||
-            (event.target instanceof Element && event.target.closest('button'))
-          )
-            return;
-          pointer.current = event.pointerId;
-          event.currentTarget.setPointerCapture(event.pointerId);
-          point(event);
+          if (paused || phase !== 'fly' || pointer.current) return;
+          suppressObjectClick.current = false;
+          const button = event.target instanceof Element ? event.target.closest('button') : null;
+          if (button && !button.classList.contains('space-object')) return;
+          pointer.current = {
+            id: event.pointerId,
+            x: event.clientX,
+            y: event.clientY,
+            dragging: !button,
+          };
+          // A scene object can begin either a tap or a rocket drag. Leave its
+          // native click intact until the finger actually starts moving.
+          if (!button) {
+            event.currentTarget.setPointerCapture(event.pointerId);
+            point(event);
+          }
         }}
         onPointerMove={(event) => {
-          if (!paused && pointer.current === event.pointerId && phase === 'fly') point(event);
+          const gesture = pointer.current;
+          if (paused || phase !== 'fly' || gesture?.id !== event.pointerId) return;
+          if (!gesture.dragging) {
+            if (Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) < 8) return;
+            gesture.dragging = true;
+            suppressObjectClick.current = true;
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }
+          point(event);
         }}
-        onPointerUp={() => {
-          pointer.current = null;
+        onPointerUp={(event) => {
+          if (pointer.current?.id === event.pointerId) pointer.current = null;
         }}
-        onPointerCancel={() => {
-          pointer.current = null;
+        onPointerCancel={(event) => {
+          if (pointer.current?.id === event.pointerId) pointer.current = null;
+        }}
+        onLostPointerCapture={(event) => {
+          if (event.target === event.currentTarget && pointer.current?.id === event.pointerId)
+            pointer.current = null;
+        }}
+        onClickCapture={(event) => {
+          if (suppressObjectClick.current && event.detail > 0) {
+            suppressObjectClick.current = false;
+            event.preventDefault();
+            event.stopPropagation();
+          }
         }}
       >
         <svg

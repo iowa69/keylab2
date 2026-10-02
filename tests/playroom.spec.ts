@@ -135,7 +135,21 @@ test('short accidental parent tap preserves keyboard play; settings pause and pe
 }) => {
   await setup(page);
   await open(page, 'Little music makers');
+  // Record focus in the release event itself: a slow frame must not swallow
+  // the next keyboard press while focus remains inside the parent controls.
+  await page.evaluate(() => {
+    window.addEventListener(
+      'pointerup',
+      () => {
+        document.documentElement.dataset.playReadyAfterRelease = String(
+          !document.activeElement?.closest('[data-ui]'),
+        );
+      },
+      { once: true },
+    );
+  });
   await page.getByRole('button', { name: 'Hold for grown-up settings' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-play-ready-after-release', 'true');
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await page.keyboard.press('x');
   await expect(page.getByTestId('music-game')).toHaveAttribute('data-notes-played', '1');
