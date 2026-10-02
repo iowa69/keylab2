@@ -490,3 +490,252 @@
     display: none;
   }
 }
+/* The picnic shares the same fixed play surface as every other adventure. */
+.picnic-game {
+  height: 100%;
+  min-height: 0;
+}
+.picnic-stage {
+  min-height: 0;
+}
+.picnic-order,
+.picnic-controls {
+  flex-shrink: 0;
+}
+.picnic-order {
+  min-height: 65px;
+  padding: 7px 14px;
+}
+.picnic-controls {
+  min-height: 75px;
+  padding: 5px 12px 8px;
+}
+.picnic-controls > button {
+  height: 59px;
+  width: 65px;
+}
+.picnic-bear {
+  border: 0;
+  background: none;
+  padding: 0;
+  pointer-events: auto;
+  z-index: 3;
+  cursor: pointer;
+}
+.picnic-bear:disabled {
+  opacity: 1;
+}
+.picnic-bear:focus-visible {
+  outline: 3px dashed #6b9670;
+  border-radius: 30%;
+}
+.picnic-bear-breath {
+  transform-origin: 76px 150px;
+  animation: picnic-breathe 3s ease-in-out infinite;
+}
+.picnic-bear-head {
+  transform-origin: 77px 108px;
+  animation: picnic-look 6s ease-in-out infinite;
+}
+.picnic-bear-blink {
+  transform-origin: center 66px;
+  animation: picnic-blink 5s linear infinite;
+}
+.picnic-bear-wave {
+  transform-origin: 118px 137px;
+}
+.picnic-bear-waving .picnic-bear-wave {
+  animation: picnic-wave 0.5s ease-in-out infinite;
+}
+.picnic-bear-happy .picnic-bear-chew {
+  transform-origin: 77px 88px;
+  animation: picnic-chew 0.4s ease-in-out infinite;
+}
+.picnic-butterfly {
+  position: absolute;
+  right: 2%;
+  top: 20%;
+  width: clamp(66px, 8vw, 94px);
+  height: 82px;
+  border: 0;
+  background: none;
+  padding: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+.picnic-butterfly svg {
+  animation: picnic-float 7s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.picnic-wings {
+  transform-origin: 50px 45px;
+  animation: picnic-flap 1.2s ease-in-out infinite;
+}
+.picnic-butterfly-hello .picnic-wings {
+  animation-duration: 0.25s;
+}
+.picnic-butterfly-hello {
+  filter: drop-shadow(0 0 9px #ffefc2);
+}
+.picnic-paused *,
+.picnic-calm * {
+  animation-play-state: paused !important;
+}
+.picnic-calm .picnic-bear-happy {
+  animation: none;
+}
+.picnic-bear:active {
+  scale: 1.06;
+}
+@keyframes picnic-breathe {
+  50% {
+    transform: scale(1.025, 0.97);
+  }
+}
+@keyframes picnic-look {
+  0%,
+  65%,
+  100% {
+    transform: rotate(0);
+  }
+  76% {
+    transform: rotate(4deg);
+  }
+  87% {
+    transform: rotate(-3deg);
+  }
+}
+@keyframes picnic-blink {
+  0%,
+  50%,
+  54%,
+  100% {
+    transform: scaleY(1);
+  }
+  52% {
+    transform: scaleY(0.07);
+  }
+}
+@keyframes picnic-wave {
+  50% {
+    transform: rotate(-38deg);
+  }
+}
+@keyframes picnic-chew {
+  50% {
+    transform: scaleY(0.65);
+  }
+}
+@keyframes picnic-float {
+  25% {
+    translate: -12px -8px;
+  }
+  50% {
+    translate: -22px 8px;
+  }
+  75% {
+    translate: -3px 15px;
+  }
+}
+@keyframes picnic-flap {
+  50% {
+    transform: scaleX(0.6);
+  }
+}
+@media (max-width: 550px) {
+  .picnic-game {
+    min-height: 0;
+    height: 100%;
+  }
+  .picnic-stage {
+    min-height: 0;
+  }
+  .picnic-order {
+    min-height: 66px;
+  }
+  .picnic-controls {
+    min-height: 68px;
+  }
+  .picnic-controls > button {
+    width: 56px;
+    height: 54px;
+  }
+  .picnic-bear {
+    bottom: 12%;
+  }
+  .picnic-butterfly {
+    width: 64px;
+    height: 64px;
+    right: 1%;
+    top: 27%;
+  }
+  .picnic-bear-bubble {
+    right: -18%;
+  }
+}
+@media (max-height: 650px) {
+  .picnic-game {
+    height: 100%;
+    min-height: 0;
+  }
+  .picnic-stage {
+    min-height: 0;
+  }
+  .picnic-order {
+    min-height: 55px;
+    padding: 4px 10px;
+    gap: 1px 10px;
+  }
+  .picnic-order-fruits > span {
+    width: 28px;
+    height: 29px;
+  }
+  .picnic-order-number {
+    font-size: 25px;
+  }
+  .picnic-order-label {
+    font-size: 10px;
+  }
+  .picnic-controls {
+    min-height: 58px;
+    padding: 3px 10px 5px;
+  }
+  .picnic-controls > button {
+    width: 49px;
+    height: 48px;
+  }
+  .picnic-control-hint b {
+    font-size: 12px;
+  }
+  .picnic-control-hint small {
+    font-size: 8px;
+  }
+  .picnic-bear {
+    width: 88px;
+    bottom: 8%;
+  }
+  .picnic-falling-fruit {
+    width: 57px;
+    height: 63px;
+  }
+  .picnic-basket {
+    width: 111px;
+  }
+  .picnic-serve {
+    min-height: 56px;
+    font-size: 16px;
+    padding: 5px 15px;
+  }
+  .picnic-butterfly {
+    width: 58px;
+    height: 58px;
+  }
+  .picnic-yum {
+    display: none;
+  }
+  .picnic-finish {
+    inset: 10% 4% 25%;
+  }
+}

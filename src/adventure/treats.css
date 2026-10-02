@@ -1,0 +1,650 @@
+.sweet-studio {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  isolation: isolate;
+  background: #fff0d7;
+  color: #735747;
+  font-family: var(--round, 'Nunito', sans-serif);
+  border-radius: 25px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.sweet-studio button {
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.sweet-studio button:disabled {
+  cursor: default;
+}
+.sweet-topbar {
+  display: flex;
+  flex-shrink: 0;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff7e8;
+  padding: 6px 15px;
+  z-index: 4;
+  min-height: 68px;
+}
+.sweet-kinds {
+  display: flex;
+  gap: 9px;
+}
+.sweet-kinds button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 57px;
+  padding: 3px 14px 3px 5px;
+  border: 2px solid transparent;
+  background: #f4e6d4;
+  border-radius: 18px;
+  color: #886148;
+  font-weight: 900;
+  font-size: 15px;
+}
+.sweet-kinds button[aria-pressed='true'] {
+  background: #fff6bf;
+  border-color: #d3a851;
+  box-shadow: 0 3px 0 #d3a85130;
+}
+.sweet-kinds .sweet-dessert-art {
+  width: 43px;
+  height: 46px;
+  flex-shrink: 0;
+}
+.sweet-clear,
+.sweet-undo {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  background: #fff9ea;
+  color: #ac816b;
+  border: 2px solid #ead9bd;
+  border-radius: 17px;
+}
+.sweet-clear svg,
+.sweet-undo svg {
+  width: 25px;
+  height: 25px;
+}
+.sweet-scene {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: radial-gradient(ellipse at 45% 50%, #fff8e8 0, #f7dfc8 100%);
+  overflow: hidden;
+}
+.sweet-awning-v5 {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 24px;
+  background: repeating-linear-gradient(90deg, #efabac 0 42px, #fff0da 42px 84px);
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 5px #db9a9730;
+}
+.sweet-caption {
+  position: absolute;
+  left: 4%;
+  top: 30px;
+  right: 4%;
+  margin: 0;
+  text-align: center;
+  color: #91654e;
+  font-size: clamp(14px, 1.9vw, 21px);
+  font-weight: 900;
+  z-index: 2;
+  pointer-events: none;
+}
+.sweet-creation {
+  position: absolute;
+  left: 10%;
+  top: 9%;
+  bottom: 55px;
+  width: 48%;
+  padding: 0;
+  border: 0;
+  background: none;
+  transition: filter 0.2s;
+}
+.sweet-creation > .sweet-dessert-art {
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.sweet-drop-ready {
+  filter: drop-shadow(0 0 10px #f5d36e);
+}
+.sweet-count {
+  position: absolute;
+  left: 12%;
+  bottom: 6%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #fff9e7;
+  color: #957149;
+  padding: 5px 10px;
+  border: 2px solid #efd1a4;
+  border-radius: 16px;
+  font-size: 24px;
+  font-weight: 900;
+}
+.sweet-count small {
+  font-size: 11px;
+}
+.sweet-customer {
+  position: absolute;
+  right: 8%;
+  bottom: 62px;
+  width: 27%;
+  height: 66%;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+.sweet-friend-art {
+  width: 100%;
+  height: calc(100% - 32px);
+  overflow: visible;
+  filter: drop-shadow(0 6px 1px #b7895920);
+}
+.sweet-friend-body {
+  transform-origin: 90px 215px;
+  animation: sweet-breathe 3.7s ease-in-out infinite;
+}
+.sweet-friend-head {
+  transform-origin: 90px 140px;
+  animation: sweet-look 5s ease-in-out infinite;
+}
+.sweet-blink {
+  transform-origin: 90px 100px;
+  animation: sweet-blink 5.5s infinite;
+}
+.sweet-wave {
+  transform-origin: 141px 168px;
+  animation: sweet-wave 5s ease-in-out infinite;
+}
+.sweet-customer-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #896c53;
+}
+.sweet-customer-name svg {
+  width: 16px;
+  height: 16px;
+}
+.sweet-speech {
+  position: absolute;
+  top: -9%;
+  left: 5%;
+  min-width: 105px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 22px 22px 22px 5px;
+  padding: 8px 12px;
+  background: #fffdf2;
+  color: #b58061;
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 #c2a48018;
+  z-index: 2;
+}
+.sweet-speech svg {
+  width: 20px;
+  height: 20px;
+  color: #d9ad55;
+}
+.sweet-speech > span {
+  font-size: 24px;
+  color: #98ae7f;
+}
+.sweet-customer.yuck .sweet-friend-head {
+  animation: sweet-no 0.6s ease-in-out infinite;
+}
+.sweet-customer.yum .sweet-friend-head {
+  animation: sweet-yes 0.8s ease-in-out infinite;
+}
+.sweet-customer.serve .sweet-chew {
+  transform-origin: 90px 128px;
+  animation: sweet-nom 0.3s ease-in-out infinite;
+}
+.sweet-creation.phase-serve > .sweet-dessert-art {
+  animation: sweet-delivery 1.05s ease-in-out both;
+}
+.sweet-creation.phase-yum > .sweet-dessert-art,
+.sweet-creation.phase-yuck > .sweet-dessert-art {
+  opacity: 0.35;
+  transform: scale(0.86);
+}
+.sweet-actions {
+  position: absolute;
+  bottom: 9px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 4;
+}
+.sweet-serve {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 49px;
+  padding: 6px 23px;
+  background: #769f84;
+  color: #fffcef;
+  border: 2px solid #648e73;
+  border-radius: 18px;
+  box-shadow: 0 4px 0 #507c6235;
+  font-size: 18px;
+  font-weight: 900;
+}
+.sweet-serve:disabled {
+  opacity: 0.5;
+}
+.sweet-serve svg {
+  width: 23px;
+  height: 23px;
+}
+.sweet-undo:disabled {
+  opacity: 0.4;
+}
+.sweet-pantry {
+  background: #fff8e9;
+  flex-shrink: 0;
+  padding: 3px 14px 9px;
+  z-index: 4;
+  border-top: 4px solid #e7bfa4;
+}
+.sweet-tray-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+}
+.sweet-tray-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  border-radius: 11px;
+  padding: 6px 12px;
+  color: #aa8a72;
+  font-size: 14px;
+  font-weight: 900;
+  min-height: 34px;
+}
+.sweet-tray-tabs button[aria-pressed='true'] {
+  background: #f8dfc5;
+  color: #805a46;
+}
+.sweet-tray-tabs button svg {
+  width: 17px;
+  height: 17px;
+}
+.sweet-tray-tabs button > span {
+  letter-spacing: 1px;
+  color: #d3a39e;
+  font-size: 11px;
+}
+.sweet-tray-tabs small {
+  margin-left: auto;
+  color: #a08a72;
+  font-size: 11px;
+}
+.sweet-ingredients {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 8px;
+}
+.sweet-ingredients button {
+  border: 2px solid #f0dfc5;
+  background: #fffdf4;
+  border-radius: 18px;
+  min-height: 83px;
+  padding: 0 4px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  box-shadow: 0 3px 0 #d6b78e24;
+}
+.sweet-ingredients button:disabled {
+  opacity: 0.42;
+}
+.sweet-ingredients button:active {
+  background: #fff2c1;
+  transform: translateY(2px);
+}
+.sweet-ingredients svg {
+  height: 58px;
+  width: 65px;
+  pointer-events: none;
+}
+.sweet-ingredients span {
+  font-size: 12px;
+  font-weight: 900;
+  color: #8a6856;
+  line-height: 1.1;
+  pointer-events: none;
+}
+.sweet-drag-ghost {
+  position: fixed;
+  width: 90px;
+  height: 90px;
+  transform: translate(-50%, -65%) rotate(-9deg);
+  z-index: 500;
+  pointer-events: none;
+  filter: drop-shadow(0 7px 4px #84644a40);
+}
+.sweet-drag-ghost svg {
+  width: 100%;
+  height: 100%;
+}
+.sweet-paused *,
+.sweet-calm * {
+  animation-play-state: paused !important;
+}
+.sweet-calm .sweet-creation.phase-serve > .sweet-dessert-art {
+  animation: none;
+  opacity: 0.6;
+}
+.sweet-studio button:focus-visible {
+  outline: 3px dashed #93604c;
+  outline-offset: 2px;
+}
+@keyframes sweet-breathe {
+  50% {
+    transform: scale(1.025, 0.975);
+  }
+}
+@keyframes sweet-look {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  80% {
+    transform: rotate(4deg);
+  }
+  90% {
+    transform: rotate(-3deg);
+  }
+}
+@keyframes sweet-blink {
+  0%,
+  42%,
+  46%,
+  100% {
+    transform: scaleY(1);
+  }
+  44% {
+    transform: scaleY(0.06);
+  }
+}
+@keyframes sweet-wave {
+  0%,
+  65%,
+  100% {
+    transform: rotate(0);
+  }
+  72%,
+  86% {
+    transform: rotate(-28deg);
+  }
+  79%,
+  93% {
+    transform: rotate(8deg);
+  }
+}
+@keyframes sweet-no {
+  25% {
+    transform: translateX(-5px) rotate(-3deg);
+  }
+  75% {
+    transform: translateX(5px) rotate(3deg);
+  }
+}
+@keyframes sweet-yes {
+  50% {
+    transform: translateY(5px) rotate(3deg);
+  }
+}
+@keyframes sweet-nom {
+  50% {
+    transform: scaleY(0.55);
+  }
+}
+@keyframes sweet-delivery {
+  50% {
+    transform: translate(38%, -6%) scale(0.78);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(87%, 2%) scale(0.1);
+    opacity: 0;
+  }
+}
+@media (max-width: 600px) {
+  .sweet-topbar {
+    padding: 4px 8px;
+    gap: 5px;
+    min-height: 55px;
+  }
+  .sweet-kinds {
+    gap: 4px;
+    flex: 1;
+  }
+  .sweet-kinds button {
+    flex: 1;
+    flex-direction: column;
+    min-height: 51px;
+    gap: 0;
+    padding: 1px 5px;
+    font-size: 10px;
+    border-radius: 12px;
+  }
+  .sweet-kinds .sweet-dessert-art {
+    width: 29px;
+    height: 30px;
+  }
+  .sweet-clear {
+    width: 43px;
+    height: 46px;
+    border-radius: 13px;
+  }
+  .sweet-clear svg {
+    width: 21px;
+  }
+  .sweet-caption {
+    top: 24px;
+    font-size: 13px;
+  }
+  .sweet-awning-v5 {
+    height: 18px;
+    background-size: 64px 100%;
+    background: repeating-linear-gradient(90deg, #efabac 0 32px, #fff0da 32px 64px);
+  }
+  .sweet-creation {
+    left: 1%;
+    width: 58%;
+    top: 7%;
+    bottom: 55px;
+  }
+  .sweet-customer {
+    right: 4%;
+    width: 36%;
+    height: 58%;
+    bottom: 62px;
+  }
+  .sweet-speech {
+    left: 3%;
+    top: -16%;
+    font-size: 14px;
+    min-width: 81px;
+    padding: 6px 9px;
+  }
+  .sweet-speech svg {
+    width: 15px;
+  }
+  .sweet-customer-name {
+    font-size: 12px;
+    gap: 5px;
+  }
+  .sweet-count {
+    left: 14%;
+    font-size: 19px;
+    gap: 4px;
+    padding: 4px 6px;
+    bottom: 5%;
+  }
+  .sweet-count small {
+    font-size: 9px;
+  }
+  .sweet-serve {
+    min-height: 46px;
+    font-size: 15px;
+    padding: 5px 14px;
+  }
+  .sweet-serve svg {
+    width: 20px;
+  }
+  .sweet-undo {
+    width: 45px;
+    height: 46px;
+  }
+  .sweet-pantry {
+    padding: 2px 7px 6px;
+  }
+  .sweet-tray-tabs {
+    gap: 2px;
+    height: 34px;
+  }
+  .sweet-tray-tabs button {
+    font-size: 12px;
+    gap: 4px;
+    padding: 4px 7px;
+    min-height: 32px;
+  }
+  .sweet-tray-tabs small {
+    font-size: 9px;
+  }
+  .sweet-tray-tabs button > span {
+    display: none;
+  }
+  .sweet-ingredients {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .sweet-ingredients button {
+    min-height: 61px;
+    padding: 0 2px 4px;
+    border-radius: 12px;
+  }
+  .sweet-ingredients svg {
+    height: 40px;
+    width: 47px;
+  }
+  .sweet-ingredients span {
+    font-size: 10px;
+  }
+  .sweet-friend-art {
+    height: calc(100% - 23px);
+  }
+}
+@media (max-height: 650px) {
+  .sweet-topbar {
+    min-height: 50px;
+  }
+  .sweet-kinds button {
+    min-height: 45px;
+  }
+  .sweet-kinds .sweet-dessert-art {
+    height: 35px;
+  }
+  .sweet-caption {
+    font-size: 12px;
+    top: 22px;
+  }
+  .sweet-ingredients button {
+    min-height: 59px;
+  }
+  .sweet-ingredients svg {
+    height: 37px;
+  }
+  .sweet-tray-tabs {
+    height: 32px;
+  }
+  .sweet-creation {
+    bottom: 47px;
+    top: 9%;
+  }
+  .sweet-customer {
+    bottom: 50px;
+    height: 57%;
+  }
+  .sweet-speech {
+    font-size: 12px;
+    padding: 4px 7px;
+    min-width: 76px;
+  }
+  .sweet-actions {
+    bottom: 5px;
+    gap: 6px;
+  }
+  .sweet-serve {
+    min-height: 42px;
+    font-size: 14px;
+  }
+  .sweet-undo {
+    height: 42px;
+    width: 42px;
+  }
+  .sweet-count {
+    font-size: 17px;
+  }
+  .sweet-awning-v5 {
+    height: 16px;
+  }
+  .sweet-customer-name {
+    font-size: 11px;
+  }
+  .sweet-ingredients span {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 600px) and (max-height: 650px) {
+  .sweet-caption {
+    right: 42%;
+    text-align: left;
+    font-size: 11px;
+  }
+  .sweet-speech {
+    top: 0;
+    transform: translateY(-40%);
+  }
+}

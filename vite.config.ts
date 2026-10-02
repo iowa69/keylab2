@@ -10,6 +10,9 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'],
       manifest: {
+        id: './',
+        lang: 'en',
+        orientation: 'any',
         name: 'Keylab 2 — Little hands, big adventures',
         short_name: 'Keylab 2',
         description: 'Build, drive, discover, make music, and choose your own little adventure.',

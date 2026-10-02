@@ -1,7 +1,7 @@
 {
   "name": "keylab2",
   "private": true,
-  "version": "4.0.0",
+  "version": "5.0.0",
   "type": "module",
   "description": "A picture-led playground of nine purposeful adventures for little explorers.",
   "author": "Giovanni Lorenzin",

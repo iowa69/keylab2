@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { advanceRunner, createRunnerState, jumpRunner, steerRunner } from './runnerModel';
+import {
+  advanceRunner,
+  createRunnerState,
+  jumpRunner,
+  steerRunner,
+  runnerPrizes,
+} from './runnerModel';
 
 describe('little explorer runner', () => {
   it('helps a baby reach a new island, then provides a fresh goal', () => {
@@ -16,6 +22,17 @@ describe('little explorer runner', () => {
     expect(state.island).toBe(1);
     expect(state.stars).toBe(0);
     expect(state.items.length).toBe(6);
+  });
+
+  it('cycles all five islands and varied alphabet treasures without growing the scene', () => {
+    const state = createRunnerState();
+    const found = new Set<string>();
+    for (let frame = 0; frame < 16000; frame++) {
+      for (const prize of advanceRunner(state, 1 / 60, true, false).prizes) found.add(prize);
+      expect(state.items.length).toBeLessThanOrEqual(6);
+    }
+    expect(state.trips).toBeGreaterThan(5);
+    expect([...found].sort()).toEqual([...runnerPrizes].sort());
   });
 
   it('keeps steering in three lanes and safely lands repeated jumps', () => {

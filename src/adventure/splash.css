@@ -1,11 +1,13 @@
 .splash-game {
   position: relative;
-  height: clamp(520px, 75dvh, 780px);
-  min-height: 490px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
   width: 100%;
   overflow: hidden;
   isolation: isolate;
-  border-radius: 30px;
+  border-radius: 25px;
   color: #3d5a55;
   background: #d7ebde;
   font-family: var(--round, 'Nunito', sans-serif);
@@ -13,23 +15,32 @@
   user-select: none;
   -webkit-user-select: none;
 }
+.splash-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: none;
+}
 .splash-meadow,
 .splash-hose,
-.splash-friends {
+.splash-friends,
+.splash-theme-art {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 .splash-meadow,
-.splash-hose {
+.splash-hose,
+.splash-theme-art {
   pointer-events: none;
 }
 .splash-sun {
   position: absolute;
   top: 8%;
-  left: 74%;
-  width: clamp(58px, 9vw, 112px);
+  left: 75%;
+  width: clamp(45px, 7vw, 86px);
   aspect-ratio: 1;
   border-radius: 50%;
   background: #f9e7a7;
@@ -41,74 +52,21 @@
 .splash-heading {
   position: absolute;
   z-index: 4;
-  top: 29px;
-  left: 30px;
+  top: 18px;
+  left: 23px;
   pointer-events: none;
-}
-.splash-label {
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 1.8px;
-  color: #638577;
-}
-.splash-heading h2 {
-  margin: 7px 0 6px;
-  font-size: clamp(26px, 3.5vw, 41px);
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -1.3px;
 }
 .splash-heading p {
-  font-size: 15px;
-  font-weight: 800;
   margin: 0;
-}
-.splash-progress {
-  position: absolute;
-  z-index: 4;
-  right: 25px;
-  top: 23px;
-  padding: 9px 14px 10px;
-  border-radius: 21px;
-  background: #fffaf0e6;
-  border: 2px solid #fffdf5;
-  box-shadow: 0 6px 0 #527f6511;
-  text-align: center;
-  pointer-events: none;
-}
-.splash-progress-faces {
-  display: flex;
-  gap: 3px;
-}
-.splash-progress-faces > span {
-  position: relative;
-  width: 40px;
-  height: 41px;
-}
-.splash-progress-faces svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.splash-progress-faces b {
-  position: absolute;
-  right: -3px;
-  bottom: -2px;
-  background: #79b796;
-  color: #fffef2;
-  font-size: 13px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-}
-.splash-progress strong {
-  font-size: 22px;
+  font-size: clamp(14px, 2vw, 22px);
   font-weight: 900;
 }
-.splash-progress small {
+.splash-heading > span {
+  display: block;
+  margin-top: 4px;
   font-size: 12px;
-  margin-left: 4px;
+  font-weight: 800;
+  color: #6b8270;
 }
 .splash-friends {
   z-index: 2;
@@ -116,7 +74,7 @@
 }
 .splash-friend {
   position: absolute;
-  width: clamp(124px, 19vw, 207px);
+  width: clamp(118px, 19vw, 215px);
   aspect-ratio: 1;
   background: transparent;
   padding: 0;
@@ -146,7 +104,7 @@
   display: flex;
   gap: 6px;
   left: 50%;
-  bottom: -10px;
+  bottom: -6px;
   transform: translateX(-50%);
   padding: 6px 8px;
   border-radius: 18px;
@@ -167,193 +125,239 @@
   inset: 0;
   pointer-events: none;
 }
-.splash-sparkle > svg:first-child {
+.splash-sparkle > svg {
   position: absolute;
-  width: 34%;
-  height: 34%;
-  right: -6%;
-  top: 6%;
+  width: 30%;
+  height: 30%;
+  right: -4%;
+  top: 8%;
   transform: rotate(14deg);
 }
-.splash-sparkle > svg:last-child {
+.splash-boo {
   position: absolute;
-  width: 23%;
-  height: 23%;
-  left: -3%;
-  top: 30%;
+  right: -10%;
+  top: -7%;
+  background: #fff9e6;
+  padding: 7px 14px;
+  border-radius: 20px 20px 20px 4px;
+  font-size: 18px;
+  font-weight: 900;
+  color: #927259;
+  box-shadow: 0 4px 0 #648b701a;
+  transform: rotate(6deg);
 }
-.splash-friend > .splash-scamper {
-  left: -28%;
-  width: 60%;
+.splash-hidden-boy {
+  position: absolute;
+  left: 3%;
+  bottom: -2%;
+  width: clamp(110px, 17vw, 177px);
+  height: 39%;
+  z-index: 4;
+  pointer-events: none;
 }
-.splash-instruction {
+.splash-stage-hint {
   position: absolute;
   z-index: 4;
-  bottom: 31px;
+  bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-radius: 22px;
-  padding: 11px 19px 11px 12px;
-  background: #fff9e6dc;
-  color: #486d62;
-  pointer-events: none;
-  font-size: 15px;
+  background: #fff9e3bc;
+  border: 2px solid #fffce9;
+  padding: 7px 20px;
+  border-radius: 20px;
+  font-size: 14px;
   font-weight: 900;
+  pointer-events: none;
 }
-.splash-instruction svg {
-  width: 50px;
-  height: 40px;
-}
-.splash-instruction small {
-  font-size: 11px;
-  font-weight: 700;
-  color: #6c8578;
-}
-.splash-finish {
-  position: absolute;
+.splash-tools {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 7px 12px 10px;
+  gap: 12px;
+  background: #fff9e8;
+  border-top: 3px solid #f0e9c9;
   z-index: 5;
-  left: 50%;
-  bottom: 34px;
-  transform: translateX(-50%);
+}
+.splash-sprays {
+  display: flex;
+  gap: 8px;
+}
+.splash-tools button {
+  font-family: inherit;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 13px;
-  min-width: 260px;
-}
-.splash-finish-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 18px;
-  font-weight: 900;
-  white-space: nowrap;
-}
-.splash-finish-label svg {
-  width: 28px;
-  height: 28px;
-}
-.splash-finish button {
-  display: flex;
-  gap: 10px;
-  align-items: center;
   justify-content: center;
-  min-height: 66px;
-  min-width: 212px;
-  background: #fff4d7;
-  border: 3px solid #fffdf1;
-  border-radius: 22px;
-  box-shadow: 0 5px 0 #73966b55;
-  color: #436755;
-  font-size: 20px;
+  gap: 1px;
+  border: 2px solid #e1dfc9;
+  border-radius: 19px;
+  background: #fffdf2;
+  min-width: 85px;
+  min-height: 75px;
+  touch-action: none;
+  color: #75816b;
+  box-shadow: 0 3px 0 #8aa78520;
+  padding: 2px 10px 5px;
+  font-size: 12px;
   font-weight: 900;
-  padding: 11px 20px;
+  -webkit-tap-highlight-color: transparent;
 }
-.splash-finish button svg {
+.splash-tools button[aria-pressed='true'] {
+  background: #e0efd9;
+  border-color: #95ba8f;
+  color: #54784e;
+}
+.splash-tools button:active {
+  transform: translateY(2px);
+}
+.splash-tools button:focus-visible {
+  outline: 3px dashed #608a79;
+  outline-offset: 2px;
+}
+.splash-sprays svg {
+  width: 47px;
+  height: 47px;
+}
+.splash-tools > .splash-muddy {
+  background: #e9d6b5;
+  color: #946d4a;
+  border-color: #d5bb98;
+}
+.splash-muddy svg,
+.splash-theme svg {
   width: 31px;
   height: 31px;
+  margin: 6px;
 }
-.splash-finish button:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 #73966b55;
+.splash-theme {
+  max-width: 105px;
 }
-.splash-pause {
-  position: absolute;
-  z-index: 8;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: #f8f6e6c9;
-  backdrop-filter: blur(3px);
-  font-size: 24px;
-  font-weight: 900;
+.splash-pond-colors {
+  transition: fill 0.65s;
+}
+.splash-paused * {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+.splash-is-calm * {
+  animation: none !important;
+  transition: none !important;
 }
 @media (max-width: 600px) {
-  .splash-game {
-    height: max(540px, calc(100dvh - 150px));
-    min-height: 520px;
-    border-radius: 23px;
-  }
   .splash-heading {
-    left: 18px;
-    top: 23px;
-    max-width: 205px;
-  }
-  .splash-heading h2 {
-    font-size: 29px;
-    max-width: 175px;
+    top: 15px;
+    left: 15px;
+    right: 80px;
   }
   .splash-heading p {
-    max-width: 174px;
-    font-size: 13px;
+    font-size: 14px;
   }
-  .splash-label {
-    font-size: 8px;
-    letter-spacing: 1px;
-  }
-  .splash-progress {
-    right: 12px;
-    top: 21px;
-    padding: 8px 9px;
-  }
-  .splash-progress-faces > span {
-    width: 29px;
-    height: 30px;
-  }
-  .splash-progress strong {
-    font-size: 19px;
-  }
-  .splash-progress small {
+  .splash-heading > span {
     font-size: 10px;
   }
   .splash-friend {
-    width: clamp(112px, 29vw, 160px);
+    width: clamp(90px, 29vw, 165px);
+  }
+  .splash-boo {
+    font-size: 14px;
+    padding: 5px 9px;
+    right: -7%;
+    top: -3%;
   }
   .splash-mud-dots {
     gap: 4px;
-    padding: 5px 7px;
+    padding: 4px 6px;
+    bottom: 0;
   }
   .splash-mud-dots i {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
   }
-  .splash-instruction {
-    bottom: 35px;
-    width: 198px;
+  .splash-tools {
+    padding: 5px 6px 8px;
+    gap: 5px;
+    flex-wrap: wrap;
   }
-  .splash-finish-label {
-    font-size: 15px;
+  .splash-sprays {
+    gap: 5px;
+    flex: 1 0 100%;
+    justify-content: center;
   }
-  .splash-finish {
-    bottom: 32px;
+  .splash-tools button {
+    min-width: 0;
+    min-height: 63px;
+    padding: 2px 3px 4px;
+    border-radius: 14px;
+    font-size: 11px;
+  }
+  .splash-sprays button {
+    flex: 1;
+  }
+  .splash-sprays svg {
+    width: 40px;
+    height: 40px;
+  }
+  .splash-tools > .splash-muddy,
+  .splash-tools > .splash-theme {
+    flex: 1;
+    flex-direction: row;
+    max-width: none;
+    min-height: 42px;
+    gap: 6px;
+  }
+  .splash-muddy svg,
+  .splash-theme svg {
+    width: 23px;
+    height: 23px;
+    margin: 2px;
+  }
+  .splash-hidden-boy {
+    height: 30%;
+    left: 0;
+  }
+  .splash-stage-hint {
+    font-size: 12px;
+    bottom: 12px;
+    padding: 6px 13px;
+  }
+  .splash-sun {
+    left: 78%;
+    top: 10%;
   }
 }
-@media (max-height: 600px) and (min-width: 650px) {
-  .splash-game {
-    height: max(390px, calc(100dvh - 90px));
-    min-height: 390px;
+@media (max-height: 650px) {
+  .splash-tools {
+    padding-top: 4px;
+    padding-bottom: 5px;
+  }
+  .splash-tools button {
+    min-height: 60px;
+  }
+  .splash-sprays svg {
+    width: 36px;
+    height: 36px;
+  }
+  .splash-stage-hint {
+    bottom: 8px;
+    padding: 4px 12px;
+    font-size: 11px;
   }
   .splash-heading {
-    top: 18px;
-    left: 22px;
+    top: 10px;
   }
-  .splash-heading h2 {
-    font-size: 29px;
+  .splash-heading p {
+    font-size: 13px;
   }
   .splash-friend {
-    width: 155px;
+    width: clamp(88px, 16vw, 155px);
   }
-  .splash-instruction {
-    bottom: 15px;
+  .splash-hidden-boy {
+    height: 39%;
   }
-  .splash-finish {
-    bottom: 15px;
-    gap: 5px;
-  }
-  .splash-finish button {
-    min-height: 55px;
+  .splash-tools > .splash-muddy,
+  .splash-tools > .splash-theme {
+    min-height: 36px;
   }
 }

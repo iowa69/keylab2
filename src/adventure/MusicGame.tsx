@@ -82,6 +82,7 @@ export function MusicGame({ settings, paused, onCelebrate }: GameProps) {
   const current = songs[song],
     finished = index >= current.notes.length;
   const advanceRef = useRef<() => void>(() => {});
+  const fingers = useRef(new Map<number, number>());
   function note(chosen?: number) {
     if (paused) return;
     if (!free && finished) {
@@ -111,6 +112,9 @@ export function MusicGame({ settings, paused, onCelebrate }: GameProps) {
   useEffect(() => {
     if (!settings.sound) setListening(false);
   }, [settings.sound]);
+  useEffect(() => {
+    if (paused) fingers.current.clear();
+  }, [paused]);
   useEffect(() => {
     if (active < 0 || paused) return;
     const t = setTimeout(() => setActive(-1), 330);
@@ -185,15 +189,44 @@ export function MusicGame({ settings, paused, onCelebrate }: GameProps) {
           <span style={{ width: `${(index / current.notes.length) * 100}%` }} />
         </div>
       )}
-      <div className="piano" aria-label="Color piano">
+      <div
+        className="piano"
+        aria-label="Color piano"
+        onPointerDown={(event) => {
+          if (paused) return;
+          const key = (event.target as Element).closest<HTMLElement>('[data-piano-key]');
+          if (!key) return;
+          const chosen = Number(key.dataset.pianoKey);
+          event.currentTarget.setPointerCapture(event.pointerId);
+          fingers.current.set(event.pointerId, chosen);
+          setListening(false);
+          note(chosen);
+        }}
+        onPointerMove={(event) => {
+          if (paused || !fingers.current.has(event.pointerId)) return;
+          const key = document
+            .elementFromPoint(event.clientX, event.clientY)
+            ?.closest<HTMLElement>('[data-piano-key]');
+          if (!key || !event.currentTarget.contains(key)) return;
+          const chosen = Number(key.dataset.pianoKey);
+          if (chosen === fingers.current.get(event.pointerId)) return;
+          fingers.current.set(event.pointerId, chosen);
+          note(chosen);
+        }}
+        onPointerUp={(event) => fingers.current.delete(event.pointerId)}
+        onPointerCancel={(event) => fingers.current.delete(event.pointerId)}
+        onLostPointerCapture={(event) => fingers.current.delete(event.pointerId)}
+      >
         {colors.map((color, i) => (
           <button
             key={color}
             className={`${active === i ? 'active' : ''} ${!free && !finished && current.notes[index] === i ? 'next-note' : ''}`}
             style={{ background: color }}
             aria-label={`Piano key ${i + 1}`}
+            data-piano-key={i}
             disabled={paused}
-            onClick={() => {
+            onClick={(event) => {
+              if (event.detail !== 0) return;
               setListening(false);
               note(i);
             }}

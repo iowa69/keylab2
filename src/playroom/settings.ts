@@ -1,5 +1,7 @@
 export type Preferences = {
   mode: 'baby' | 'toddler';
+  name: string;
+  narration: boolean;
   sound: boolean;
   volume: number;
   calm: boolean;
@@ -8,17 +10,27 @@ export type Preferences = {
 };
 export const defaults: Preferences = {
   mode: 'baby',
+  name: '',
+  narration: true,
   sound: true,
   volume: 0.32,
   calm: false,
   contrast: false,
   breakMinutes: 0,
 };
-export const storageKey = 'keylab2-adventures-v4';
+export const storageKey = 'keylab2-adventures-v5';
 export function validatePreferences(value: unknown): Preferences {
   const raw = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
   return {
     mode: raw.mode === 'toddler' ? 'toddler' : 'baby',
+    name:
+      typeof raw.name === 'string'
+        ? raw.name
+            .replace(/[\x00-\x1f]/g, '')
+            .trim()
+            .slice(0, 32)
+        : '',
+    narration: typeof raw.narration === 'boolean' ? raw.narration : true,
     sound: typeof raw.sound === 'boolean' ? raw.sound : defaults.sound,
     volume:
       typeof raw.volume === 'number' && Number.isFinite(raw.volume)
@@ -37,6 +49,7 @@ export function loadPreferences(): Preferences {
     return validatePreferences(
       JSON.parse(
         localStorage.getItem(storageKey) ||
+          localStorage.getItem('keylab2-adventures-v4') ||
           localStorage.getItem('keylab2-playroom-v3') ||
           localStorage.getItem('keylab2-settings') ||
           '{}',

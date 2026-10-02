@@ -1,6 +1,25 @@
+export const runnerPrizes = [
+  'star',
+  'strawberry',
+  'orange',
+  'bee',
+  'apple',
+  'banana',
+  'flower',
+] as const;
+export type RunnerPrize = (typeof runnerPrizes)[number];
+export const prizeWords: Record<RunnerPrize, { letter: string; word: string; color: string }> = {
+  star: { letter: 'S', word: 'star', color: '#f4cb56' },
+  strawberry: { letter: 'S', word: 'strawberry', color: '#ed7c83' },
+  orange: { letter: 'O', word: 'orange', color: '#f5aa54' },
+  bee: { letter: 'B', word: 'bee', color: '#f4ca56' },
+  apple: { letter: 'A', word: 'apple', color: '#e87a74' },
+  banana: { letter: 'B', word: 'banana', color: '#f5d77b' },
+  flower: { letter: 'F', word: 'flower', color: '#de94bc' },
+};
 export type RunnerItem = {
   id: number;
-  kind: 'star' | 'bump';
+  kind: RunnerPrize | 'bump';
   lane: number;
   x: number;
   z: number;
@@ -15,6 +34,7 @@ export type RunnerState = {
   time: number;
   stars: number;
   island: number;
+  trips: number;
   gate: number | null;
   magnet: number;
   bump: number;
@@ -50,6 +70,24 @@ export const runnerIslands = [
     tree: '#b0dece',
     detail: '#f8d778',
   },
+  {
+    name: 'Seashell shore',
+    icon: 'shell',
+    sky: '#bee7ed',
+    ground: '#e9d6a2',
+    road: '#fff0cf',
+    tree: '#77b8a6',
+    detail: '#e88da0',
+  },
+  {
+    name: 'Autumn orchard',
+    icon: 'apple',
+    sky: '#f6ddbd',
+    ground: '#d2c790',
+    road: '#f7e8bc',
+    tree: '#e49c70',
+    detail: '#cf765e',
+  },
 ] as const;
 
 export function laneX(lane: number) {
@@ -60,7 +98,9 @@ function addItem(state: RunnerState, z: number) {
   const id = state.nextId++;
   // First two stars teach the goal before asking the child to steer.
   const lane = id < 2 ? 1 : [0, 2, 1, 2, 0, 1][id % 6];
-  state.items.push({ id, kind: id > 2 && id % 4 === 3 ? 'bump' : 'star', lane, x: laneX(lane), z });
+  const kind =
+    id > 2 && id % 5 === 4 ? 'bump' : runnerPrizes[(id + state.trips) % runnerPrizes.length];
+  state.items.push({ id, kind, lane, x: laneX(lane), z });
 }
 
 export function createRunnerState(): RunnerState {
@@ -73,6 +113,7 @@ export function createRunnerState(): RunnerState {
     time: 0,
     stars: 0,
     island: 0,
+    trips: 0,
     gate: null,
     magnet: 0,
     bump: 0,
@@ -100,7 +141,13 @@ export function jumpRunner(state: RunnerState) {
 /** Advance active play only. The owner never calls this while paused. */
 export function advanceRunner(state: RunnerState, delta: number, baby: boolean, calm: boolean) {
   const dt = Math.min(Math.max(delta, 0), 0.05);
-  const events = { collected: 0, bumped: false, openedGate: false, newIsland: false };
+  const events = {
+    collected: 0,
+    prizes: [] as RunnerPrize[],
+    bumped: false,
+    openedGate: false,
+    newIsland: false,
+  };
   state.time += dt;
   state.magnet = Math.max(0, state.magnet - dt);
   state.bump = Math.max(0, state.bump - dt);
@@ -118,6 +165,7 @@ export function advanceRunner(state: RunnerState, delta: number, baby: boolean, 
     state.gate += movement;
     if (state.gate > 5) {
       state.island = (state.island + 1) % runnerIslands.length;
+      state.trips++;
       state.stars = 0;
       state.gate = null;
       state.items = [];
@@ -129,14 +177,15 @@ export function advanceRunner(state: RunnerState, delta: number, baby: boolean, 
 
   for (const item of state.items) {
     item.z += movement;
-    if (item.kind === 'star' && item.z > -9 && (state.magnet > 0 || baby)) {
+    if (item.kind !== 'bump' && item.z > -9 && (state.magnet > 0 || baby)) {
       item.x += (state.x - item.x) * Math.min(1, dt * (baby ? 2 : 5));
     }
     if (item.z >= 2.2 && item.z < 3.7) {
-      if (item.kind === 'star' && Math.abs(item.x - state.x) < (baby ? 1.65 : 1.2)) {
+      if (item.kind !== 'bump' && Math.abs(item.x - state.x) < (baby ? 1.65 : 1.2)) {
         item.z = 10;
         state.stars++;
         events.collected++;
+        events.prizes.push(item.kind);
         if (state.stars === 5) {
           state.gate = -27;
           state.items = [];

@@ -18,7 +18,21 @@ type Picture =
   | 'lion'
   | 'moon'
   | 'rabbit'
-  | 'turtle';
+  | 'turtle'
+  | 'icecream'
+  | 'jellyfish'
+  | 'kite'
+  | 'nest'
+  | 'orange'
+  | 'pear'
+  | 'queen'
+  | 'strawberry'
+  | 'umbrella'
+  | 'volcano'
+  | 'whale'
+  | 'xylophone'
+  | 'yoyo'
+  | 'zebra';
 type Discovery = {
   picture: Picture;
   letter?: string;
@@ -43,10 +57,24 @@ const WORDS: { letter: string; picture: Picture; name: string }[] = [
   { letter: 'F', picture: 'fish', name: 'Fish' },
   { letter: 'G', picture: 'giraffe', name: 'Giraffe' },
   { letter: 'H', picture: 'hedgehog', name: 'Hedgehog' },
+  { letter: 'I', picture: 'icecream', name: 'Ice cream' },
+  { letter: 'J', picture: 'jellyfish', name: 'Jellyfish' },
+  { letter: 'K', picture: 'kite', name: 'Kite' },
   { letter: 'L', picture: 'lion', name: 'Lion' },
   { letter: 'M', picture: 'moon', name: 'Moon' },
+  { letter: 'N', picture: 'nest', name: 'Nest' },
+  { letter: 'O', picture: 'orange', name: 'Orange' },
+  { letter: 'P', picture: 'pear', name: 'Pear' },
+  { letter: 'Q', picture: 'queen', name: 'Queen' },
   { letter: 'R', picture: 'rabbit', name: 'Rabbit' },
+  { letter: 'S', picture: 'strawberry', name: 'Strawberry' },
   { letter: 'T', picture: 'turtle', name: 'Turtle' },
+  { letter: 'U', picture: 'umbrella', name: 'Umbrella' },
+  { letter: 'V', picture: 'volcano', name: 'Volcano' },
+  { letter: 'W', picture: 'whale', name: 'Whale' },
+  { letter: 'X', picture: 'xylophone', name: 'Xylophone' },
+  { letter: 'Y', picture: 'yoyo', name: 'Yo-yo' },
+  { letter: 'Z', picture: 'zebra', name: 'Zebra' },
 ];
 const COLORS = [
   { name: 'Red', color: '#EF7880' },
@@ -288,6 +316,261 @@ function PictureArt({
           <rect x="100" y="81" width="48" height="40" rx="20" fill="#BCD2A1" />
           <Eyes x={127} y={93} wide={11} />
           <path d="M25 112H117" stroke="#63957F" strokeWidth="7" strokeLinecap="round" />
+        </>
+      )}
+      {kind === 'icecream' && (
+        <>
+          <path d="M48 77h64l-26 59q-6 10-12 0Z" fill="#D9A46F" />
+          <path
+            d="m56 94 37 32m-31-20 25 22m17-35-34 30m29-14-20 18"
+            stroke="#BA855B"
+            strokeWidth="3"
+          />
+          <circle cx="56" cy="67" r="24" fill="#F3B4C6" />
+          <circle cx="104" cy="67" r="24" fill="#B6D5B5" />
+          <circle cx="80" cy="39" r="26" fill="#FFF0CD" />
+          <path d="M65 21q13-9 24 0" stroke="#FFF9E7" strokeWidth="7" strokeLinecap="round" />
+          <Eyes y={62} wide={20} />
+          <circle cx="83" cy="11" r="8" fill="#E87F86" />
+        </>
+      )}
+      {kind === 'jellyfish' && (
+        <>
+          <g stroke="#B6A2CF" strokeWidth="9" strokeLinecap="round">
+            <path d="M47 80q-22 20 0 32t-4 24M70 81q-12 21 1 32t-2 24M92 83q16 20 1 34t9 18M113 79q24 24 1 40" />
+          </g>
+          <path
+            d="M27 79C20 7 139 7 133 79q-10 17-23 2-15 20-29 1-16 20-28 0-18 16-26-3"
+            fill="#E5AFCD"
+          />
+          <path d="M44 51q7-17 20-18" stroke="#F5D4E3" strokeWidth="9" strokeLinecap="round" />
+          <Eyes y={58} />
+        </>
+      )}
+      {kind === 'kite' && (
+        <>
+          <path d="M81 98q-37 6-18 23t-15 22" stroke="#8D8AA9" strokeWidth="3" />
+          <path d="m63 113-11-6 2 14 9-8 12-4-3 12Z" fill="#B69ACF" />
+          <path d="m80 9 50 42-50 51-50-51Z" fill="#F2CD7C" />
+          <path d="m80 9 50 42H80ZM80 51v51L30 51Z" fill="#EBA29D" />
+          <path d="M80 9v93M30 51h100" stroke="#A98A6B" strokeWidth="2.5" />
+          <Eyes y={52} wide={16} />
+        </>
+      )}
+      {kind === 'nest' && (
+        <>
+          <ellipse cx="80" cy="105" rx="65" ry="24" fill="#AA8767" />
+          <ellipse cx="55" cy="82" rx="20" ry="26" fill="#E5D6B7" />
+          <ellipse cx="101" cy="80" rx="21" ry="29" fill="#F0DCA2" />
+          <path d="m48 86 7 8 7-8m32-2 7 8 7-8" fill="#DEA569" />
+          <g fill="#655B50">
+            <circle cx="47" cy="76" r="3" />
+            <circle cx="63" cy="76" r="3" />
+            <circle cx="93" cy="74" r="3" />
+            <circle cx="109" cy="74" r="3" />
+          </g>
+          <path d="M15 105q65 16 130 0-12 39-65 34-57 4-65-34" fill="#C3A080" />
+          <g stroke="#967A62" strokeWidth="4" strokeLinecap="round">
+            <path d="m26 113 77 16m-64 1 85-18M21 102l105 29M49 106l88 7" />
+          </g>
+          <path d="M25 86q-20-18-7-36 22 9 15 36" fill="#91B495" />
+        </>
+      )}
+      {kind === 'orange' && (
+        <>
+          <circle cx="80" cy="83" r="52" fill="#EFB370" />
+          <path d="M79 32q-1-15 9-22" stroke="#9C825E" strokeWidth="6" strokeLinecap="round" />
+          <path d="M84 25q20-28 43-5-17 19-43 5" fill="#8DBB93" />
+          <path d="M43 61q-11 13-8 27" stroke="#F9D295" strokeWidth="8" strokeLinecap="round" />
+          <Eyes y={82} />
+          <g fill="#D99859">
+            {[
+              [42, 105],
+              [52, 115],
+              [67, 122],
+              [102, 116],
+              [118, 100],
+              [120, 76],
+            ].map(([x, y]) => (
+              <circle key={x} cx={x} cy={y} r="2" />
+            ))}
+          </g>
+        </>
+      )}
+      {kind === 'pear' && (
+        <>
+          <path
+            d="M61 41q19-23 37 0 4 28 23 45 33 49-40 51-73-2-44-48 21-25 24-48"
+            fill="#C4D59C"
+          />
+          <path d="M79 30q-3-14 6-23" stroke="#957B5F" strokeWidth="7" strokeLinecap="round" />
+          <path d="M85 22q17-27 39-12-10 25-39 12" fill="#80A984" />
+          <path d="M48 88q-13 24 5 30" stroke="#DDE8B8" strokeWidth="8" strokeLinecap="round" />
+          <Eyes y={91} />
+          <ellipse cx="49" cy="108" rx="8" ry="4" fill="#DDAAA0" />
+          <ellipse cx="110" cy="108" rx="8" ry="4" fill="#DDAAA0" />
+        </>
+      )}
+      {kind === 'queen' && (
+        <>
+          <path d="M36 78 27 32l34 24m38-1 34-23-9 48" fill="#D5B594" />
+          <rect x="28" y="53" width="104" height="83" rx="37" fill="#E3C6A5" />
+          <path d="m42 45-6-26 22 11L80 7l22 23 22-11-6 26Z" fill="#EFCA73" />
+          <path d="M42 47h76" stroke="#D6AA56" strokeWidth="8" strokeLinecap="round" />
+          <circle cx="80" cy="32" r="7" fill="#B397CF" />
+          <circle cx="51" cy="34" r="4" fill="#DF9DA6" />
+          <circle cx="109" cy="34" r="4" fill="#91BBAA" />
+          <Eyes y={87} />
+          <path d="m75 99 5 6 5-6" fill="#BE9291" />
+          <path
+            d="m32 93 16 6m-16 8 16-2m64-6 16-6m-16 12 16 2"
+            stroke="#AE8F79"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+        </>
+      )}
+      {kind === 'strawberry' && (
+        <>
+          <path d="M28 67C18 20 141 20 132 67q-16 60-52 72Q43 124 28 67" fill="#EA8E95" />
+          <path d="m80 43-27-17 8 24-29-6 17 19 31-12 31 12 17-19-30 6 9-24Z" fill="#88B897" />
+          <path d="M80 42q-8-13 0-26" stroke="#6D9A7C" strokeWidth="6" strokeLinecap="round" />
+          <Eyes y={79} />
+          <g fill="#F9DFAC">
+            {[
+              [44, 68],
+              [113, 65],
+              [38, 87],
+              [120, 88],
+              [48, 108],
+              [111, 108],
+              [66, 120],
+              [91, 126],
+            ].map(([x, y]) => (
+              <ellipse key={x} cx={x} cy={y} rx="2.3" ry="3.8" />
+            ))}
+          </g>
+        </>
+      )}
+      {kind === 'umbrella' && (
+        <>
+          <path
+            d="M80 19v101q0 25 21 17 10-4 6-15"
+            stroke="#A78576"
+            strokeWidth="7"
+            strokeLinecap="round"
+          />
+          <path
+            d="M15 82Q27 14 80 22q54-8 65 60-16-14-32 0-16-14-33 0-16-14-32 0-17-14-33 0"
+            fill="#9CC9CF"
+          />
+          <path d="M80 22Q48 37 48 82m32-60q33 15 33 60" stroke="#739EA8" strokeWidth="3" />
+          <path d="M48 82q4-46 32-60v60q-16-14-32 0" fill="#F0CF8C" />
+          <Eyes y={62} wide={15} />
+          <path
+            d="m32 14-5 8m107-1-5 8m18 73-5 8"
+            stroke="#AECAD7"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+        </>
+      )}
+      {kind === 'volcano' && (
+        <>
+          <path d="M14 134 59 51h42l45 83Z" fill="#BBA3B7" />
+          <path d="m59 51 21-9 21 9 14 28-18-9-17 14-14-15-21 10Z" fill="#E9B2AB" />
+          <ellipse cx="80" cy="51" rx="21" ry="8" fill="#9B7B8E" />
+          <path d="M76 37q-24-18-7-27 11-7 18 5 22-13 26 4 3 15-29 18" fill="#EDD3CD" />
+          <path d="M72 21q-4-8 3-9" stroke="#FAE5D7" strokeWidth="5" strokeLinecap="round" />
+          <Eyes y={109} wide={19} />
+          <path d="M24 134h112" stroke="#9CB893" strokeWidth="9" strokeLinecap="round" />
+        </>
+      )}
+      {kind === 'whale' && (
+        <>
+          <path
+            d="M125 74q6-33 29-29 6 20-14 32 5 41-39 53-70 19-82-24C4 49 87 27 116 79Z"
+            fill="#94BDCF"
+          />
+          <path d="M24 102q28 41 81 16-11 28-44 18-27-6-37-34" fill="#D7E7DD" />
+          <path d="M78 113q11-18 24-5-1 16-24 17" fill="#73A3BA" />
+          <Eyes x={54} y={81} wide={14} />
+          <path
+            d="M67 39q0-22-19-22m20 21q5-29 25-22"
+            stroke="#B6D3E0"
+            strokeWidth="6"
+            strokeLinecap="round"
+          />
+          <circle cx="44" cy="14" r="5" fill="#B6D3E0" />
+          <circle cx="98" cy="13" r="5" fill="#B6D3E0" />
+        </>
+      )}
+      {kind === 'xylophone' && (
+        <>
+          <path
+            d="m25 115 110-37m-113 57 119-40"
+            stroke="#A08169"
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
+          {['#DDA0AE', '#E5B777', '#D5CE88', '#9FC7B4', '#A0BBD7', '#C1A9D4'].map((c, i) => (
+            <g key={c} transform={`translate(${28 + i * 19} ${100 - i * 6}) rotate(-16)`}>
+              <rect x="-9" y={-28 + i * 2} width="18" height={60 - i * 3} rx="5" fill={c} />
+              <circle cy={-18 + i * 2} r="2" fill="#FFF6E6" />
+              <circle cy="18" r="2" fill="#FFF6E6" />
+            </g>
+          ))}
+          <path
+            d="m35 19 63 62m24-62L66 78"
+            stroke="#AD8C73"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+          <circle cx="33" cy="17" r="11" fill="#DBAFB9" />
+          <circle cx="125" cy="16" r="11" fill="#ABCABB" />
+        </>
+      )}
+      {kind === 'yoyo' && (
+        <>
+          <path
+            d="M103 8q-57 18-25 42t5 37"
+            stroke="#A58B79"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+          <ellipse cx="89" cy="100" rx="42" ry="35" fill="#A990C0" transform="rotate(-16 89 100)" />
+          <path d="m48 92 40 21" stroke="#766384" strokeWidth="9" />
+          <ellipse cx="69" cy="92" rx="39" ry="35" fill="#E8B9BD" transform="rotate(-16 69 92)" />
+          <ellipse cx="69" cy="92" rx="25" ry="22" fill="#F4D5CD" />
+          <Eyes x={69} y={87} wide={10} />
+          <path
+            d="m116 72 12-10m-1 34 14 4M31 53l-10-8"
+            stroke="#DAC381"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+        </>
+      )}
+      {kind === 'zebra' && (
+        <>
+          <path d="M48 48q-28-43-12-43 21 1 25 39m40 0q6-41 24-39 17 2-13 44" fill="#DDDCD5" />
+          <path
+            d="m40 14 9 24m69-23-11 23"
+            stroke="#A8A1A5"
+            strokeWidth="7"
+            strokeLinecap="round"
+          />
+          <path d="M70 31 68 12l10 8L84 8l5 17 11-8-6 21" fill="#6B6875" />
+          <rect x="40" y="34" width="80" height="101" rx="36" fill="#F1EDE0" />
+          <path
+            d="m42 59 20 9-22 6m3 11 18 8-15 9m72-43-20 9 22 6m-3 11-18 8 15 9M74 36l6 22 7-22"
+            fill="#77727D"
+          />
+          <ellipse cx="80" cy="115" rx="31" ry="21" fill="#C9C3C6" />
+          <Eyes y={80} wide={17} />
+          <ellipse cx="68" cy="113" rx="3" ry="4" fill="#817985" />
+          <ellipse cx="91" cy="113" rx="3" ry="4" fill="#817985" />
+          <path d="M73 125q7 5 14 0" stroke="#817985" strokeWidth="2.5" strokeLinecap="round" />
         </>
       )}
     </svg>

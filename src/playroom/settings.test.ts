@@ -17,12 +17,25 @@ describe('saved preferences from old versions or damaged storage', () => {
         breakMinutes: 5,
       }),
     ).toEqual({
+      name: '',
+      narration: true,
       mode: 'toddler',
       sound: false,
       volume: 0.4,
       calm: true,
       contrast: true,
       breakMinutes: 5,
+    });
+  });
+  it('keeps greetings local and bounds their input', () => {
+    expect(validatePreferences({ name: '  Pip\u0000  ', narration: false })).toMatchObject({
+      name: 'Pip',
+      narration: false,
+    });
+    expect(validatePreferences({ name: 'a'.repeat(80) }).name).toHaveLength(32);
+    expect(validatePreferences({ name: 23, narration: 'false' })).toMatchObject({
+      name: '',
+      narration: true,
     });
   });
   it('bounds loudness and accepts only actual supported reminder numbers', () => {

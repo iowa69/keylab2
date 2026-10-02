@@ -1,46 +1,49 @@
 # A little world the child can choose
 
-The central rule is **see a purpose, do something, watch the result**. An attractive reaction is useful feedback; a delivered parcel, fed friend, visited planet, or newly opened island gives that reaction meaning.
+The central rule is **see a purpose, do something, watch the result**. Delivering a treat, greeting an animal, opening a rainbow, or visiting a planet gives each reaction meaning. The child chooses the adventure and can return to an unfinished creation.
 
-The home screen is a toy shelf. Each whole illustration is a button, every game is available, and a large house always takes the child back. Settings belong to the grown-up; choosing an adventure belongs to the child.
+The home screen is a nine-picture toy shelf. During play, a picture dock switches games directly and Home returns to the shelf. The app fits one viewport, including iPad portrait and landscape. Settings require a grown-up's deliberate hold.
 
 ## The nine loops
 
-| Game       | Visible invitation                              | Action                                        | Meaningful result                                          | What comes next                               |
-| ---------- | ----------------------------------------------- | --------------------------------------------- | ---------------------------------------------------------- | --------------------------------------------- |
-| Garage     | Empty workshop and pictured parts               | Choose body, paint, wheels; accelerate        | Your chosen car carries a parcel to a friend               | Drive again or build another                  |
-| Runner     | Five empty star shapes and a road               | Steer, jump, collect                          | A rainbow gate opens                                       | A different 3D island                         |
-| Space      | A chosen planet and three fuel stars            | Collect stars                                 | Rocket travels to that planet; its name and feature appear | Pick another world                            |
-| Sweet shop | Friend asks for a pictured treat                | Add three scoops or pour chocolate, decorate  | The friend receives and eats your creation                 | Another friend to serve                       |
-| Transport  | A train/plane and three empty passenger seats   | Board friends, then travel                    | Each friend arrives at their chosen destination            | Another trip or vehicle                       |
-| Discovery  | A large pictured target                         | Match a letter, count a group, choose a color | A picture is added to an album                             | Complete three discoveries and turn the page  |
-| Music      | Familiar song picture and highlighted piano key | Tap any key in guided mode                    | Each action plays the next real melody note                | Finish the song, choose another, or improvise |
-| Splash     | Three friends with four mud patches each        | Hold and aim a hose or press keys             | Dirt disappears and clean friends run away                 | A clean parade and a new puddle               |
-| Arcade     | Bear requests a pictured quantity of fruit      | Move basket or tap fruit                      | A complete basket can be served to Bear                    | Catch and count the next fruit                |
+| Game       | Visible invitation                        | Action and result                                                                              | Continuing discovery                                                           |
+| ---------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Garage     | A custom car and pictured parts           | Choose shape, paint, wheels, roof toy and sticker; drive, greet, beep and throw toys           | Six cycling worlds; change the car whenever you wish                           |
+| Runner     | A toy road, treasures and a hiding friend | Steer, jump and peek; spoken pictures connect objects to letters                               | Five treasures open a rainbow to the next of five worlds                       |
+| Space      | A planet destination and six empty stars  | Drag the rocket, dodge or bounce off hazards, collect stars and greet aliens                   | A planet visit says its name and a simple fact; eight choices remain available |
+| Sweet shop | An expressive customer and ingredients    | Tap or drag flavors and toppings into a cone, split or chocolate; serve and watch the response | Tall creations, unusual toppings and another friend to feed                    |
+| Transport  | Three large illustrated coach windows     | Drag or tap friends into seats; collect food and offer it to a passenger                       | Different tastes, changing scenery, a meowing cat and a bin for silly finds    |
+| Discovery  | A pictured letter, group or color         | Match the picture or explore with helpful hints                                                | All 26 letters, numbers one to five, six colors and album pages                |
+| Music      | A song picture and highlighted piano key  | Tap, slide or press keys for the next melody note; listen or improvise                         | Three familiar tunes and free play                                             |
+| Splash     | Muddy, expressive animal friends          | Aim and hold a spray; color or clean the scene and make friends react                          | Different spray tools, changing ponds and fresh mud                            |
+| Picnic     | Bear's pictured fruit order               | Move the basket or tap falling fruit; count and serve                                          | Moving friends and an endless sequence of new picnics                          |
 
-## Art direction
+## Art and interaction
 
-Warm cream paper, generous rounded shapes, restrained textured backgrounds, and original illustrated characters. Every tile shows the object the child will actually manipulate. Consistent smiling faces connect the workshop, food shop, planets, and music stage. Colors distinguish parts and controls without becoming the only way to identify a goal.
+Warm cream paper, rounded shapes, generous picture buttons and original illustrated characters connect the games. The runner uses actual 3D toy geometry; the other games use responsive SVG. Objects should look like the action they offer: a flavor is a scoop, a passenger is a draggable face, a planet is a recognizable world.
 
-Use a large pictorial invitation before explanatory text. Progress uses real repeated objects, missing shapes, or washed-off mud as well as numbers. Celebrations stay in the game and make the changed world visible; they do not interrupt with advertising, reward screens, locked content, or modal popups.
+The picture carries the invitation; short English words reinforce it. A baby can experiment without reading. Touch has a tap alternative wherever a precise drag would be difficult. Random ordinary keys move the activity forward, while arrows provide more deliberate steering. A sound toggle is always reachable, and visual responses remain meaningful without sound.
 
-The runner uses actual 3D depth, rounded toy geometry, recognizable landmarks, gentle bumps, and an endless sequence of short achievable journeys. Other games use responsive SVG rather than flattening everything into the same renderer.
+The mischievous yellow spray uses a fully clothed cartoon character obscured below the waist by a leafy screen. Its response is brief surprise and silly color, with water available to clean the characters again. The drawings contain no anatomical detail.
 
-## Playability rules
+## Engineering and playability rules
 
-- A child can choose and change games without opening grown-up settings.
-- Pointer controls make the pictured action happen. A selected paint or part visibly changes the creation.
-- A random key nudges the current task forward. Directional keys offer more control where it helps.
-- A pointer click must not accidentally disable later keyboard play.
-- Matching offers an inviting hint after a mismatch. Little-explorer mode supplies help after exploration.
-- Missing an arcade catch recycles the fruit. Runner obstacles bounce; no death screen or penalties.
-- Completion stays long enough to understand and offers an obvious continuation.
-- Touch controls remain reachable on small screens; Home stays visible during scrolling.
-- Pause stops simulation, sound, and scene animation. Navigation releases timers and rendering resources.
-- No required reading, timed failures, unlock grind, account, ads, purchases, or external video.
+- Every game is available immediately. There are no lives, countdown failures, advertisements, purchases or locked levels.
+- A part, ingredient or spray must visibly change the world. A taller dessert must still show each addition.
+- Gentle bumps preserve progress. Missed fruit returns; unwanted food produces an expressive response and another chance.
+- Taps and drags must not disable later keyboard input. Home restores focus to a visible game picture.
+- Switching games preserves the current session's work. Inactive games stop simulation, drawing, timers and CSS motion.
+- Pointer cancellation, tab hiding and settings must release held controls. Audio stops immediately when muted or paused.
+- Speech queues retain at most one upcoming discovery. Deliberate greetings and replay buttons can interrupt it.
+- Art and interactive scene objects stay bounded during endless play. A single 3D scene is retained and cleaned up when the app unmounts.
+- Progress is stored only where explained: settings and keepsake stamps persist on the device; unfinished game scenes last for the current session.
 
-## Review approach
+## Review and validation
 
-Separate implementation passes covered vehicle games, 3D/splash engineering, and learning/arcade design. Independent review checked visible purpose, keyboard/pointer continuity, small-screen layout, pauses, replay, and silent play. Found issues—focus lost after a brief parent-button tap, movement continuing during pause, and Home scrolling away—were corrected before release.
+Separate implementation passes covered vehicles, runner/space, and food/meadow/picnic. Independent reviewers played the games and checked touch use, visible consequences, preserving work, and pause behavior. Review fixes included hidden Home focus targets, sparse-passenger food selection, pointer press movement in Firefox, portrait car cropping, overlapping controls, and the representation of large desserts.
 
-Automated browser scenarios complement visual inspection. They cannot establish that every child understands the pictures unaided. A useful next observation is a shared play session: let the child choose freely, watch where they hesitate, and change that specific invitation or response.
+Browser checks cover Chromium desktop/mobile, Firefox, and WebKit in two iPad orientations. Shared checks exercise the chooser, real game actions, keyboard after pointer input, speech fallback, settings, pauses, and small screens. Offline tests warm a dedicated origin, stop its server, and reload/play all nine cached adventures.
+
+These are engineering and design checks; physical iPad use and shared play with a child remain separate observations. During a shared session, watch which invitation causes hesitation and adjust that particular picture or response.
+
+See [the research references](PLAY_REFERENCES.md) for the inspiration and platform documentation.

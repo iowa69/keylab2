@@ -2,7 +2,7 @@
 
 **Little hands, big adventures.**
 
-A picture-led playground where a child chooses what to make, where to go, and what to discover. Nine complete, forgiving games with big touch controls, useful keyboard input, original illustrations, gentle music, and a visible way home.
+A picture-led playground where a child chooses what to make, where to go, and what to discover. Nine forgiving games with big touch controls, useful keyboard input, original illustrations, gentle music, and a picture dock for switching adventures. The whole playroom fits one screen on tablets and phones.
 
 **[Play Keylab 2 →](https://iowa69.github.io/keylab2/)**
 
@@ -10,17 +10,19 @@ A picture-led playground where a child chooses what to make, where to go, and wh
 
 ## Pick a picture. Make an adventure.
 
-| Adventure               | What the child makes happen                                                                                                                              |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **My little garage**    | Choose a car body, paint, and wheels. Drive the finished car, collect stars, and deliver a parcel to a friend.                                           |
-| **Jungle dash**         | Steer and jump through a real 3D toy world. Five stars open a rainbow gate to jungle, candy, and moon adventures. Bumps bounce; they never end the game. |
-| **Space explorers**     | Pick one of eight planets, collect three fuel stars, and send a rocket to visit it. Fill a little planet passport.                                       |
-| **The sweet shop**      | Build a three-scoop ice cream or pour a chocolate bar. Decorate it and share it with a hungry friend.                                                    |
-| **Away we go!**         | Choose a train or plane, board three animal friends, and take each to a different destination.                                                           |
-| **Discovery safari**    | Match illustrated letters, count real pictured objects, and discover colors. Complete pages of a picture album.                                          |
-| **Little music makers** | Play familiar traditional melodies one note at a time, listen to them, or make your own tune on the color piano.                                         |
-| **Mischief meadow**     | Aim a water hose at three muddy friends. Wash off their mud, watch them scamper, and make a fresh puddle.                                                |
-| **Fruit picnic**        | Catch a pictured order of strawberries, oranges, or blueberries. Serve the basket to Bear and start the next picnic.                                     |
+| Adventure               | What the child makes happen                                                                                                                                                                     |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **My little garage**    | Build a car with five categories of parts and colors. Drive through six repeating worlds, greet friends, beep the horn, and toss bubbles, teddy bears, or confetti from the window.             |
+| **Jungle dash**         | Explore five 3D toy islands, jump through rainbows, find seven kinds of treasures, and play peekaboo with five animal friends. Hear English letter associations as you discover things.         |
+| **Space explorers**     | Steer a rocket through stars, asteroids, aliens, comets, and black-hole swirls. Collect six stars to visit one of eight planets, hear its name and a simple fact, then keep exploring.          |
+| **The sweet shop**      | Make an ice cream with up to 18 scoops, a banana split, or chocolate. Choose eight flavors and eight toppings, including fish and pickles. Four friends react to what you make; Cat likes fish! |
+| **Away we go!**         | Drag or tap friends into three themed train coaches or a plane. Collect and share favorite foods, bin silly poop, pet the meowing roof cat, and travel through changing scenery.                |
+| **Discovery safari**    | Discover all 26 English letters with original pictures, count groups of one to five friends, and match six colors. Fill pages of a picture album.                                               |
+| **Little music makers** | Tap or slide across a color piano, play three familiar traditional melodies one note at a time, listen, or make your own tune.                                                                  |
+| **Mischief meadow**     | Aim playful sprays, wash and surprise animal friends, and change the pond's color and world. Includes water, bubbles, rainbow paint, and a cartoon wee surprise from behind a leafy screen.     |
+| **Fruit picnic**        | Catch a pictured order of strawberries, oranges, or blueberries. Animated friends watch, blink, and celebrate as you feed Bear and begin another picnic.                                        |
+
+Screenshots: [Jungle dash](docs/jungle-dash.png) · [The sweet shop](docs/sweet-shop.png) · [Space explorers](docs/space-explorers.png) · [Garage on a phone](docs/my-car-mobile.png).
 
 Every game is available from the start. A local checkmark remembers an adventure the child has completed; it never locks or sells anything. Home is always in reach. No losing lives, countdown pressure, account, purchase, advertisement, or video popup.
 
@@ -28,7 +30,7 @@ Every game is available from the start. A local checkmark remembers an adventure
 
 - **Choose:** tap a picture, click, or use keys **1–9** on the home screen. Arrow keys navigate focused game cards; Tab and Enter work too.
 - **Play:** large picture buttons, taps, holds, and drags. Ordinary keyboard presses always give a useful action in a game. The runner and vehicles also provide directional controls.
-- **Switch:** the house button returns to all nine games.
+- **Switch:** the picture dock changes games directly; the house returns to all nine pictures. Unfinished creations and journeys stay in place during the current session. Reloading starts fresh games.
 - **Sound:** the speaker button toggles sound immediately. The games still work silently.
 - **Settings:** hold the lock button for **2.5 seconds**, with a pointer or Space/Enter. A brief tap does not open settings.
 
@@ -36,11 +38,20 @@ The default **Little explorer** mode adds help with matching, catching, and stee
 
 ## Grown-up settings
 
-Choose assistance, volume, calmer motion, stronger control outlines, and an optional rest after 5, 10, or 15 minutes of active game time. The game pauses in settings, at a rest reminder, and when the tab is hidden. Time spent choosing games or in settings does not count. A grown-up starts fresh playtime after a reminder.
+Choose a name for greetings, assistance, volume, spoken English, calmer motion, stronger control outlines, and an optional rest after 5, 10, or 15 minutes of active game time. Games pause while another adventure is open, in settings, at a rest reminder, and when the tab is hidden. Time spent choosing games or in settings does not count. A grown-up starts fresh playtime after a reminder.
 
 System reduced-motion preferences automatically enable calmer play. Fullscreen can be requested from settings where supported; Add to Home Screen is useful on phones and tablets. A website cannot lock browser or operating-system shortcuts.
 
-The tunes are locally synthesized performances of **Twinkle, Twinkle, Little Star**, **Mary Had a Little Lamb**, and **Row, Row, Row Your Boat**. Guided piano play advances the melody with every key; free play gives each key a different note. Spoken hints use an installed local English voice when one is available. No audio recordings or remote speech services are needed. Start with your device volume low.
+The tunes are locally synthesized performances of **Twinkle, Twinkle, Little Star**, **Mary Had a Little Lamb**, and **Row, Row, Row Your Boat**. Guided piano play advances the melody with every key; free play gives each key a different note. Spoken English uses the browser's speech system, preferring an installed local English voice. Voice availability and offline speech depend on the voices installed on the device. Keylab adds no external speech service or recordings. Short horns, meows, splashes, and reactions are synthesized locally.
+
+## Play on iPad
+
+1. Open **[Keylab 2](https://iowa69.github.io/keylab2/)** in Safari.
+2. Choose **Share → Add to Home Screen**, then launch its icon for the full play surface.
+3. Tap a game to start. Portrait and landscape both work; touch starts the sound.
+4. Hold the lock for 2.5 seconds to set a greeting name or adjust sound and assistance.
+
+The same link works on desktop browsers, Android phones/tablets, and iPhone. It is an installable website, with no App Store download required.
 
 ## Offline and privacy
 
@@ -62,14 +73,14 @@ npm run dev
 ```bash
 npm test
 npm run build
-npx playwright install chromium
+npx playwright install --with-deps chromium webkit firefox
 npm run test:e2e
 npm run format:check
 ```
 
 Browser tests use the production preview, so build first. Service workers are disabled in development. Test offline behavior in the production preview on localhost or over HTTPS.
 
-React handles the game chooser and illustrated games. Three.js renders Jungle dash, using procedural geometry, bounded scene objects, and a capped pixel ratio. A playable illustrated fallback uses the same runner model if WebGL is unavailable. Animation loops stop advancing while paused and release resources on game switches. Web Audio produces bounded, short musical feedback.
+React handles the game chooser and illustrated games. Three.js renders Jungle dash, using procedural geometry, bounded scene objects, and a capped pixel ratio. A playable illustrated fallback uses the same runner model if WebGL is unavailable. Visited game components stay mounted to preserve play; inactive games stop advancing and drawing. The single 3D scene releases its resources when the application unmounts. Web Audio produces bounded, short musical feedback.
 
 ```text
 src/
@@ -86,14 +97,14 @@ src/
   playroom/
     settings.ts           Validated preferences and older-version migration
     offline.ts            Service-worker installation and updates
-tests/playroom.spec.ts    Desktop/mobile browser acceptance tests
+tests/playroom.spec.ts    Browser acceptance tests for five device/engine configurations
 ```
 
-Automated checks cover real game completion and replay, keyboard after pointer input, navigation, pauses including moving artwork, preferences, small screens, and offline reloading. Chromium runs in desktop and mobile emulation. These checks are not hands-on usability sessions with children, nor physical iOS/Android testing.
+Automated checks cover real game completion and replay, keyboard after pointer input, navigation, pauses including moving artwork, preferences, small screens, and offline reloading. The suite runs Chromium desktop/mobile, Firefox, and WebKit with portrait/landscape iPad touch settings. Offline checks shut down a dedicated origin server and reload all nine games from the cache. These checks are not hands-on usability sessions with children or physical iOS/Android testing.
 
 ## Design and publishing
 
-See [the game design notes](docs/GAME_DESIGN.md) for the picture-first interaction rules and each game's purpose. Pushes to `main` run formatting, unit tests, a production build, and desktop/mobile browser checks before publishing to GitHub Pages. No backend or secrets are required. Relative assets support the `/keylab2/` repository path.
+See [the game design notes](docs/GAME_DESIGN.md) and [visual/interaction references](docs/PLAY_REFERENCES.md) for the picture-first interaction rules and each game's purpose. Pushes to `main` run formatting, unit tests, a production build, and five browser/device configurations before publishing to GitHub Pages. No backend or secrets are required. Relative assets support the `/keylab2/` repository path.
 
 ## Credits and license
 

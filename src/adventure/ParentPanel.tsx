@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, Download, Maximize, RotateCcw, Volume2, X } from 'lucide-react';
 import type { Preferences } from '../playroom/settings';
+import { speak, unlockAudio } from './audio';
 export function ParentPanel({
   settings,
   onChange,
@@ -46,6 +47,21 @@ export function ParentPanel({
       <span className="eyebrow">A MOMENT FOR GROWN-UPS</span>
       <h2 id="parent-title">Play, their way.</h2>
       <p>Choose a little help, gentle sounds, and time to pause.</p>
+      <label className="parent-row">
+        <span>
+          <strong>A name for greetings</strong>
+          <small>Saved only on this device.</small>
+        </span>
+        <input
+          className="name-input"
+          aria-label="Name for greetings"
+          value={settings.name}
+          maxLength={32}
+          autoComplete="off"
+          placeholder="Little explorer"
+          onChange={(event) => patch({ name: event.target.value })}
+        />
+      </label>
       <fieldset>
         <legend>A helping hand</legend>
         <div className="parent-modes">
@@ -71,6 +87,17 @@ export function ParentPanel({
           type="checkbox"
           checked={settings.sound}
           onChange={(e) => patch({ sound: e.target.checked })}
+        />
+      </label>
+      <label className="parent-row">
+        <span>
+          <strong>English words & greetings</strong>
+          <small>Short names, discoveries, and friendly hellos.</small>
+        </span>
+        <input
+          type="checkbox"
+          checked={settings.narration}
+          onChange={(event) => patch({ narration: event.target.checked })}
         />
       </label>
       <label className="parent-row">
@@ -143,6 +170,22 @@ export function ParentPanel({
       <div className="parent-utilities">
         <button
           className="small-action"
+          disabled={!settings.sound || !settings.narration}
+          onClick={() => {
+            unlockAudio(settings);
+            speak(
+              settings.name
+                ? `Hello, ${settings.name}! Let’s play together!`
+                : 'Hello, little explorer! Let’s play together!',
+              settings,
+              { interrupt: true },
+            );
+          }}
+        >
+          Say hello
+        </button>
+        <button
+          className="small-action"
           onClick={async () => {
             try {
               if (document.fullscreenElement) await document.exitFullscreen();
@@ -162,6 +205,14 @@ export function ParentPanel({
             Refresh game update
           </button>
         )}
+      </div>
+      <div className="parent-device-tip">
+        <strong>A little app on your iPad</strong>Open Keylab 2 in Safari, tap Share, then Add to
+        Home Screen. It opens in its own play window. Both portrait and landscape work. Open it
+        online once and wait for the offline message below before travelling.
+        <br />
+        If words are silent, check the device volume and try “Say hello”. English speech uses your
+        device’s available voice.
       </div>
       <p className="parent-note" role="status">
         {message || (

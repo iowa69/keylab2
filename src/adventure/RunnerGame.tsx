@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import * as THREE from 'three';
-import { Animal, Cone, Planet, Star } from './Art';
+import { Animal, Cone, Face, Planet, Star } from './Art';
 import { playTone, speak } from './audio';
 import type { GameProps } from './types';
 import {
@@ -8,6 +8,8 @@ import {
   createRunnerState,
   jumpRunner,
   runnerIslands,
+  prizeWords,
+  type RunnerPrize,
   steerRunner,
   type RunnerState,
 } from './runnerModel';
@@ -19,6 +21,7 @@ function snapshot(state: RunnerState) {
   return {
     stars: state.stars,
     island: state.island,
+    trips: state.trips,
     gate: state.gate,
     x: state.x,
     jump: state.jump,
@@ -59,6 +62,7 @@ function buildWorld(host: HTMLDivElement) {
   const cone = shape(new THREE.ConeGeometry(1, 1, 10));
   const disk = shape(new THREE.CircleGeometry(1, 24));
   const arc = shape(new THREE.TorusGeometry(1, 0.045, 7, 32, Math.PI));
+  const ring = shape(new THREE.TorusGeometry(1, 0.065, 6, 28));
   const starShape = new THREE.Shape();
   for (let i = 0; i < 10; i++) {
     const angle = Math.PI / 2 + (i * Math.PI) / 5;
@@ -128,6 +132,9 @@ function buildWorld(host: HTMLDivElement) {
     foliage: THREE.Mesh[];
     accent: THREE.Mesh;
     trunk: THREE.Mesh;
+    candy: THREE.Mesh;
+    moonRing: THREE.Mesh;
+    palm: THREE.Group;
   }[] = [];
   for (let i = 0; i < 24; i++) {
     const group = new THREE.Group();
@@ -144,8 +151,26 @@ function buildWorld(host: HTMLDivElement) {
     const accent = mesh(group, ball, '#f28a63', [0.45, 2.5, 0.85], [0.22, 0.28, 0.22]);
     const shadow = mesh(group, disk, '#365f65', [0, 0.18, 0], [1.2, 0.8, 1], true, 0.1);
     shadow.rotation.x = -Math.PI / 2;
+    const candy = mesh(group, cone, '#e9bd87', [0, 1.55, 0], [0.88, 2.3, 0.88]);
+    candy.rotation.z = Math.PI;
+    const moonRing = mesh(group, ring, '#f6d993', [0, 2.8, 0], [1.6, 1.6, 1.6]);
+    moonRing.rotation.x = 1.2;
+    moonRing.rotation.y = 0.25;
+    const palm = new THREE.Group();
+    for (let leaf = 0; leaf < 5; leaf++) {
+      const angle = (leaf * Math.PI * 2) / 5;
+      const blade = mesh(
+        palm,
+        ball,
+        '#59aa89',
+        [Math.cos(angle) * 0.65, 2.9, Math.sin(angle) * 0.65],
+        [0.26, 0.16, 1.25],
+      );
+      blade.rotation.y = Math.PI / 2 - angle;
+    }
+    group.add(palm);
     scene.add(group);
-    decor.push({ group, index: i, foliage, accent, trunk });
+    decor.push({ group, index: i, foliage, accent, trunk, candy, moonRing, palm });
   }
 
   const clouds: THREE.Group[] = [];
@@ -231,7 +256,14 @@ function buildWorld(host: HTMLDivElement) {
         sea.material = material(state.island === 2 ? '#858fc5' : '#8ed6e3');
         sunBall.material = material(state.island === 2 ? '#fff4dd' : '#ffe8a3', true);
         for (const tree of decor) {
-          for (const top of tree.foliage) top.material = material(colors.tree);
+          for (const top of tree.foliage) {
+            top.material = material(colors.tree);
+            top.visible = state.island !== 3;
+          }
+          tree.candy.visible = state.island === 1;
+          tree.moonRing.visible = state.island === 2;
+          tree.palm.visible = state.island === 3;
+          tree.trunk.visible = state.island !== 1;
           tree.accent.material = material(colors.detail);
           tree.trunk.material = material(state.island === 1 ? '#fff0ce' : '#cda179');
         }
@@ -264,6 +296,71 @@ function buildWorld(host: HTMLDivElement) {
             mesh(group, starGeometry, '#ffd167', [0, 1.15, 0], [1, 1, 1]);
             for (const x of [-0.15, 0.15])
               mesh(group, ball, '#9c7339', [x, 1.19, 0.235], [0.032, 0.045, 0.03]);
+          } else if (item.kind === 'strawberry') {
+            const fruit = mesh(group, ball, '#ed6f7d', [0, 1.1, 0], [0.51, 0.64, 0.47]);
+            fruit.rotation.z = 0.1;
+            for (let i = 0; i < 5; i++) {
+              const a = (i * Math.PI * 2) / 5;
+              const leaf = mesh(
+                group,
+                ball,
+                '#64ab7a',
+                [Math.cos(a) * 0.21, 1.68, Math.sin(a) * 0.2],
+                [0.12, 0.08, 0.28],
+              );
+              leaf.rotation.y = -a;
+            }
+            for (let i = 0; i < 6; i++)
+              mesh(
+                group,
+                ball,
+                '#ffe7a3',
+                [i % 2 ? 0.2 : -0.17, 0.82 + Math.floor(i / 2) * 0.22, 0.43],
+                [0.035, 0.054, 0.03],
+              );
+          } else if (item.kind === 'orange' || item.kind === 'apple') {
+            mesh(
+              group,
+              ball,
+              item.kind === 'apple' ? '#e7786d' : '#f5a34b',
+              [0, 1.12, 0],
+              [0.56, 0.55, 0.53],
+            );
+            mesh(group, cylinder, '#89674b', [0, 1.72, 0], [0.045, 0.22, 0.045]);
+            const leaf = mesh(group, ball, '#63ae80', [0.17, 1.74, 0], [0.26, 0.08, 0.12]);
+            leaf.rotation.z = 0.35;
+            for (const x of [-0.15, 0.15])
+              mesh(group, ball, '#614b42', [x, 1.18, 0.5], [0.035, 0.046, 0.025]);
+          } else if (item.kind === 'bee') {
+            mesh(group, ball, '#f5d16d', [0, 1.18, 0], [0.59, 0.39, 0.39]);
+            for (const x of [-0.18, 0.17])
+              mesh(group, ball, '#6f5c4f', [x, 1.19, 0], [0.09, 0.4, 0.395]);
+            for (const x of [-0.25, 0.25])
+              mesh(group, ball, '#e6f8f3', [x, 1.62, -0.05], [0.25, 0.35, 0.08]);
+            mesh(group, ball, '#f5d16d', [0.5, 1.2, 0.05], [0.24, 0.28, 0.3]);
+            mesh(group, ball, '#5d4946', [0.59, 1.28, 0.32], [0.04, 0.055, 0.03]);
+          } else if (item.kind === 'banana') {
+            for (let i = 0; i < 6; i++)
+              mesh(
+                group,
+                ball,
+                '#f4d36c',
+                [-0.42 + i * 0.17, 1.02 + Math.pow(i - 2.5, 2) * 0.055, 0],
+                [0.17, 0.2, 0.21],
+              );
+            mesh(group, ball, '#96794c', [0.47, 1.48, 0], [0.075, 0.08, 0.15]);
+          } else if (item.kind === 'flower') {
+            for (let i = 0; i < 6; i++) {
+              const a = (i * Math.PI) / 3;
+              mesh(
+                group,
+                ball,
+                '#e9a0c3',
+                [Math.cos(a) * 0.36, 1.2 + Math.sin(a) * 0.36, 0],
+                [0.25, 0.25, 0.12],
+              );
+            }
+            mesh(group, ball, '#f8da81', [0, 1.2, 0.15], [0.23, 0.23, 0.12]);
           } else {
             mesh(group, ball, '#ad96ce', [0, 0.5, 0], [0.73, 0.47, 0.6]);
             mesh(group, ball, '#c5b1df', [-0.21, 0.65, 0.25], [0.23, 0.13, 0.23]);
@@ -282,8 +379,10 @@ function buildWorld(host: HTMLDivElement) {
           scene.add(group);
         }
         group.position.set(item.x, 0, item.z);
-        if (item.kind === 'star' && !calm)
-          group.children[0].rotation.y = Math.sin(state.time * 2 + item.id) * 0.3;
+        if (item.kind !== 'bump' && !calm) {
+          group.position.y = Math.sin(state.time * (item.kind === 'bee' ? 5 : 2) + item.id) * 0.13;
+          group.rotation.y = Math.sin(state.time * 1.3 + item.id) * 0.18;
+        }
       }
       gate.position.z = state.gate ?? -77;
       renderer.render(scene, camera);
@@ -297,6 +396,85 @@ function buildWorld(host: HTMLDivElement) {
       renderer.domElement.remove();
     },
   };
+}
+
+export function PrizeArt({ kind }: { kind: RunnerPrize }) {
+  if (kind === 'star') return <Star />;
+  return (
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      {kind === 'strawberry' ? (
+        <>
+          <path d="M19 39q-4 24 31 50 35-26 31-50Q73 20 50 31 27 20 19 39" fill="#ed7c83" />
+          <path d="m50 36-28-12 18-1 8-14 7 16 20-6-15 18" fill="#70a777" />
+          {[0, 1, 2, 3, 4].map((i) => (
+            <ellipse
+              key={i}
+              cx={33 + (i % 2) * 31}
+              cy={43 + Math.floor(i / 2) * 13}
+              rx="2"
+              ry="3"
+              fill="#ffe6a9"
+            />
+          ))}
+          <Face x={50} y={49} />
+        </>
+      ) : kind === 'orange' || kind === 'apple' ? (
+        <>
+          <path d="M50 28V12" stroke="#85654e" strokeWidth="5" strokeLinecap="round" />
+          <path d="M50 22Q60 1 80 13Q69 32 50 22" fill="#70af85" />
+          <path
+            d="M50 29Q15 13 15 54Q15 89 48 88Q83 94 86 55Q87 15 50 29"
+            fill={kind === 'apple' ? '#e77b73' : '#f2ad59'}
+          />
+          <Face x={50} y={49} />
+        </>
+      ) : kind === 'bee' ? (
+        <>
+          <ellipse cx="35" cy="25" rx="15" ry="22" fill="#d1eee9" transform="rotate(-28 35 25)" />
+          <ellipse cx="64" cy="25" rx="15" ry="22" fill="#d1eee9" transform="rotate(28 64 25)" />
+          <ellipse cx="49" cy="54" rx="37" ry="27" fill="#f4cd6b" />
+          <path d="M32 31v44m19-46v49" stroke="#766154" strokeWidth="9" />
+          <circle cx="71" cy="51" r="20" fill="#f4cd6b" />
+          <circle cx="72" cy="47" r="3" fill="#5c4840" />
+          <path
+            d="M71 58q8 6 11-2"
+            fill="none"
+            stroke="#5c4840"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </>
+      ) : kind === 'banana' ? (
+        <>
+          <path
+            d="M18 22Q40 77 80 24Q83 72 44 85Q14 80 18 22"
+            fill="#f5d57a"
+            stroke="#dbb357"
+            strokeWidth="3"
+          />
+          <path d="M25 29Q37 92 78 35" fill="none" stroke="#ffedab" strokeWidth="5" />
+          <path d="m78 19 5 10M16 19l5 6" stroke="#8e7052" strokeWidth="5" strokeLinecap="round" />
+          <Face x={47} y={61} />
+        </>
+      ) : (
+        <>
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <ellipse
+              key={i}
+              cx="50"
+              cy="26"
+              rx="15"
+              ry="21"
+              transform={`rotate(${i * 60} 50 50)`}
+              fill="#eaa1c5"
+            />
+          ))}
+          <circle cx="50" cy="50" r="22" fill="#f5d584" />
+          <Face x={50} y={45} />
+        </>
+      )}
+    </svg>
+  );
 }
 
 function IslandArt({ island }: { island: number }) {
@@ -377,8 +555,8 @@ function FlatWorld({ view }: { view: RunnerView }) {
               transform: `translate(-50%, -50%) scale(${perspective * 1.4})`,
             }}
           >
-            {item.kind === 'star' ? (
-              <Star />
+            {item.kind !== 'bump' ? (
+              <PrizeArt kind={item.kind} />
             ) : (
               <svg viewBox="0 0 100 85" aria-hidden="true">
                 <path d="m12 58 11-32 31-14 28 17 10 32-15 13H27z" fill="#a695bd" />
@@ -414,7 +592,30 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
   latest.current = { settings, paused, onCelebrate };
   const [view, setView] = useState(() => snapshot(model.current));
   const [flat, setFlat] = useState(false);
-  const [caption, setCaption] = useState('Find five stars!');
+  const [caption, setCaption] = useState('Find five little treasures!');
+  const [finds, setFinds] = useState<RunnerPrize[]>([]);
+  const [peekUntil, setPeekUntil] = useState(0);
+  const friendIndex = (Math.floor(view.time / 16) + view.trips) % 5;
+  const friends = ['cat', 'duck', 'bunny', 'bear', 'pig'] as const;
+  const friend = friends[friendIndex];
+  const friendName = friend === 'bunny' ? 'rabbit' : friend;
+  const revealed = view.time < peekUntil;
+  const peek = () => {
+    if (paused || document.hidden) return;
+    setPeekUntil(model.current.time + 5);
+    model.current.magnet = 5;
+    jumpRunner(model.current);
+    setCaption(`Peekaboo! ${friendName[0].toUpperCase()} is for ${friendName}!`);
+    playTone(7 + friendIndex, settings, 0.25);
+    speak(
+      `Peekaboo! Hello, ${friendName}! ${friendName[0].toUpperCase()} is for ${friendName}.`,
+      settings,
+      { interrupt: true },
+    );
+  };
+  useEffect(() => {
+    if (paused) pointer.current = null;
+  }, [paused]);
   const pointer = useRef<{ x: number; y: number; id: number } | null>(null);
 
   const action = (direction: 'left' | 'right' | 'jump') => {
@@ -470,17 +671,21 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
         );
         if (event.collected) {
           playTone(state.stars + 1, current.settings, 0.16);
-          setCaption(`${state.stars} ${state.stars === 1 ? 'star' : 'stars'}!`);
-          speak(String(state.stars), current.settings);
+          const prize = event.prizes[event.prizes.length - 1];
+          const word = prizeWords[prize];
+          setFinds((previous) => [...previous, ...event.prizes].slice(-5));
+          setCaption(`${word.letter} is for ${word.word}!`);
+          speak(`${word.letter} is for ${word.word}.`, current.settings);
           messageUntil = state.time + 1.6;
         }
         if (event.openedGate) {
           setCaption('Rainbow ready!');
           messageUntil = state.time + 6;
-          current.onCelebrate('Five stars! A new island!');
-          speak('Five stars! Follow the rainbow!', current.settings);
+          current.onCelebrate('Five treasures! A new island!');
+          speak('Five treasures! Through the rainbow!', current.settings);
         }
         if (event.newIsland) {
+          setFinds([]);
           setCaption(runnerIslands[state.island].name);
           speak(runnerIslands[state.island].name, current.settings);
           messageUntil = state.time + 2.5;
@@ -491,7 +696,7 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
         }
         if (messageUntil > 0 && state.time > messageUntil) {
           messageUntil = 0;
-          setCaption(state.gate === null ? 'Find five stars!' : 'Through the rainbow!');
+          setCaption(state.gate === null ? 'Find five little treasures!' : 'Through the rainbow!');
         }
         world?.render(state, current.settings.calm);
         if (now - lastPaint > 65) {
@@ -508,7 +713,9 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || latest.current.paused)
         return;
       const target = event.target instanceof Element ? event.target : null;
-      const ownButton = target?.closest('[data-runner-control]');
+      const ownButton = target?.closest(
+        '[data-runner-control], [data-runner-friend], [data-runner-prize]',
+      );
       if (target?.closest('input, select, textarea, [contenteditable="true"]')) return;
       if (target?.closest('button, a, [data-ui]') && !ownButton) return;
       if (ownButton && (event.key === ' ' || event.key === 'Enter')) return;
@@ -552,9 +759,13 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
 
   return (
     <section
-      className={`runner-game ${settings.calm ? 'runner-is-calm' : ''} ${settings.contrast ? 'runner-high-contrast' : ''}`}
+      className={`runner-game ${paused ? 'runner-is-paused' : ''} ${settings.calm ? 'runner-is-calm' : ''} ${settings.contrast ? 'runner-high-contrast' : ''}`}
       aria-label="Rainbow run"
       data-testid="runner-game"
+      data-island={view.island}
+      data-trips={view.trips}
+      data-treasures={view.stars}
+      data-time={view.time.toFixed(2)}
     >
       <div className="runner-world" ref={worldHost} />
       {flat && <FlatWorld view={view} />}
@@ -580,14 +791,18 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
           </span>
           {runnerIslands[view.island].name}
         </span>
-        <h2>Rainbow run</h2>
+        <h2>Jungle dash</h2>
         <p>{caption}</p>
       </div>
-      <div className="runner-goal" role="status" aria-label={`${view.stars} of 5 stars collected`}>
+      <div
+        className="runner-goal"
+        role="status"
+        aria-label={`${view.stars} of 5 treasures collected`}
+      >
         <span className="runner-goal-stars" aria-hidden="true">
           {[0, 1, 2, 3, 4].map((i) => (
             <span key={i} className={i < view.stars ? 'is-collected' : ''}>
-              ★
+              {finds[i] ? <PrizeArt kind={finds[i]} /> : <Star />}
             </span>
           ))}
         </span>
@@ -599,6 +814,52 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
           </span>
         </span>
       </div>
+      <button
+        type="button"
+        className={`runner-peek ${revealed ? 'is-revealed' : ''}`}
+        data-runner-friend
+        aria-label={`Play peekaboo with ${friendName}`}
+        aria-pressed={revealed}
+        disabled={paused}
+        onClick={peek}
+      >
+        <span className="runner-peek-label">{revealed ? 'Peekaboo!' : 'Who’s there?'}</span>
+        <span className="runner-peek-friend">
+          <Animal kind={friend} />
+          {revealed && <b>{friendName[0].toUpperCase()}</b>}
+        </span>
+        <svg className="runner-peek-bush" viewBox="0 0 160 75" aria-hidden="true">
+          <path
+            d="M4 75Q-5 43 27 41Q10 8 49 20Q71-8 92 20Q130 0 130 36Q169 30 156 75Z"
+            fill={runnerIslands[view.island].tree}
+          />
+          <path
+            d="M20 67q18-20 37 0m28-12q20-15 40 4"
+            fill="none"
+            stroke="#ffffff"
+            strokeOpacity=".2"
+            strokeWidth="6"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
+      {finds.length > 0 && (
+        <button
+          type="button"
+          data-runner-prize
+          className="runner-word"
+          disabled={paused}
+          aria-label={`Hear ${prizeWords[finds[finds.length - 1]].letter} is for ${finds[finds.length - 1]}`}
+          onClick={() => {
+            const w = prizeWords[finds[finds.length - 1]];
+            speak(`${w.letter} is for ${w.word}.`, settings, { interrupt: true });
+          }}
+        >
+          <b>{prizeWords[finds[finds.length - 1]].letter}</b>
+          <PrizeArt kind={finds[finds.length - 1]} />
+          <span>{finds[finds.length - 1]}</span>
+        </button>
+      )}
       <div className="runner-controls" aria-label="Driving controls">
         <button
           type="button"

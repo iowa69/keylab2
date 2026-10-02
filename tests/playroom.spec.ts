@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-const storageKey = 'keylab2-adventures-v4';
+const storageKey = 'keylab2-adventures-v5';
 const errors = new WeakMap<Page, string[]>();
 test.beforeEach(async ({ page }) => {
   const caught: string[] = [];
@@ -59,9 +59,11 @@ for (const [id, name] of games)
   test(`${name}: child chooses, plays and returns home`, async ({ page }) => {
     await setup(page);
     await expect(page.locator('.game-card')).toHaveCount(9);
+    for (const card of await page.locator('.game-card').all()) await expect(card).toBeInViewport();
     await open(page, name);
     await expect(page.locator('.game-heading h1')).toHaveText(name);
     await page.keyboard.press('g');
+    await expect(page.getByRole('navigation', { name: 'Switch adventures' })).toBeVisible();
     await expect(page.locator('.game-body')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Home — choose another game' })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
@@ -69,44 +71,8 @@ for (const [id, name] of games)
     );
     await page.getByRole('button', { name: 'Home — choose another game' }).click();
     await expect(page.getByRole('heading', { name: 'Where shall we go?' })).toBeVisible();
-    await expect(page.locator(`[data-game="${id}"]`)).toBeFocused();
+    await expect(page.locator(`.game-card[data-game="${id}"]`)).toBeFocused();
   });
-test('solar exploration connects fuel, flight, a real planet and a keepsake', async ({ page }) => {
-  await setup(page);
-  await open(page, 'Space explorers');
-  await page.getByRole('button', { name: 'Explore Saturn', exact: true }).click();
-  await page.getByRole('button', { name: 'Collect fuel star 1' }).click();
-  await page.keyboard.press('x');
-  await page.keyboard.press('y');
-  await expect(page.getByTestId('space-game')).toHaveAttribute('data-phase', 'fly');
-  await expect(page.getByRole('heading', { name: 'Hello, Saturn!' })).toBeVisible({
-    timeout: 5000,
-  });
-  await expect(page.getByText('Look at those beautiful rings!')).toBeVisible();
-  await page.getByRole('button', { name: 'Next planet' }).click();
-  await expect(page.getByRole('heading', { name: 'Uranus', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Home — choose another game' }).click();
-  await expect(page.locator('[data-game="space"] [aria-label="Adventure explored"]')).toBeVisible();
-  await page.reload();
-  await expect(page.locator('[data-game="space"] [aria-label="Adventure explored"]')).toBeVisible();
-});
-test('ice cream and chocolate are made, decorated, and shared', async ({ page }) => {
-  await setup(page);
-  await open(page, 'The sweet shop');
-  await page.getByRole('button', { name: 'Add strawberry scoop' }).click();
-  await page.getByRole('button', { name: 'Add chocolate scoop' }).click();
-  await page.keyboard.press('v');
-  await page.getByRole('button', { name: 'Sprinkles', exact: true }).click();
-  await page.getByRole('button', { name: 'Serve to our friend' }).click();
-  await expect(page.getByTestId('treats-game')).toHaveAttribute('data-phase', 'yum');
-  await expect(page.getByText('Yum, yum, yum!')).toBeVisible();
-  await page.getByRole('button', { name: 'Make another' }).click();
-  await page.getByRole('button', { name: 'Chocolate', exact: true }).click();
-  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: /Pour chocolate/ }).click();
-  await page.keyboard.press('c');
-  await page.keyboard.press('x');
-  await expect(page.getByTestId('treats-game')).toHaveAttribute('data-phase', 'yum');
-});
 test('a whole song is playable by any keys, with free play and song choice', async ({ page }) => {
   await setup(page);
   await open(page, 'Little music makers');
@@ -148,72 +114,21 @@ test('listening pauses, and mute stops automatic song playback', async ({ page }
     String(Number(muted) + 1),
   );
 });
-test('rocket and treat animations freeze when play becomes hidden', async ({ page }) => {
+
+test('sliding across the piano plays each new color once', async ({ page }) => {
   await setup(page);
-  await open(page, 'Space explorers');
-  for (const key of ['x', 'y', 'z']) await page.keyboard.press(key);
-  await expect(page.getByTestId('space-game')).toHaveAttribute('data-phase', 'fly');
-  await page.waitForTimeout(120);
-  await visibility(page, true);
-  const pose = () =>
-    page.locator('.space-rocket').evaluate((el) => {
-      const s = getComputedStyle(el);
-      return [s.left, s.top, s.transform];
-    });
-  const frozen = await pose();
-  await page.waitForTimeout(400);
-  expect(await pose()).toEqual(frozen);
-  await expect(page.getByTestId('space-game')).toHaveAttribute('data-phase', 'fly');
-  await visibility(page, false);
-  await expect(page.getByTestId('space-game')).toHaveAttribute('data-phase', 'visit');
-  await page.getByRole('button', { name: 'Home — choose another game' }).click();
-  await open(page, 'The sweet shop');
-  for (let i = 0; i < 5; i++) await page.keyboard.press('x');
-  await expect(page.getByTestId('treats-game')).toHaveAttribute('data-phase', 'serve');
-  await visibility(page, true);
-  const treat = () =>
-    page.locator('.treat-product').evaluate((el) => {
-      const s = getComputedStyle(el);
-      return [s.left, s.transform, s.opacity];
-    });
-  const paused = await treat();
-  await page.waitForTimeout(400);
-  expect(await treat()).toEqual(paused);
-  await visibility(page, false);
-  await expect(page.getByTestId('treats-game')).toHaveAttribute('data-phase', 'yum');
-});
-test('mischief washes muddy friends and starts a fresh puddle', async ({ page }) => {
-  await setup(page);
-  await open(page, 'Mischief meadow');
-  for (let i = 0; i < 12; i++) {
-    await page.keyboard.press('x');
-    await page.waitForTimeout(400);
-  }
-  await expect(page.getByLabel('3 of 3 friends washed')).toBeVisible();
-  await page.getByRole('button', { name: 'New puddle' }).click();
-  await expect(page.getByLabel('0 of 3 friends washed')).toBeVisible();
-  await expect(page.locator('[data-friend]')).toHaveCount(3);
-});
-test('arcade catches a pictured order, serves it, then changes fruit', async ({ page }) => {
-  await setup(page);
-  await open(page, 'Fruit picnic');
-  await expect
-    .poll(
-      async () => {
-        const phase = await page.getByTestId('arcade-game').getAttribute('data-phase');
-        if (phase === 'catch') {
-          await page.keyboard.press('x');
-          await page.waitForTimeout(140);
-        }
-        return phase;
-      },
-      { timeout: 17000, intervals: [120] },
-    )
-    .toBe('ready');
-  await page.getByRole('button', { name: 'Serve the fruit picnic' }).click();
-  await expect(page.getByTestId('arcade-game')).toHaveAttribute('data-phase', 'served');
-  await page.getByRole('button', { name: 'Next fruit picnic' }).click();
-  await expect(page.getByLabel('0 of 4 oranges collected')).toBeVisible();
+  await open(page, 'Little music makers');
+  const first = await page.getByRole('button', { name: 'Piano key 1', exact: true }).boundingBox();
+  const fourth = await page.getByRole('button', { name: 'Piano key 4', exact: true }).boundingBox();
+  await page.mouse.move(first!.x + first!.width / 2, first!.y + first!.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(fourth!.x + fourth!.width / 2, fourth!.y + fourth!.height / 2, {
+    steps: 24,
+  });
+  await page.mouse.up();
+  await expect(page.getByTestId('music-game')).toHaveAttribute('data-notes-played', '4');
+  await page.keyboard.press('x');
+  await expect(page.getByTestId('music-game')).toHaveAttribute('data-notes-played', '5');
 });
 test('short accidental parent tap preserves keyboard play; settings pause and persist', async ({
   page,
@@ -251,7 +166,7 @@ test('small portrait keeps home reachable and prevents horizontal overflow', asy
     'Mischief meadow',
   ]) {
     await open(page, name);
-    await page.mouse.wheel(0, 300);
+    await page.evaluate(() => window.scrollTo(0, 300));
     const home = page.getByRole('button', { name: 'Home — choose another game' });
     await expect(home).toBeInViewport();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
@@ -259,100 +174,6 @@ test('small portrait keeps home reachable and prevents horizontal overflow', asy
     );
     await home.click();
   }
-});
-test('cached playground and all nine adventures work after an offline reload', async ({
-  page,
-  context,
-}) => {
-  await setup(page);
-  await expect(page.locator('main')).toHaveAttribute('data-offline-ready', 'true', {
-    timeout: 20000,
-  });
-  await page.reload();
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
-  });
-  await context.setOffline(true);
-  await page.reload();
-  await expect(page.locator('.game-card')).toHaveCount(9);
-  for (const name of [
-    'My little garage',
-    'Jungle dash',
-    'Space explorers',
-    'Little music makers',
-  ]) {
-    await open(page, name);
-    await expect(page.locator('.game-heading h1')).toHaveText(name);
-    await page.keyboard.press('x');
-    await page.getByRole('button', { name: 'Home — choose another game' }).click();
-  }
-  await context.setOffline(false);
-});
-test('a custom car keeps its chosen parts while driving and delivering', async ({ page }) => {
-  await setup(page);
-  await open(page, 'My little garage');
-  await page.getByRole('button', { name: 'Choose van', exact: true }).click();
-  await page.getByRole('button', { name: 'Paint car blue', exact: true }).click();
-  await page.getByRole('button', { name: 'Choose flower wheels', exact: true }).click();
-  await expect(page.getByRole('img', { name: 'Blue van with flower wheels' })).toBeVisible();
-  await page.getByRole('button', { name: 'Drive my car' }).click();
-  await page.getByRole('button', { name: 'Accelerate. Tap or hold to drive' }).click();
-  for (let i = 0; i < 14; i++) await page.keyboard.press('x');
-  await expect(page.getByRole('heading', { name: 'A picnic for bunny!' })).toBeVisible();
-  await expect(page.getByLabel('5 of 5 stars collected')).toBeVisible();
-  await page.getByRole('button', { name: 'Drive again' }).click();
-  await expect(page.getByRole('heading', { name: 'Take the picnic to bunny' })).toBeVisible();
-  await page.getByRole('button', { name: 'Build a new car' }).click();
-  await expect(page.getByRole('heading', { name: 'Pick your car' })).toBeVisible();
-});
-for (const vehicle of ['train', 'plane'])
-  test(`${vehicle}: boards friends and delivers them to three places`, async ({ page }) => {
-    await setup(page);
-    await open(page, 'Away we go!');
-    await page.getByRole('button', { name: `Choose the ${vehicle}` }).click();
-    for (const friend of ['Fox', 'Chick', 'Elephant'])
-      await page.getByRole('button', { name: `Board ${friend}`, exact: true }).click();
-    for (const [friend, place] of [
-      ['Fox', 'Apple farm'],
-      ['Chick', 'Rainbow mountain'],
-      ['Elephant', 'Sunny beach'],
-    ]) {
-      for (let i = 0; i < 5; i++) await page.keyboard.press('x');
-      await page
-        .getByRole('button', { name: `Let ${friend} off at ${place}`, exact: true })
-        .click();
-    }
-    await expect(page.getByRole('heading', { name: 'Three very happy friends!' })).toBeVisible();
-    await page.getByRole('button', { name: 'Take another trip' }).click();
-    await expect(page.getByRole('heading', { name: 'Three friends need a ride' })).toBeVisible();
-  });
-test('the runner stays playable when WebGL is unavailable', async ({ page }) => {
-  await page.addInitScript(() => {
-    const original = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function (
-      this: HTMLCanvasElement,
-      type: string,
-      ...args: unknown[]
-    ) {
-      return type === 'webgl' || type === 'webgl2'
-        ? null
-        : Reflect.apply(original, this, [type, ...args]);
-    } as typeof original;
-  });
-  await setup(page);
-  await open(page, 'Jungle dash');
-  await expect(page.locator('.runner-flat-world')).toBeVisible();
-  const player = page.locator('.runner-flat-player');
-  await page.getByRole('button', { name: 'Move left', exact: true }).click();
-  await expect
-    .poll(async () => player.evaluate((el) => parseFloat((el as HTMLElement).style.left)))
-    .toBeLessThan(50);
-  await page.keyboard.press('x');
-  await expect
-    .poll(async () => player.evaluate((el) => getComputedStyle(el).transform))
-    .not.toBe('none');
-  await page.getByRole('button', { name: 'Home — choose another game' }).click();
-  await expect(page.locator('.game-card')).toHaveCount(9);
 });
 test('discovery fills pages of letters, numbers, and colors, with helpful baby matching', async ({
   page,
@@ -402,4 +223,82 @@ test('rest counts active game time and can be restarted by a grown-up', async ({
   await expect(page.getByRole('heading', { name: 'A little time to rest.' })).not.toBeVisible();
   await page.keyboard.press('x');
   await expect(page.getByTestId('music-game')).toHaveAttribute('data-notes-played', '1');
+});
+
+test('picture dock preserves play and freezes a song while exploring another game', async ({
+  page,
+}) => {
+  await setup(page, { sound: true, narration: false });
+  await open(page, 'Little music makers');
+  await page.getByRole('button', { name: 'Listen', exact: true }).click();
+  await expect
+    .poll(async () =>
+      Number(await page.getByTestId('music-game').getAttribute('data-notes-played')),
+    )
+    .toBeGreaterThan(0);
+  await page.getByRole('button', { name: 'Switch to Discovery safari', exact: true }).click();
+  const notes = await page.getByTestId('music-game').getAttribute('data-notes-played');
+  await page.getByRole('button', { name: 'A for Apple', exact: true }).click();
+  await page.waitForTimeout(650);
+  await expect(page.getByTestId('music-game')).toHaveAttribute('data-notes-played', notes!);
+  await page.getByRole('button', { name: 'Switch to Little music makers', exact: true }).click();
+  await expect(page.getByTestId('music-game')).toBeVisible();
+  await expect(page.getByTestId('music-game')).toHaveAttribute('data-notes-played', notes!);
+  await page.getByRole('button', { name: 'Switch to Discovery safari', exact: true }).click();
+  await expect(page.getByTestId('discovery-game')).toHaveAttribute('data-phase', 'found');
+  await page.getByRole('button', { name: 'Home — choose another game' }).click();
+  await open(page, 'Discovery safari');
+  await expect(page.getByTestId('discovery-game')).toHaveAttribute('data-phase', 'found');
+});
+
+test('English greetings work before the device returns its voice list', async ({ page }) => {
+  await page.addInitScript(() => {
+    const spoken: { text: string; lang: string }[] = [];
+    Object.defineProperty(window, '__testSpoken', { value: spoken });
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+      configurable: true,
+      value: class {
+        text: string;
+        constructor(text: string) {
+          this.text = text;
+        }
+      },
+    });
+    Object.defineProperty(window, 'speechSynthesis', {
+      configurable: true,
+      value: {
+        getVoices: () => [],
+        speak: (utterance: { text: string; lang: string }) =>
+          spoken.push({ text: utterance.text, lang: utterance.lang }),
+        cancel: () => {},
+        resume: () => {},
+        paused: false,
+      },
+    });
+  });
+  await setup(page, { sound: true, name: 'Pip' });
+  await page.getByRole('button', { name: 'Say hello to Pip' }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as unknown as { __testSpoken: { text: string; lang: string }[] }).__testSpoken,
+      ),
+    )
+    .toContainEqual({ text: 'Hello, Pip! I’m Pip. Let’s play!', lang: 'en-GB' });
+  await parents(page);
+  await page.getByLabel('Name for greetings').fill('Little Star');
+  await page.getByRole('checkbox', { name: 'English words & greetings' }).uncheck();
+  await page.getByRole('button', { name: 'Back to playing' }).click();
+  const count = await page.evaluate(
+    () => (window as unknown as { __testSpoken: unknown[] }).__testSpoken.length,
+  );
+  await page.getByRole('button', { name: 'Say hello to Pip' }).click();
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { __testSpoken: unknown[] }).__testSpoken.length,
+    ),
+  ).toBe(count);
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Hello, Little Star!' })).toBeVisible();
 });

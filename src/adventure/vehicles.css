@@ -1,898 +1,1259 @@
 .vg-game {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px 18px;
   color: #243c56;
-  padding: 22px 28px 24px;
   font-family: var(--round, 'Nunito', sans-serif);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .vg-game * {
   box-sizing: border-box;
 }
 .vg-game button {
   font-family: inherit;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  color: inherit;
   cursor: pointer;
-}
-.vg-game button:focus-visible {
-  outline: 4px solid #395d82;
-  outline-offset: 5px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .vg-game button:disabled {
   cursor: default;
 }
-.vg-game-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 18px;
-  min-height: 72px;
-  margin-bottom: 15px;
+.vg-game button:focus-visible {
+  outline: 4px solid #3978a0;
+  outline-offset: 2px;
 }
-.vg-eyebrow {
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  color: #817764;
-}
-.vg-game h2 {
-  font-size: clamp(23px, 2.8vw, 35px);
-  font-weight: 900;
-  line-height: 1.12;
-  margin: 6px 0;
-  letter-spacing: -0.04em;
-}
-.vg-build-progress {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-}
-.vg-step {
-  display: grid;
-  justify-items: center;
-  gap: 4px;
-  position: relative;
-  color: #938671;
-}
-.vg-step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  width: 27px;
-  height: 2px;
-  background: #e6dbc4;
-  left: calc(100% - 4px);
-  top: 18px;
-}
-.vg-step > span {
-  background: #efe6d4;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 17px;
-  font-weight: 900;
-}
-.vg-step small {
-  font-weight: 800;
-  font-size: 10px;
-}
-.vg-step-current > span {
-  background: #f3c75c;
-  box-shadow: 0 0 0 4px #fae8b3;
-  color: #243c56;
-}
-.vg-step-current {
-  color: #243c56;
-}
-.vg-step-done > span {
-  background: #9fc6a3;
-  color: #244e42;
-}
-.vg-garage-stage,
-.vg-road-stage,
-.vg-journey-stage {
-  overflow: hidden;
-  border-radius: 25px;
-  border: 2px solid #eadfc9;
-  background: #f6e6c9;
-}
-.vg-garage-stage > svg,
-.vg-scene {
-  width: 100%;
+.vg-game button svg {
   display: block;
-}
-.vg-garage-stage {
-  max-height: 335px;
-}
-.vg-garage-stage > svg {
-  max-height: 335px;
-}
-.vg-road-stage,
-.vg-journey-stage {
-  touch-action: manipulation;
-}
-.vg-scene {
-  max-height: 410px;
-}
-.vg-choices {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  max-width: 850px;
-  margin: 18px auto 0;
-}
-.vg-picture-choice {
-  flex: 1;
-  min-width: 0;
-  max-width: 242px;
-  border: 2px solid #eadfc9;
-  border-radius: 22px;
-  background: #fffcf4;
-  color: #243c56;
-  box-shadow: 0 5px 0 #e8dcc4;
-  padding: 8px 12px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition:
-    transform 0.15s,
-    background 0.15s;
-}
-.vg-picture-choice:hover {
-  transform: translateY(-3px);
-  background: #fff2cd;
-}
-.vg-picture-choice:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 #e8dcc4;
-}
-.vg-picture-choice svg {
   width: 100%;
-  max-height: 120px;
+  height: 100%;
+  pointer-events: none;
 }
-.vg-picture-choice > span {
-  font-size: 14px;
-  font-weight: 900;
-}
-.vg-paint-choice,
-.vg-wheel-choice {
-  max-width: 180px;
-}
-.vg-paint-choice > svg,
-.vg-wheel-choice > svg {
-  max-height: 92px;
-}
-.vg-bottom-bar {
+.vg-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 15px;
-  margin-top: 18px;
+  gap: 12px;
+  flex-shrink: 0;
 }
-.vg-small-action {
-  background: #f5edda;
-  color: #685f50;
+.vg-kicker {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  font-weight: 900;
+  color: #7c7b67;
+}
+.vg-title h2 {
+  font-size: clamp(20px, 2.6vw, 30px);
+  line-height: 1.06;
+  margin: 3px 0;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+.vg-mini {
+  background: #fff3ca;
+  border: 2px solid #dec59b;
+  width: 52px;
+  height: 49px;
+  border-radius: 17px;
+  padding: 5px;
+}
+.vg-tally {
   display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 10px 14px;
-  border: 1.5px solid #e6dac2;
-  border-radius: 16px;
-  min-height: 56px;
-  font-size: 12px;
-  font-weight: 800;
-}
-.vg-small-action svg {
-  width: 29px;
-  height: 29px;
-}
-.vg-small-action:hover {
-  background: #ecdfc3;
-}
-.vg-go-button {
-  min-width: 144px;
-  min-height: 86px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid #345a4b;
-  border-radius: 24px;
-  background: #92c69a;
-  color: #244c41;
-  font-size: 20px;
-  font-weight: 1000;
-  padding: 7px 20px;
-  box-shadow: 0 5px 0 #4f8064;
-}
-.vg-go-button > svg {
-  width: 50px;
-  height: 45px;
-}
-.vg-go-button:hover {
-  background: #a2d5a8;
-}
-.vg-go-button:active {
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 #4f8064;
-}
-.vg-mission {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 3px;
+  background: #fff0c1;
+  border: 2px solid #e3c88d;
+  border-radius: 20px;
+  padding: 3px 10px 3px 4px;
 }
-.vg-mission > svg {
-  width: 130px;
-  height: 53px;
+.vg-tally svg {
+  width: 40px;
+  height: 40px;
 }
-.vg-mission > small {
-  font-size: 13px;
-  font-weight: 800;
+.vg-tally b {
+  font-size: 25px;
 }
-.vg-play-hint {
-  font-size: 12px;
-  color: #7c7465;
-  text-align: center;
-  line-height: 1.5;
-  margin: 0;
-}
-.vg-play-hint > strong {
-  font-size: 14px;
-  color: #52605e;
-}
-.vg-star-count {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: #f9ebc1;
-  border: 1px solid #e5d3a4;
-  padding: 3px 13px 3px 3px;
-  border-radius: 15px;
-  white-space: nowrap;
-}
-.vg-star-count svg {
-  width: 43px;
-  height: 43px;
-}
-.vg-star-count b {
-  font-size: 26px;
-}
-.vg-star-count b > span {
-  font-size: 15px;
-  opacity: 0.6;
-}
-.vg-route {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 12px 9px 0;
-  color: #6a8e78;
-  font-size: 23px;
-}
-.vg-route > div {
-  background: #e8e6cf;
-  border-radius: 6px;
+.vg-main-scene {
+  position: relative;
+  min-height: 0;
   flex: 1;
-  height: 8px;
+  border: 2px solid #dddbc5;
+  border-radius: 25px;
   overflow: hidden;
+  background: #d6e8d9;
+  isolation: isolate;
 }
-.vg-route i {
-  display: block;
+.vg-main-scene > svg {
+  width: 100%;
   height: 100%;
-  border-radius: inherit;
-  background: #81b18d;
-  transition: width 0.22s;
+  display: block;
+}
+.vg-build-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.vg-build-tabs button {
+  width: 90px;
+  height: 70px;
+  border: 2px solid transparent;
+  border-radius: 17px;
+  background: #eee7d6;
+  padding: 4px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.vg-build-tabs button svg {
+  height: 43px;
+  width: 52px;
+}
+.vg-build-tabs span {
+  font-size: 10px;
+  font-weight: 900;
+}
+.vg-build-tabs [aria-selected='true'] {
+  background: #ffdfa0;
+  border-color: #bf9751;
+}
+.vg-options {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 0;
+  height: 85px;
+}
+.vg-options > button {
+  border: 2px solid #e1cfac;
+  background: #fffaf0;
+  border-radius: 20px;
+  box-shadow: 0 3px #e3d5bd;
+  flex: 1;
+  max-width: 150px;
+  min-width: 0;
+  padding: 5px;
+}
+.vg-options > button[aria-pressed='true'] {
+  border-color: #5e9d91;
+  background: #e4f0dd;
+  box-shadow: 0 3px #88b6a4;
+}
+.vg-options > button.vg-start-button,
+.vg-controls > button.vg-start-button {
+  background: #83c89c;
+  border-color: #559774;
+  box-shadow: 0 3px #559774;
+}
+.vg-start-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 12px;
+  font-weight: 900;
+}
+.vg-start-button svg {
+  max-height: 46px;
+}
+.vg-controls {
+  display: flex;
+  gap: 9px;
+  justify-content: center;
+  height: 80px;
+  flex-shrink: 0;
+}
+.vg-controls > button {
+  flex: 1;
+  max-width: 115px;
+  min-width: 0;
+  border: 2px solid #dfcba5;
+  border-radius: 19px;
+  background: #fff7dd;
+  padding: 4px 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  box-shadow: 0 3px #e2d4b8;
+  font-weight: 900;
+  font-size: 11px;
+}
+.vg-controls > button svg {
+  max-height: 43px;
+}
+.vg-toy-choices {
+  display: flex;
+  background: #e9eee2;
+  border-radius: 20px;
+  padding: 7px;
+  gap: 5px;
+  min-width: 0;
+  max-width: 250px;
+  flex: 3;
+}
+.vg-toy-choices button {
+  width: 33.33%;
+  max-width: 76px;
+  border: 2px solid transparent;
+  background: transparent;
+  border-radius: 14px;
+  padding: 4px;
+  min-width: 0;
+}
+.vg-toy-choices [aria-pressed='true'] {
+  border-color: #90bfae;
+  background: #fff8df;
+}
+.vg-window-button {
+  position: absolute;
+  left: 37%;
+  top: 35%;
+  width: 76px;
+  height: 86px;
+  border: 3px solid #fff0c4;
+  border-radius: 22px;
+  background: #fff9e7ed;
+  box-shadow: 0 4px 0 #5b768234;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 900;
+}
+.vg-window-button > svg {
+  height: 51px !important;
+}
+.vg-friend-button {
+  position: absolute;
+  right: 9%;
+  bottom: 19%;
+  width: 17%;
+  height: 38%;
+  border: 0;
+  border-radius: 40%;
+  background: transparent;
+}
+.vg-road-label {
+  position: absolute;
+  bottom: 6px;
+  left: 14px;
+  background: #fff3dcb8;
+  padding: 3px 9px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  pointer-events: none;
+}
+.vg-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 .vg-wheel-turn {
-  animation: vg-spin 0.9s linear infinite;
+  animation: vg-spin 0.65s linear infinite;
 }
-.vg-scenery {
-  transition: transform 0.24s linear;
+.vg-car-bob {
+  animation: vg-bob 0.8s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: center;
 }
-.vg-paused * {
+.vg-friend-breathe {
+  animation: vg-breathe 2.5s ease-in-out infinite alternate;
+}
+.vg-friend-wave {
+  animation: vg-wave 0.35s ease-in-out 4 alternate;
+}
+.vg-game .vg-blink {
+  animation: vg-blink 5s infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+.vg-paused *,
+.vg-paused *:before,
+.vg-paused *:after {
   animation-play-state: paused !important;
 }
-.vg-propeller {
-  animation: vg-propeller 0.24s ease-in-out infinite alternate;
+.vg-calm *,
+.vg-calm *:before,
+.vg-calm *:after {
+  animation: none !important;
+  transition: none !important;
+}
+.vg-transport-choose {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 5px;
+}
+.vg-vehicle-pick {
+  min-height: 0;
+  background: #f5dfad;
+  border: 3px solid #d5b789;
+  border-radius: 30px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 5px #ddc5a0;
+}
+.vg-vehicle-pick:nth-child(2) {
+  background: #d3e9df;
+  border-color: #abc9be;
+  box-shadow: 0 5px #abc9be;
+}
+.vg-vehicle-pick svg {
+  height: auto !important;
+  max-height: 300px;
+}
+.vg-vehicle-pick strong {
+  font-size: clamp(20px, 3vw, 36px);
+  font-weight: 900;
+}
+.vg-vehicle-pick span {
+  font-size: 13px;
+  font-weight: 800;
+  margin: 6px;
+}
+.vg-transport-stage {
+  touch-action: none;
+}
+.vg-train-layout {
+  position: absolute;
+  left: 7%;
+  right: 6%;
+  bottom: 20%;
+  display: flex;
+  align-items: flex-end;
+  height: 39%;
+  gap: 1.4%;
+  z-index: 2;
+}
+.vg-coach {
+  height: 100%;
+  width: 24%;
+  position: relative;
+  border: 3px solid #465b64;
+  border-radius: 18px 18px 12px 12px;
+  background: var(--coach);
+  padding: 8px 5px 10px;
+  overflow: visible;
+  box-shadow: 0 7px 0 #4a5c62;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+.vg-coach:before,
+.vg-coach:after {
+  content: '';
+  position: absolute;
+  bottom: -17px;
+  width: 24px;
+  height: 24px;
+  border: 5px solid #354e60;
+  border-radius: 50%;
+  background: #f5ddb0;
+}
+.vg-coach:before {
+  left: 11%;
+}
+.vg-coach:after {
+  right: 11%;
+}
+.vg-coach-window {
+  position: relative;
+  display: block;
+  flex: 1;
+  min-height: 0;
+  width: 85%;
+  border: 2px solid #71938c;
+  border-radius: 15px;
+  background: #f4f0db;
+  overflow: visible;
+}
+.vg-coach-window > svg {
+  height: 100% !important;
+  width: 100% !important;
+}
+.vg-seat-label {
+  font-size: clamp(8px, 1.1vw, 12px);
+  font-weight: 900;
+  line-height: 1.1;
+  padding-top: 5px;
+  white-space: nowrap;
+}
+.vg-coach[data-empty='true'] .vg-coach-window {
+  border-style: dashed;
+  background: #ffffff70;
+}
+.vg-coach[data-ready='true'] {
+  box-shadow:
+    0 0 0 5px #fff0a9,
+    0 8px 0 #4a5c62;
+}
+.vg-seat-nudge {
+  font-size: clamp(24px, 4vw, 40px);
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #4c756e;
+}
+.vg-engine {
+  height: 120%;
+  width: 25%;
+  position: relative;
+  align-self: flex-end;
+}
+.vg-engine > svg {
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+}
+.vg-cat {
+  position: absolute;
+  top: -54px;
+  left: 22%;
+  width: 67px;
+  height: 66px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  z-index: 3;
+}
+.vg-cat-speech {
+  position: absolute;
+  top: -60px;
+  left: 76%;
+  font-weight: 900;
+  background: #fff9e6;
+  border-radius: 20px;
+  padding: 8px 13px;
+  white-space: nowrap;
+  font-size: 15px;
+}
+.vg-plane-layout {
+  bottom: 25%;
+  left: 13%;
+  right: 10%;
+  height: 34%;
+  background: #f5d57b;
+  border: 3px solid #566776;
+  border-radius: 80px 90px 40px 45px;
+  padding: 15px 15% 15px 6%;
+  gap: 4%;
+  box-shadow: 0 8px #d4ab62;
+}
+.vg-plane-layout:before {
+  content: '';
+  position: absolute;
+  width: 24%;
+  height: 120%;
+  top: 30%;
+  left: 39%;
+  transform: skew(-38deg);
+  background: #ec9b88;
+  border: 3px solid #566776;
+  border-radius: 0 0 15px 15px;
+  z-index: -1;
+}
+.vg-plane-layout .vg-coach {
+  width: 33.33%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 50%;
+}
+.vg-plane-layout .vg-coach:before,
+.vg-plane-layout .vg-coach:after {
+  display: none;
+}
+.vg-plane-layout .vg-coach-window {
+  width: 100%;
+  border-radius: 50%;
+}
+.vg-plane-layout .vg-seat-label {
+  position: absolute;
+  top: 100%;
+  padding-top: 7px;
+}
+.vg-plane-layout .vg-engine {
+  position: absolute;
+  right: -5%;
+  width: 15%;
+  height: 90%;
+  top: 5%;
+}
+.vg-plane-layout .vg-cat {
+  left: -30%;
+  top: -51px;
+}
+.vg-plane-layout .vg-cat-speech {
+  left: 65%;
+}
+.vg-passenger-dock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-shrink: 0;
+  height: 89px;
+  min-width: 0;
+}
+.vg-passenger-button {
+  background: #fff7e4;
+  border: 2px solid #d6c6a6;
+  border-radius: 19px;
+  min-width: 0;
+  max-width: 110px;
+  height: 85px;
+  flex: 1;
+  padding: 5px;
+  touch-action: none !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.vg-passenger-button > svg {
+  height: 60px !important;
+  pointer-events: none;
+}
+.vg-passenger-button span {
+  font-size: 10px;
+  font-weight: 900;
+}
+.vg-passenger-button[aria-pressed='true'] {
+  border-color: #5a9c87;
+  background: #dff0df;
+  box-shadow: 0 0 0 3px #9fcbad;
+}
+.vg-passenger-button[data-boarded='true'] {
+  background: #e6e9d9;
+  border-style: dashed;
+  opacity: 0.75;
+}
+.vg-drag-ghost {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  width: 94px;
+  height: 94px;
+  filter: drop-shadow(0 7px 5px #243c5633);
+  transform: translate(-50%, -50%);
+}
+.vg-drag-ghost svg {
+  width: 100%;
+  height: 100%;
+}
+.vg-boarding-instruction {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  background: #fff9e6e8;
+  border: 2px solid #e1d4b5;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+  z-index: 3;
+}
+.vg-floating-food {
+  position: absolute;
+  top: 16%;
+  width: 72px;
+  height: 72px;
+  border: 2px solid #fff2c9;
+  background: #fffae9e8;
+  box-shadow: 0 4px #8da7a330;
+  border-radius: 50%;
+  padding: 7px;
+  z-index: 4;
+  animation: vg-food-bob 2.4s ease-in-out infinite alternate;
+}
+.vg-floating-food:nth-of-type(2n) {
+  animation-delay: -1s;
+}
+.vg-feed-wish {
+  position: absolute;
+  top: -39px;
+  right: -12px;
+  width: 44px;
+  height: 44px;
+  background: #fff8e9;
+  border: 2px solid #c8b99a;
+  border-radius: 50%;
+  padding: 5px;
+  pointer-events: none;
+}
+.vg-feed-wish:after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 11px;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  background: #fff8e9;
+  border-right: 2px solid #c8b99a;
+  border-bottom: 2px solid #c8b99a;
+}
+.vg-reaction {
+  position: absolute;
+  top: -42px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 7px 13px;
+  background: #fff4bc;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 1000;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 5;
+}
+.vg-happy .vg-coach-window > svg {
+  animation: vg-munch 0.35s ease-in-out 6 alternate;
+}
+.vg-yuck .vg-coach-window > svg {
+  animation: vg-nope 0.25s ease-in-out 6 alternate;
+}
+.vg-inventory {
+  display: flex;
+  gap: 5px;
+  flex: 3;
+  min-width: 0;
+  border-radius: 20px;
+  background: #e9e9d9;
+  padding: 5px;
+  max-width: 260px;
+}
+.vg-inventory > button {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 15px;
+  padding: 3px;
+}
+.vg-inventory > button[aria-pressed='true'] {
+  border-color: #8fb79c;
+  background: #fff9e3;
+}
+.vg-inventory > button[data-empty='true'] {
+  opacity: 0.4;
+}
+.vg-inventory small {
+  font-size: 11px;
+  font-weight: 900;
+}
+.vg-inventory svg {
+  height: 42px !important;
+}
+.vg-transport-status {
+  font-size: 12px;
+  font-weight: 800;
+  max-width: 200px;
+  text-align: center;
+}
+.vg-transport-status svg {
+  height: 45px;
+  width: 45px;
+  display: block;
+  margin: auto;
+}
+.vg-moving .vg-coach:before,
+.vg-moving .vg-coach:after {
+  animation: vg-spin 0.7s linear infinite;
 }
 @keyframes vg-spin {
   to {
     transform: rotate(360deg);
   }
 }
-@keyframes vg-propeller {
+@keyframes vg-bob {
+  from {
+    translate: 0 0;
+  }
   to {
-    transform: scaleY(0.15);
+    translate: 0 -3px;
   }
 }
-.vg-passenger-count {
-  border-radius: 17px;
-  padding: 7px 13px;
-  display: flex;
-  gap: 7px;
-  align-items: center;
-  background: #e8edd7;
+@keyframes vg-breathe {
+  to {
+    scale: 1 1.035;
+    translate: 0 -2px;
+  }
 }
-.vg-passenger-count b {
-  font-size: 30px;
+@keyframes vg-wave {
+  to {
+    rotate: 9deg;
+    translate: 0 -9px;
+  }
 }
-.vg-passenger-count span {
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.25;
+@keyframes vg-blink {
+  0%,
+  43%,
+  47%,
+  100% {
+    scale: 1 1;
+  }
+  45% {
+    scale: 1 0.1;
+  }
 }
-.vg-transport-choices {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 25px;
-  padding: 10px 15px 30px;
+@keyframes vg-food-bob {
+  to {
+    translate: 0 -8px;
+  }
 }
-.vg-vehicle-card {
-  position: relative;
-  background: #f4edcf;
-  border: 2px solid #e3d9b9;
-  border-radius: 30px;
-  color: #243c56;
-  padding: 15px 15px 24px;
-  text-align: center;
-  box-shadow: 0 7px 0 #e0d3ad;
-  transition: transform 0.2s;
+@keyframes vg-munch {
+  to {
+    rotate: 6deg;
+    scale: 1.06;
+  }
 }
-.vg-plane-card {
-  background: #e9f1e8;
-  border-color: #c7ded6;
-  box-shadow: 0 7px 0 #c4dacf;
-}
-.vg-vehicle-card:hover {
-  transform: translateY(-4px) rotate(-1deg);
-}
-.vg-vehicle-card:active {
-  transform: translateY(4px);
-}
-.vg-vehicle-card > svg {
-  display: block;
-  width: 100%;
-  max-height: 310px;
-}
-.vg-vehicle-card > span {
-  display: block;
-  font-size: 26px;
-  font-weight: 1000;
-  letter-spacing: -0.03em;
-}
-.vg-vehicle-card > small {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  margin: 6px 0 13px;
-}
-.vg-vehicle-card > i {
-  display: inline-grid;
-  width: 57px;
-  height: 46px;
-  border-radius: 15px;
-  background: #fff8e4;
-  place-items: center;
-}
-.vg-vehicle-card > i svg {
-  width: 40px;
-  height: 34px;
-}
-.vg-boarding-stage {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 30px;
-  align-items: center;
-  background: #e9efdb;
-  border: 2px solid #d8e1c8;
-  padding: 18px 28px;
-  border-radius: 26px;
-  min-height: 270px;
-}
-.vg-boarding-vehicle > svg {
-  width: 100%;
-  display: block;
-  max-height: 250px;
-}
-.vg-seats {
-  display: flex;
-  gap: 12px;
-}
-.vg-seat {
-  position: relative;
-  flex: 1;
-  border: 3px dashed #afbea3;
-  border-radius: 20px;
-  background: #f4f5e7;
-  padding: 10px 0 3px;
-  min-width: 0;
-}
-.vg-seat > b {
-  background: #dce3cd;
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  font-size: 16px;
-  position: absolute;
-  left: 50%;
-  top: -14px;
-  transform: translateX(-50%);
-}
-.vg-seat > svg {
-  width: 100%;
-  display: block;
-}
-.vg-seat-next {
-  border-color: #c49441;
-  border-style: solid;
-  box-shadow: 0 0 0 5px #f3d898;
-}
-.vg-seat-next > b {
-  background: #f3ca64;
-}
-.vg-seat-filled {
-  border-color: #82ad89;
-  border-style: solid;
-  background: #f6f6e7;
-}
-.vg-seat > i {
-  position: absolute;
-  bottom: -9px;
-  right: -5px;
-  font-style: normal;
-  display: grid;
-  place-items: center;
-  background: #7fac88;
-  color: white;
-  border: 3px solid #e9efdb;
-  width: 29px;
-  height: 29px;
-  border-radius: 50%;
-  font-weight: 900;
-}
-.vg-loading-caption {
-  text-align: center;
-  font-size: 15px;
-  font-weight: 900;
-  margin: 17px 0 0;
-}
-.vg-passengers {
-  max-width: 640px;
-  margin-top: 10px;
-}
-.vg-passengers .vg-picture-choice {
-  max-width: 165px;
-}
-.vg-passengers .vg-picture-choice > svg {
-  max-height: 115px;
-}
-.vg-already-boarded {
-  opacity: 0.35;
-  box-shadow: none;
-}
-.vg-trip-map {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 45px;
-  margin-top: 11px;
-}
-.vg-trip-map > div {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  opacity: 0.5;
-  position: relative;
-}
-.vg-trip-map > div:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  width: 34px;
-  height: 3px;
-  border-top: 3px dotted #c7c9b7;
-  left: calc(100% + 6px);
-}
-.vg-trip-map > div.vg-map-current,
-.vg-trip-map > div.vg-map-done {
-  opacity: 1;
-}
-.vg-trip-map > div > span {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 13px;
-  font-weight: 900;
-  background: #e9e1ce;
-}
-.vg-trip-map > div.vg-map-current > span {
-  background: #f5d174;
-}
-.vg-trip-map > div.vg-map-done > span {
-  background: #a5c7a0;
-}
-.vg-trip-map svg {
-  width: 60px;
-  height: 52px;
-}
-.vg-trip-map small {
-  font-size: 11px;
-  font-weight: 800;
-}
-.vg-deliver-button {
-  border: 2px solid #b39256;
-  border-radius: 23px;
-  background: #f6d685;
-  color: #654e2b;
-  min-width: 150px;
-  min-height: 88px;
-  display: flex;
-  align-items: center;
-  padding: 5px 12px;
-  box-shadow: 0 5px 0 #c1a15f;
-  font-weight: 900;
-  gap: 7px;
-}
-.vg-deliver-button svg {
-  width: 80px;
-  height: 70px;
-}
-.vg-deliver-button span {
-  max-width: 55px;
-  text-align: left;
-  font-size: 15px;
-}
-.vg-deliver-button:active {
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 #c1a15f;
-}
-.vg-trip-complete {
-  background: #eaf0db;
-  border: 2px solid #d7dfc7;
-  border-radius: 26px;
-  padding: 24px 20px;
-  text-align: center;
-}
-.vg-arrival-friends {
-  display: flex;
-  justify-content: space-evenly;
-  gap: 20px;
-}
-.vg-arrival-friends > div {
-  position: relative;
-  display: grid;
-  justify-items: center;
-}
-.vg-arrival-friends .vg-landmark-large {
-  width: min(18vw, 180px);
-  height: 160px;
-}
-.vg-arrival-friends > div > svg:nth-child(2) {
-  width: 100px;
-  margin-top: -20px;
-}
-.vg-arrival-friends b {
-  background: #f6d98a;
-  font-size: 19px;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  display: grid;
-  place-items: center;
-}
-.vg-trip-complete p {
-  color: #73806b;
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 17px 0 0;
-}
-.vg-trip-complete strong {
-  color: #475e4d;
-}
-.vg-calm *,
-.vg-calm *::before,
-.vg-calm *::after {
-  animation: none !important;
-  transition: none !important;
+@keyframes vg-nope {
+  to {
+    translate: 7px 0;
+    rotate: -8deg;
+  }
 }
 @media (max-width: 700px) {
   .vg-game {
-    padding: 15px 14px 21px;
+    padding: 8px;
+    gap: 7px;
   }
-  .vg-game-heading {
-    gap: 10px;
-    min-height: 66px;
-    margin-bottom: 11px;
+  .vg-title h2 {
+    font-size: 22px;
   }
-  .vg-game h2 {
-    font-size: 24px;
-    max-width: 290px;
-  }
-  .vg-eyebrow {
-    font-size: 8px;
-    letter-spacing: 0.1em;
-  }
-  .vg-build-progress {
-    gap: 12px;
-  }
-  .vg-step > span {
-    width: 27px;
-    height: 27px;
-    font-size: 14px;
-  }
-  .vg-step small {
+  .vg-kicker {
     font-size: 8px;
   }
-  .vg-step:not(:last-child)::after {
-    width: 18px;
-    top: 13px;
-    left: calc(100% - 5px);
-  }
-  .vg-garage-stage,
-  .vg-road-stage,
-  .vg-journey-stage {
-    border-radius: 19px;
-  }
-  .vg-garage-stage > svg {
-    min-height: 230px;
-    width: 150%;
-    margin-left: -25%;
-  }
-  .vg-road-stage > svg,
-  .vg-journey-stage > svg {
-    min-height: 240px;
-    width: 155%;
-    margin-left: -27.5%;
-  }
-  .vg-road-car {
-    transform: translate(245px, 190px) scale(0.88);
-  }
-  .vg-journey-train {
-    transform: translate(237px, 173px) scale(0.98);
-  }
-  .vg-journey-plane {
-    transform: translate(238px, 105px) scale(1.05);
-  }
-  .vg-at-stop .vg-journey-destination {
-    transform: translate(600px, 258px) scale(1.05);
-  }
-  .vg-choices {
-    gap: 9px;
-    margin-top: 15px;
-  }
-  .vg-picture-choice {
-    border-radius: 17px;
-    padding: 9px 5px;
-  }
-  .vg-picture-choice > span {
-    font-size: 11px;
-    line-height: 1.2;
-  }
-  .vg-picture-choice > svg {
-    min-height: 67px;
-  }
-  .vg-paint-choice > svg {
-    min-height: 65px;
-    max-height: 75px;
-  }
-  .vg-bottom-bar {
-    gap: 8px;
-    margin-top: 13px;
-  }
-  .vg-small-action {
-    padding: 9px;
-    gap: 3px;
-    min-height: 60px;
-    flex-direction: column;
-    border-radius: 14px;
-    font-size: 10px;
-  }
-  .vg-small-action svg {
-    width: 24px;
-    height: 24px;
-  }
-  .vg-go-button {
-    min-width: 100px;
-    min-height: 81px;
+  .vg-main-scene {
     border-radius: 20px;
-    padding: 7px 12px;
-    gap: 2px;
-    flex-direction: column;
-    font-size: 17px;
   }
-  .vg-go-button > svg {
-    width: 37px;
-    height: 32px;
+  .vg-build-tabs {
+    gap: 5px;
   }
-  .vg-play-hint {
+  .vg-build-tabs button {
+    height: 60px;
+    width: 68px;
+    padding: 3px 8px;
+  }
+  .vg-build-tabs button svg {
+    height: 36px;
+    width: 43px;
+  }
+  .vg-build-tabs span {
+    font-size: 9px;
+  }
+  .vg-options {
+    height: 72px;
+    gap: 5px;
+  }
+  .vg-options > button {
+    border-radius: 15px;
+    padding: 3px;
+  }
+  .vg-options > .vg-start-button {
+    min-width: 65px;
+  }
+  .vg-start-button {
     font-size: 10px;
-    line-height: 1.35;
-    max-width: 180px;
   }
-  .vg-play-hint > strong {
+  .vg-options .vg-start-button svg {
+    max-height: 36px;
+  }
+  .vg-controls {
+    height: 72px;
+    gap: 5px;
+  }
+  .vg-controls > button {
+    border-radius: 15px;
+    padding: 4px;
+    max-width: 85px;
+    font-size: 9px;
+  }
+  .vg-controls > button svg {
+    max-height: 39px;
+  }
+  .vg-toy-choices {
+    gap: 1px;
+    padding: 4px;
+  }
+  .vg-toy-choices button {
+    padding: 2px;
+  }
+  .vg-window-button {
+    left: 40%;
+    top: 34%;
+    width: 66px;
+    height: 74px;
+  }
+  .vg-friend-button {
+    right: 0;
+    width: 27%;
+  }
+  .vg-transport-choose {
+    gap: 11px;
+    padding: 0;
+  }
+  .vg-vehicle-pick {
+    border-radius: 23px;
+    padding: 7px;
+  }
+  .vg-vehicle-pick span {
+    font-size: 10px;
+  }
+  .vg-transport-stage > svg {
+    object-fit: cover;
+  }
+  .vg-train-layout {
+    left: 3%;
+    right: 3%;
+    bottom: 22%;
+    height: 33%;
+    gap: 2%;
+  }
+  .vg-coach {
+    border-width: 2px;
+    border-radius: 12px 12px 8px 8px;
+    padding: 5px 3px 7px;
+  }
+  .vg-coach-window {
+    width: 95%;
+    border-radius: 11px;
+  }
+  .vg-coach:before,
+  .vg-coach:after {
+    width: 19px;
+    height: 19px;
+    border-width: 4px;
+    bottom: -14px;
+  }
+  .vg-seat-label {
+    font-size: 8px;
+  }
+  .vg-plane-layout {
+    left: 5%;
+    right: 5%;
+    height: 29%;
+    bottom: 29%;
+    padding: 12px 14% 12px 6%;
+    gap: 4%;
+  }
+  .vg-plane-layout .vg-seat-label {
+    font-size: 8px;
+  }
+  .vg-cat {
+    width: 51px;
+    height: 52px;
+    top: -40px;
+    left: 5%;
+  }
+  .vg-cat-speech {
+    font-size: 12px;
+    left: 35%;
+    top: -57px;
+    padding: 5px 10px;
+  }
+  .vg-plane-layout .vg-cat {
+    top: -43px;
+    left: -51%;
+  }
+  .vg-floating-food {
+    width: 58px;
+    height: 58px;
+    padding: 7px;
+    top: 17%;
+  }
+  .vg-feed-wish {
+    width: 33px;
+    height: 33px;
+    top: -30px;
+    right: -7px;
+    padding: 3px;
+  }
+  .vg-passenger-dock {
+    height: 80px;
+    gap: 7px;
+  }
+  .vg-passenger-button {
+    height: 77px;
+    padding: 4px;
+    border-radius: 15px;
+  }
+  .vg-passenger-button > svg {
+    height: 51px !important;
+  }
+  .vg-passenger-button span {
+    font-size: 9px;
+  }
+  .vg-boarding-instruction {
     font-size: 11px;
+    padding: 6px 10px;
+    max-width: 95%;
   }
-  .vg-mission > svg {
-    width: 104px;
-    height: 43px;
-  }
-  .vg-mission > small {
+  .vg-transport-status {
     font-size: 10px;
   }
-  .vg-star-count {
-    padding-right: 9px;
-  }
-  .vg-star-count > svg {
-    width: 30px;
+  .vg-transport-status svg {
+    width: 35px;
     height: 35px;
   }
-  .vg-star-count b {
+  .vg-reaction {
+    font-size: 12px;
+    top: -35px;
+    padding: 5px 9px;
+  }
+  .vg-inventory {
+    padding: 4px;
+    gap: 2px;
+  }
+  .vg-inventory > button {
+    padding: 1px;
+  }
+  .vg-inventory svg {
+    height: 36px !important;
+  }
+  .vg-inventory small {
+    font-size: 9px;
+  }
+  .vg-tally b {
     font-size: 21px;
   }
-  .vg-star-count b > span {
-    font-size: 12px;
-  }
-  .vg-transport-choices {
-    padding: 6px 0 16px;
-    gap: 12px;
-  }
-  .vg-vehicle-card {
-    padding: 13px 7px 17px;
-    border-radius: 23px;
-  }
-  .vg-vehicle-card > svg {
-    min-height: 180px;
-  }
-  .vg-vehicle-card > span {
-    font-size: 20px;
-    line-height: 1.05;
-  }
-  .vg-vehicle-card > small {
-    font-size: 10px;
-    min-height: 29px;
-    line-height: 1.35;
-    margin: 9px 3px 11px;
-  }
-  .vg-boarding-stage {
-    grid-template-columns: 1fr;
-    gap: 6px;
-    padding: 8px 26px 19px;
-  }
-  .vg-boarding-vehicle > svg {
-    max-height: 175px;
-  }
-  .vg-seats {
-    max-width: 270px;
-    margin: 0 auto;
-    gap: 16px;
-    width: 100%;
-  }
-  .vg-seat {
-    max-width: 82px;
-  }
-  .vg-seat > svg {
-    max-height: 67px;
-  }
-  .vg-loading-caption {
-    font-size: 13px;
-  }
-  .vg-passengers {
-    margin-top: 10px;
-  }
-  .vg-passengers .vg-picture-choice > svg {
-    max-height: 90px;
-  }
-  .vg-trip-map {
-    gap: 16px;
-    margin-top: 7px;
-  }
-  .vg-trip-map > div {
-    gap: 1px;
-    flex-direction: column;
-  }
-  .vg-trip-map > div:not(:last-child)::after {
-    width: 15px;
-    top: 37px;
-    left: calc(100% + 1px);
-  }
-  .vg-trip-map > div > span {
-    position: absolute;
-    top: 0;
-    left: -4px;
-    width: 21px;
-    height: 21px;
-    font-size: 10px;
-    z-index: 1;
-  }
-  .vg-trip-map svg {
-    width: 70px;
-    height: 53px;
-  }
-  .vg-trip-map small {
-    font-size: 8px;
-  }
-  .vg-deliver-button {
-    min-width: 101px;
-    flex-direction: column;
-    min-height: 89px;
-    padding: 4px 7px;
-    gap: 0;
-  }
-  .vg-deliver-button svg {
-    width: 69px;
-    height: 57px;
-  }
-  .vg-deliver-button span {
-    max-width: none;
-    font-size: 11px;
-    text-align: center;
-  }
-  .vg-trip-complete {
-    padding: 19px 8px;
-  }
-  .vg-arrival-friends {
-    gap: 4px;
-  }
-  .vg-arrival-friends .vg-landmark-large {
-    width: 90px;
-    height: 110px;
-  }
-  .vg-arrival-friends > div > svg:nth-child(2) {
-    width: 76px;
-    margin-top: -15px;
-  }
-  .vg-trip-complete p {
-    font-size: 12px;
+  .vg-tally svg {
+    width: 31px;
+    height: 31px;
   }
 }
-@media (max-width: 390px) {
+@media (max-height: 650px) {
   .vg-game {
-    padding: 12px 10px 18px;
+    gap: 5px;
+    padding: 5px 9px;
   }
-  .vg-game h2 {
-    font-size: 21px;
+  .vg-kicker {
+    display: none;
   }
-  .vg-build-progress {
-    gap: 8px;
+  .vg-title h2 {
+    font-size: 19px;
   }
-  .vg-step small {
-    font-size: 7px;
+  .vg-mini {
+    height: 35px;
+    width: 42px;
+    padding: 3px;
   }
-  .vg-eyebrow {
-    font-size: 7px;
+  .vg-build-tabs button {
+    height: 50px;
+    padding: 2px 8px;
   }
-  .vg-picture-choice > span {
+  .vg-build-tabs button svg {
+    height: 30px;
+  }
+  .vg-options {
+    height: 63px;
+  }
+  .vg-controls {
+    height: 63px;
+  }
+  .vg-tally {
+    padding: 0 9px 0 2px;
+  }
+  .vg-tally svg {
+    height: 30px;
+    width: 30px;
+  }
+  .vg-passenger-dock {
+    height: 67px;
+  }
+  .vg-passenger-button {
+    height: 64px;
+  }
+  .vg-passenger-button > svg {
+    height: 43px !important;
+  }
+  .vg-floating-food {
+    width: 48px;
+    height: 48px;
+    top: 18%;
+    padding: 5px;
+  }
+  .vg-boarding-instruction {
     font-size: 10px;
+    padding: 4px 9px;
   }
-  .vg-vehicle-card > span {
-    font-size: 18px;
+  .vg-window-button {
+    height: 64px;
+    width: 58px;
   }
-  .vg-vehicle-card > svg {
-    min-height: 152px;
+  .vg-window-button > svg {
+    height: 38px !important;
   }
-  .vg-play-hint {
-    max-width: 127px;
+  .vg-train-layout {
+    height: 38%;
+    bottom: 20%;
   }
-  .vg-play-hint > strong {
-    font-size: 10px;
+  .vg-plane-layout {
+    height: 34%;
+    bottom: 25%;
   }
-  .vg-go-button {
-    min-width: 90px;
+  .vg-cat {
+    height: 43px;
+    top: -33px;
   }
-  .vg-road-stage > svg,
-  .vg-journey-stage > svg {
-    width: 180%;
-    margin-left: -40%;
+  .vg-coach-window {
+    border-radius: 9px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .vg-game *,
-  .vg-game *::before,
-  .vg-game *::after {
+  .vg-game *:before,
+  .vg-game *:after {
     animation: none !important;
     transition: none !important;
   }
+}
+.vg-vehicle-pick > svg:last-child {
+  width: 50px !important;
+  height: 45px !important;
+  flex-shrink: 0;
+}
+.vg-transport-foot {
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+}
+.vg-swap-button {
+  border: 0;
+  background: #e7e9db;
+  border-radius: 10px;
+  width: 44px;
+  height: 33px;
+  padding: 3px;
+}
+.vg-swap-button svg {
+  height: 100%;
+  width: 100%;
+}
+.vg-transport-choose .vg-vehicle-pick > svg:first-child {
+  min-height: 0;
+  flex: 1;
+}
+@media (max-height: 650px) {
+  .vg-transport-foot {
+    height: 26px;
+    font-size: 9px;
+  }
+  .vg-swap-button {
+    height: 26px;
+    width: 36px;
+  }
+}
+.vg-main-scene > svg.vg-custom-car {
+  position: absolute;
+  left: 25%;
+  bottom: 9%;
+  width: 50%;
+  height: auto;
+  max-height: 88%;
+  overflow: visible;
+}
+.vg-main-scene > svg.vg-car-on-road {
+  left: 18%;
+  bottom: 14%;
+  width: 38%;
+  max-height: 80%;
+}
+.vg-friend-button {
+  right: 8%;
+  bottom: 18%;
+  width: 19%;
+  height: 45%;
+  padding: 0;
+}
+.vg-window-button {
+  left: 39%;
+  top: auto;
+  bottom: 48%;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+.vg-flying-toy {
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  pointer-events: none;
+  z-index: 4;
+}
+.vg-flying-toy > svg {
+  width: 100%;
+  height: 100%;
+}
+.vg-cat {
+  top: auto;
+  bottom: 87%;
+}
+.vg-train-layout {
+  height: 38%;
+  max-height: 155px;
+}
+.vg-plane-layout {
+  height: 34%;
+  max-height: 142px;
+}
+.vg-plane-layout .vg-cat {
+  top: auto;
+  bottom: 89%;
+}
+.vg-engine > svg {
+  display: block;
+}
+.vg-engine .vg-wheel-turn {
+  animation: none;
+}
+.vg-moving .vg-engine .vg-wheel-turn {
+  animation: vg-spin 0.7s linear infinite;
+}
+@media (max-width: 700px) {
+  .vg-main-scene > svg.vg-custom-car {
+    left: 3%;
+    bottom: 19%;
+    width: 94%;
+    max-height: 80%;
+  }
+  .vg-main-scene > svg.vg-car-on-road {
+    left: 0;
+    bottom: 17%;
+    width: 76%;
+    max-height: 65%;
+  }
+  .vg-friend-button {
+    right: 0;
+    bottom: 27%;
+    width: 24%;
+    height: 34%;
+  }
+  .vg-window-button {
+    left: 43%;
+    bottom: 43%;
+    height: 68px;
+    width: 63px;
+  }
+  .vg-train-layout {
+    height: 31%;
+    max-height: 113px;
+  }
+  .vg-plane-layout {
+    height: 29%;
+    max-height: 106px;
+  }
+  .vg-cat {
+    bottom: 80%;
+  }
+  .vg-plane-layout .vg-cat {
+    bottom: 89%;
+  }
+  .vg-flying-toy {
+    height: 46px;
+    width: 46px;
+  }
+}
+@media (max-width: 360px) {
+  .vg-window-button {
+    bottom: 46%;
+    height: 58px;
+    width: 54px;
+  }
+  .vg-window-button > svg {
+    height: 34px !important;
+  }
+}
+.vg-floating-food {
+  animation: none;
+}
+.vg-floating-food > svg {
+  animation: vg-food-bob 2.4s ease-in-out infinite alternate;
+}
+.vg-floating-food:nth-of-type(2n) > svg {
+  animation-delay: -1s;
+}
+.vg-floating-food {
+  top: 7%;
+}
+.vg-cat {
+  bottom: 65%;
+}
+@media (max-width: 700px) {
+  .vg-cat {
+    bottom: 64%;
+  }
+  .vg-floating-food {
+    top: 14%;
+  }
+}
+@media (max-height: 650px) {
+  .vg-floating-food {
+    top: 7%;
+  }
+  .vg-cat {
+    bottom: 61%;
+  }
+}
+.vg-main-scene > svg {
+  pointer-events: none;
+}
+.vg-seat-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.vg-seat-label > svg {
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0;
+}
+@media (max-width: 700px) {
+  .vg-seat-label {
+    gap: 2px;
+  }
+  .vg-seat-label > svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+@media (max-width: 360px) {
+  .vg-seat-label {
+    font-size: 7px;
+  }
+  .vg-seat-label > svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+.vg-window-button {
+  translate: -50% 0;
+  transform: none;
 }

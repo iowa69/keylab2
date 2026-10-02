@@ -1,14 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ArrowRight,
-  Check,
-  Heart,
-  Home,
-  Keyboard,
-  LockKeyhole,
-  Volume2,
-  VolumeX,
-} from 'lucide-react';
+import { ArrowRight, Check, Home, LockKeyhole, Volume2, VolumeX } from 'lucide-react';
 import { loadPreferences, savePreferences } from './playroom/settings';
 import { updateApp } from './playroom/offline';
 import { games, type GameId } from './adventure/types';
@@ -22,7 +13,7 @@ import { DiscoveryGame } from './adventure/DiscoveryGame';
 import { MusicGame } from './adventure/MusicGame';
 import { SplashGame } from './adventure/SplashGame';
 import { ArcadeGame } from './adventure/ArcadeGame';
-import { hush, playTone } from './adventure/audio';
+import { hush, hushVoice, playTone, playSound, speak, unlockAudio } from './adventure/audio';
 const components = {
   garage: GarageGame,
   runner: RunnerGame,
@@ -45,6 +36,8 @@ function savedStamps(): GameId[] {
 export default function App() {
   const [settings, setSettings] = useState(loadPreferences),
     [active, setActive] = useState<GameId | null>(null),
+    [visited, setVisited] = useState<GameId[]>([]),
+    [wave, setWave] = useState(0),
     [stamps, setStamps] = useState(savedStamps),
     [parents, setParents] = useState(false),
     [holding, setHolding] = useState(false),
@@ -65,15 +58,18 @@ export default function App() {
   const focusPlay = useCallback(
     () =>
       requestAnimationFrame(() => {
-        if (playarea.current) playarea.current.focus({ preventScroll: true });
+        if (playarea.current?.offsetParent) playarea.current.focus({ preventScroll: true });
         else
-          document.querySelector<HTMLButtonElement>('[data-game]')?.focus({ preventScroll: true });
+          document
+            .querySelector<HTMLButtonElement>('.game-card[data-game]')
+            ?.focus({ preventScroll: true });
       }),
     [],
   );
   useEffect(() => {
     savePreferences(settings);
-    if (!settings.sound) hush();
+    if (!settings.sound || settings.volume <= 0) hush();
+    else if (!settings.narration) hushVoice();
   }, [settings]);
   useEffect(() => {
     try {
@@ -124,17 +120,34 @@ export default function App() {
       hush();
     };
   }, []);
-  const celebrate = useCallback(
-    (_label: string) => {
-      if (active) setStamps((s) => (s.includes(active) ? s : [...s, active]));
-    },
-    [active],
+  const celebrations = useMemo(
+    () =>
+      Object.fromEntries(
+        games.map((game) => [
+          game.id,
+          (_label: string) => setStamps((s) => (s.includes(game.id) ? s : [...s, game.id])),
+        ]),
+      ) as Record<GameId, (label: string) => void>,
+    [],
   );
   function open(id: GameId) {
     if (rest) return;
     hush();
     playTone(4, settings);
+    setVisited((previous) => (previous.includes(id) ? previous : [...previous, id]));
     setActive(id);
+    const greetings: Record<GameId, string> = {
+      garage: 'Let’s make a car!',
+      runner: 'Ready for peekaboo?',
+      space: 'Let’s fly to the planets!',
+      treats: 'What shall we make?',
+      transport: 'All aboard, friends!',
+      letters: 'Let’s find something!',
+      music: 'Let’s make music!',
+      splash: 'Ready for a silly splash?',
+      arcade: 'Bear would like a picnic!',
+    };
+    speak(greetings[id], settings, { interrupt: true });
     lastGame.current = id;
     window.scrollTo({ top: 0 });
     focusPlay();
@@ -145,7 +158,7 @@ export default function App() {
     window.scrollTo({ top: 0 });
     requestAnimationFrame(() =>
       document
-        .querySelector<HTMLButtonElement>(`[data-game="${lastGame.current}"]`)
+        .querySelector<HTMLButtonElement>(`.game-card[data-game="${lastGame.current}"]`)
         ?.focus({ preventScroll: true }),
     );
   }
@@ -183,12 +196,29 @@ export default function App() {
     timer.current = undefined;
     setHolding(false);
   }
-  const info = games.find((g) => g.id === active),
-    Game = active ? components[active] : null;
+  const info = games.find((g) => g.id === active);
+  function greet() {
+    setWave((v) => v + 1);
+    playSound('giggle', settings);
+    speak(
+      settings.name
+        ? `Hello, ${settings.name}! I’m Pip. Let’s play!`
+        : 'Hello, little explorer! I’m Pip. Let’s play!',
+      settings,
+      { interrupt: true },
+    );
+  }
   return (
     <main
-      className={`adventure-app ${effective.calm ? 'calm' : ''} ${settings.contrast ? 'contrast' : ''}`}
+      className={`adventure-app single-screen ${effective.calm ? 'calm' : ''} ${settings.contrast ? 'contrast' : ''}`}
       data-offline-ready={offline}
+      data-active-game={active ?? 'home'}
+      onPointerDownCapture={() => unlockAudio(settings)}
+      onKeyDownCapture={() => unlockAudio(settings)}
+      onContextMenu={(event) => {
+        if (!(event.target instanceof Element && event.target.closest('input,textarea')))
+          event.preventDefault();
+      }}
     >
       <header className="app-header" data-ui>
         {active ? (
@@ -218,7 +248,12 @@ export default function App() {
             className="icon-button sound-button"
             aria-label={settings.sound ? 'Turn sound off' : 'Turn sound on'}
             onClick={() => {
-              setSettings((s) => ({ ...s, sound: !s.sound }));
+              const next = { ...settings, sound: !settings.sound };
+              setSettings(next);
+              if (next.sound) {
+                unlockAudio(next);
+                playTone(4, next);
+              }
               focusPlay();
             }}
           >
@@ -256,100 +291,138 @@ export default function App() {
           </button>
         </div>
       </header>
-      {Game ? (
-        <div className="game-shell">
-          <div
-            ref={playarea}
-            className="game-body"
-            tabIndex={-1}
-            inert={paused}
-            aria-label={`${info?.name} play area`}
-          >
-            <Game settings={effective} paused={paused} onCelebrate={celebrate} />
-          </div>
-          <div className="play-tip">
-            <Keyboard size={15} />
-            <span>Tap, swipe, or press keys. Let’s see what happens!</span>
-            <span className="play-kind">
-              {settings.mode === 'baby' ? 'A little helping hand' : 'Room to explore'}
-            </span>
-          </div>
+      <div className="game-shell" hidden={!active}>
+        <div
+          ref={playarea}
+          className="game-body"
+          tabIndex={-1}
+          inert={paused || !active}
+          aria-label={`${info?.name ?? 'Adventure'} play area`}
+        >
+          {visited.map((id) => {
+            const Game = components[id];
+            const isActive = id === active;
+            return (
+              <div
+                key={id}
+                className="game-panel"
+                data-panel={id}
+                hidden={!isActive}
+                inert={!isActive || paused}
+              >
+                <Game
+                  settings={effective}
+                  paused={paused || !isActive}
+                  onCelebrate={celebrations[id]}
+                />
+              </div>
+            );
+          })}
         </div>
-      ) : (
-        <div className="playground" inert={parents || rest}>
-          <section className="welcome">
-            <div>
-              <span className="eyebrow">A WHOLE LITTLE WORLD TO PLAY IN</span>
-              <h1>Where shall we go?</h1>
-              <p>Pick a picture. Make an adventure.</p>
-            </div>
-            <div className="welcome-friend">
-              <Star />
-              <span>Let’s play!</span>
-            </div>
-          </section>
-          <div className="game-grid">
-            {games.map((game, i) => (
+      </div>
+      <div className="playground" hidden={!!active} inert={parents || rest}>
+        <section className="welcome">
+          <div>
+            <span className="eyebrow">YOUR LITTLE WORLD OF PLAY</span>
+            <h1>{settings.name ? `Hello, ${settings.name}!` : 'Where shall we go?'}</h1>
+            <p>Pick a picture. Make a little magic.</p>
+          </div>
+          <button className="hello-friend" onClick={greet} aria-label="Say hello to Pip">
+            <Animal key={wave} kind="bunny" />
+            <span>Hello, friend!</span>
+          </button>
+        </section>
+        <div className="game-grid">
+          {games.map((game, i) => (
+            <button
+              key={game.id}
+              data-game={game.id}
+              className="game-card"
+              aria-label={`Play ${game.name}`}
+              onClick={() => open(game.id)}
+              onKeyDown={(e) => {
+                if (['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) {
+                  e.preventDefault();
+                  const jump =
+                    e.key === 'ArrowRight'
+                      ? 1
+                      : e.key === 'ArrowLeft'
+                        ? -1
+                        : e.key === 'ArrowDown'
+                          ? 3
+                          : -3;
+                  document
+                    .querySelector<HTMLButtonElement>(
+                      `.game-card[data-game="${games[(i + jump + games.length) % games.length].id}"]`,
+                    )
+                    ?.focus();
+                }
+              }}
+              style={{ '--card-color': game.color } as React.CSSProperties}
+            >
+              <div className="card-picture">
+                <GameArt id={game.id} />
+                <span className="card-number">{i + 1}</span>
+                {stamps.includes(game.id) && (
+                  <span className="adventure-stamp" aria-label="Adventure explored">
+                    <Check size={15} />
+                  </span>
+                )}
+              </div>
+              <div className="card-label">
+                <div>
+                  <strong>{game.name}</strong>
+                  <span>{game.action}</span>
+                </div>
+                <span className="card-play">
+                  <ArrowRight />
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+        <div className="home-whisper">
+          <Star />
+          Made for little hands and big imaginations.
+          <Star />
+        </div>
+      </div>
+      {active && (
+        <nav className="game-dock" aria-label="Switch adventures" data-ui inert={parents || rest}>
+          <div className="dock-track">
+            {games.map((game) => (
               <button
                 key={game.id}
-                data-game={game.id}
-                className="game-card"
-                aria-label={`Play ${game.name}`}
-                onClick={() => open(game.id)}
-                onKeyDown={(e) => {
-                  if (['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) {
-                    e.preventDefault();
-                    const columns = window.innerWidth < 660 ? 2 : 3;
-                    const jump =
-                      e.key === 'ArrowRight'
-                        ? 1
-                        : e.key === 'ArrowLeft'
-                          ? -1
-                          : e.key === 'ArrowDown'
-                            ? columns
-                            : -columns;
-                    const next = (i + jump + games.length) % games.length;
-                    document
-                      .querySelector<HTMLButtonElement>(`[data-game="${games[next].id}"]`)
-                      ?.focus();
-                  }
+                aria-label={`Switch to ${game.name}`}
+                aria-current={active === game.id ? 'page' : undefined}
+                onClick={() => {
+                  if (active !== game.id) open(game.id);
+                  else focusPlay();
                 }}
-                style={{ '--card-color': game.color } as React.CSSProperties}
+                style={{ '--dock-color': game.color } as React.CSSProperties}
               >
-                <div className="card-picture">
-                  <GameArt id={game.id} />
-                  <span className="card-number">{i + 1}</span>
-                  {stamps.includes(game.id) && (
-                    <span className="adventure-stamp" aria-label="Adventure explored">
-                      <Check size={15} />
-                    </span>
-                  )}
-                </div>
-                <div className="card-label">
-                  <div>
-                    <strong>{game.name}</strong>
-                    <span>{game.action}</span>
-                  </div>
-                  <span className="card-play">
-                    <ArrowRight />
-                  </span>
-                </div>
+                <GameArt id={game.id} />
+                <span>
+                  {
+                    (
+                      {
+                        garage: 'Cars',
+                        runner: 'Run',
+                        space: 'Space',
+                        treats: 'Treats',
+                        transport: 'Train',
+                        letters: 'ABC',
+                        music: 'Music',
+                        splash: 'Splash',
+                        arcade: 'Picnic',
+                      } as const
+                    )[game.id]
+                  }
+                </span>
               </button>
             ))}
           </div>
-          <footer className="playground-footer">
-            <span>
-              <Heart size={15} /> Little adventures. Together.
-            </span>
-            <span>
-              <Keyboard size={15} /> Pick a picture or press 1–9.
-            </span>
-            <span>
-              <Star />
-              {stamps.length}/9 adventures explored
-            </span>
-          </footer>
-        </div>
+        </nav>
       )}
       {rest && (
         <div className="rest-overlay" role="status">

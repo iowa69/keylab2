@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GameProps } from './types';
-import { playTone, speak } from './audio';
+import { playSound, playTone, speak } from './audio';
 import { useGameKeys } from './useGameKeys';
 import './arcade.css';
 
@@ -18,6 +18,8 @@ type PicnicState = {
   sparkle: number;
   phase: 'catch' | 'ready' | 'served';
   servedAt: number;
+  waveUntil: number;
+  flutterUntil: number;
 };
 
 const FRUITS: FruitKind[] = ['strawberry', 'orange', 'blueberry'];
@@ -39,6 +41,8 @@ const initialState = (): PicnicState => ({
   sparkle: 0,
   phase: 'catch',
   servedAt: 0,
+  waveUntil: 0,
+  flutterUntil: 0,
 });
 const goalFor = (round: number) => 3 + (round % 3);
 const snapshot = (state: PicnicState): PicnicState => ({
@@ -108,34 +112,36 @@ function Bear({ happy }: { happy: boolean }) {
   return (
     <svg viewBox="0 0 150 160" fill="none" aria-hidden="true">
       <ellipse cx="77" cy="148" rx="61" ry="8" fill="#B5694420" />
-      <ellipse cx="76" cy="124" rx="41" ry="31" fill="#C88751" />
-      <circle cx="32" cy="39" r="21" fill="#CF905B" />
-      <circle cx="118" cy="39" r="21" fill="#CF905B" />
-      <circle cx="32" cy="39" r="12" fill="#ECAE7B" />
-      <circle cx="118" cy="39" r="12" fill="#ECAE7B" />
-      <rect x="22" y="30" width="107" height="89" rx="42" fill="#DB9F6A" />
-      <ellipse cx="77" cy="86" rx="28" ry="21" fill="#F9DAA8" />
-      {happy ? (
-        <>
-          <path
-            d="M44 68Q51 59 58 68M94 68Q101 59 108 68"
-            stroke="#513C39"
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
-          <path d="M62 88Q77 111 92 88Z" fill="#70433C" />
-          <path d="M69 99Q78 91 86 99" fill="#EE8586" />
-        </>
-      ) : (
-        <>
-          <ellipse cx="51" cy="66" rx="4" ry="6" fill="#513C39" />
-          <ellipse cx="101" cy="66" rx="4" ry="6" fill="#513C39" />
-          <path d="M66 91Q77 100 88 91" stroke="#70433C" strokeWidth="3" strokeLinecap="round" />
-        </>
-      )}
-      <ellipse cx="77" cy="81" rx="8" ry="6" fill="#513C39" />
-      <ellipse cx="40" cy="84" rx="9" ry="5" fill="#EFAC8B" />
-      <ellipse cx="112" cy="84" rx="9" ry="5" fill="#EFAC8B" />
+      <ellipse className="picnic-bear-breath" cx="76" cy="124" rx="41" ry="31" fill="#C88751" />
+      <g className="picnic-bear-head">
+        <circle cx="32" cy="39" r="21" fill="#CF905B" />
+        <circle cx="118" cy="39" r="21" fill="#CF905B" />
+        <circle cx="32" cy="39" r="12" fill="#ECAE7B" />
+        <circle cx="118" cy="39" r="12" fill="#ECAE7B" />
+        <rect x="22" y="30" width="107" height="89" rx="42" fill="#DB9F6A" />
+        <ellipse cx="77" cy="86" rx="28" ry="21" fill="#F9DAA8" />
+        {happy ? (
+          <>
+            <path
+              d="M44 68Q51 59 58 68M94 68Q101 59 108 68"
+              stroke="#513C39"
+              strokeWidth="4"
+              strokeLinecap="round"
+            />
+            <path className="picnic-bear-chew" d="M62 88Q77 111 92 88Z" fill="#70433C" />
+            <path d="M69 99Q78 91 86 99" fill="#EE8586" />
+          </>
+        ) : (
+          <>
+            <ellipse className="picnic-bear-blink" cx="51" cy="66" rx="4" ry="6" fill="#513C39" />
+            <ellipse className="picnic-bear-blink" cx="101" cy="66" rx="4" ry="6" fill="#513C39" />
+            <path d="M66 91Q77 100 88 91" stroke="#70433C" strokeWidth="3" strokeLinecap="round" />
+          </>
+        )}
+        <ellipse cx="77" cy="81" rx="8" ry="6" fill="#513C39" />
+        <ellipse cx="40" cy="84" rx="9" ry="5" fill="#EFAC8B" />
+        <ellipse cx="112" cy="84" rx="9" ry="5" fill="#EFAC8B" />
+      </g>
       <path d="M60 118L77 126L91 118L86 139L77 132L66 138Z" fill="#66B7A2" />
       <ellipse
         cx="32"
@@ -146,6 +152,7 @@ function Bear({ happy }: { happy: boolean }) {
         transform={happy ? 'rotate(40 32 129)' : undefined}
       />
       <ellipse
+        className="picnic-bear-wave"
         cx="121"
         cy="126"
         rx="14"
@@ -245,6 +252,8 @@ export function ArcadeGame({ settings, paused, onCelebrate }: GameProps) {
     const current = engine.current;
     if (live.current.paused || current.phase !== 'ready') return;
     current.phase = 'served';
+    current.waveUntil = current.time + 3;
+    playSound('giggle', live.current.settings);
     current.servedAt = current.time;
     playTone(7, live.current.settings, 0.3);
     speak('Yummy! Thank you!', live.current.settings);
@@ -261,7 +270,7 @@ export function ArcadeGame({ settings, paused, onCelebrate }: GameProps) {
       previous = now;
       const { settings: currentSettings, paused: isPaused } = live.current;
       const current = engine.current;
-      if (!isPaused) {
+      if (!isPaused && !document.hidden) {
         current.time += dt;
         current.sparkle = Math.max(0, current.sparkle - dt);
         if (current.phase === 'catch') {
@@ -335,6 +344,9 @@ export function ArcadeGame({ settings, paused, onCelebrate }: GameProps) {
     else guide(undefined, true);
   });
 
+  useEffect(() => {
+    if (paused) pointer.current = null;
+  }, [paused]);
   const kind = FRUITS[frame.round % FRUITS.length];
   const goal = goalFor(frame.round);
   const positionFromPointer = (clientX: number) => {
@@ -442,7 +454,19 @@ export function ArcadeGame({ settings, paused, onCelebrate }: GameProps) {
           <circle cx="655" cy="400" r="5" fill="#FFF2A5" />
           <circle cx="554" cy="446" r="4" fill="#FFD2C6" />
         </svg>
-        <div className={`picnic-bear ${frame.phase === 'served' ? 'picnic-bear-happy' : ''}`}>
+        <button
+          type="button"
+          className={`picnic-bear ${frame.phase === 'served' ? 'picnic-bear-happy' : ''} ${frame.time < frame.waveUntil ? 'picnic-bear-waving' : ''}`}
+          aria-label="Say hello to Bear"
+          disabled={paused}
+          onClick={() => {
+            if (paused) return;
+            engine.current.waveUntil = engine.current.time + 2;
+            playSound('giggle', settings);
+            speak('Hello! Shall we have a picnic?', settings, { interrupt: true });
+            publish();
+          }}
+        >
           <Bear happy={frame.phase === 'served'} />
           <span className="picnic-bear-bubble">
             {frame.phase === 'served' ? (
@@ -451,7 +475,42 @@ export function ArcadeGame({ settings, paused, onCelebrate }: GameProps) {
               <FruitArt kind={kind} />
             )}
           </span>
-        </div>
+        </button>
+        <button
+          type="button"
+          className={`picnic-butterfly ${frame.time < frame.flutterUntil ? 'picnic-butterfly-hello' : ''}`}
+          aria-label="Say hello to Butterfly"
+          disabled={paused}
+          onClick={() => {
+            if (paused) return;
+            engine.current.flutterUntil = engine.current.time + 2;
+            playSound('boing', settings);
+            speak('Hello, butterfly!', settings);
+            publish();
+          }}
+        >
+          <svg viewBox="0 0 100 90" aria-hidden="true">
+            <g className="picnic-wings">
+              <path d="M48 44C2-16-9 47 33 52C-1 81 34 101 48 54Z" fill="#f1b97d" />
+              <path d="M52 44C98-16 109 47 67 52C101 81 66 101 52 54Z" fill="#e6a4b2" />
+              <g fill="#fff1cf">
+                <ellipse cx="24" cy="32" rx="10" ry="13" transform="rotate(-35 24 32)" />
+                <ellipse cx="77" cy="32" rx="10" ry="13" transform="rotate(35 77 32)" />
+                <circle cx="29" cy="69" r="7" />
+                <circle cx="71" cy="69" r="7" />
+              </g>
+            </g>
+            <path d="M46 26v37q4 16 8 0V26" fill="#93775b" />
+            <path
+              d="m47 29-6-14m12 14 6-14"
+              stroke="#93775b"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+            <circle cx="41" cy="15" r="3" fill="#93775b" />
+            <circle cx="59" cy="15" r="3" fill="#93775b" />
+          </svg>
+        </button>
         {frame.phase === 'catch' &&
           frame.fruits.map((fruit) => (
             <button

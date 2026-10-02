@@ -1,25 +1,90 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import type { GameProps } from './types';
-import { playTone, speak } from './audio';
+import { playTone, playSound, speak } from './audio';
 import { useGameKeys } from './useGameKeys';
 import './vehicles.css';
 
 const INK = '#243c56';
 const paints = [
-  { color: '#f16e55', name: 'Coral' },
+  { color: '#f16e55', name: 'Red' },
   { color: '#64b8dd', name: 'Blue' },
   { color: '#f7cc58', name: 'Yellow' },
   { color: '#b796dc', name: 'Purple' },
+  { color: '#7abd93', name: 'Green' },
+  { color: '#f2a7c4', name: 'Pink' },
 ];
 type Body = 'buggy' | 'racer' | 'van';
 type Wheel = 'round' | 'flower' | 'star';
 type Vehicle = 'plane' | 'train';
+type Roof = 'none' | 'flower' | 'rocket' | 'party';
+type Decal = 'star' | 'heart' | 'rainbow';
+type Toy = 'bubbles' | 'teddy' | 'confetti';
+type Food = 'apple' | 'banana' | 'fish' | 'poop';
 const bodies: Body[] = ['buggy', 'racer', 'van'];
 const wheels: Wheel[] = ['round', 'flower', 'star'];
+const roofs: Roof[] = ['none', 'flower', 'rocket', 'party'];
+const decals: Decal[] = ['star', 'heart', 'rainbow'];
+const toys: Toy[] = ['bubbles', 'teddy', 'confetti'];
+const foods: Food[] = ['apple', 'banana', 'fish', 'poop'];
 const passengerColors = ['#f19369', '#f3c959', '#85bed3'];
 const passengerNames = ['Fox', 'Chick', 'Elephant'];
-const places = ['Apple farm', 'Rainbow mountain', 'Sunny beach'];
-
+const favorites: Food[] = ['apple', 'fish', 'banana'];
+const worlds = [
+  {
+    name: 'Apple orchard',
+    sky: '#cdebe8',
+    hill: '#acd49d',
+    ground: '#76b18e',
+    road: '#d4af88',
+    coach: 'Garden',
+    color: '#90c9a2',
+  },
+  {
+    name: 'Candy mountain',
+    sky: '#f7dbe6',
+    hill: '#d1b0dd',
+    ground: '#ba9ad0',
+    road: '#ebcba6',
+    coach: 'Sweet shop',
+    color: '#eeabc3',
+  },
+  {
+    name: 'Sunny beach',
+    sky: '#bfebf0',
+    hill: '#8ccdd7',
+    ground: '#f5d890',
+    road: '#ddba89',
+    coach: 'Ocean',
+    color: '#8dc8df',
+  },
+  {
+    name: 'Dinosaur valley',
+    sky: '#e9ecbd',
+    hill: '#a4c590',
+    ground: '#79a690',
+    road: '#baa285',
+    coach: 'Jungle',
+    color: '#b4cc81',
+  },
+  {
+    name: 'Snowy village',
+    sky: '#dce8f7',
+    hill: '#bdcddb',
+    ground: '#eef5f5',
+    road: '#b5cbd7',
+    coach: 'Snow',
+    color: '#c1cbe8',
+  },
+  {
+    name: 'Starry moon',
+    sky: '#364566',
+    hill: '#7983a8',
+    ground: '#adb1cd',
+    road: '#8b94b8',
+    coach: 'Space',
+    color: '#b9a1d8',
+  },
+];
 function Star({
   x = 0,
   y = 0,
@@ -183,8 +248,10 @@ function Passenger({
   x = 0,
   y = 0,
   size = 1,
+  mood = 'neutral',
 }: {
   index: number;
+  mood?: 'neutral' | 'happy' | 'yuck';
   x?: number;
   y?: number;
   size?: number;
@@ -216,8 +283,24 @@ function Passenger({
       {index === 0 && (
         <path d="M-29-4Q-10-3 0 11 10-3 29-4Q26 28 0 31-26 28-29-4" fill="#fff2dd" stroke="none" />
       )}
-      <circle cx="-12" cy="-3" r="3" fill={INK} stroke="none" />
-      <circle cx="12" cy="-3" r="3" fill={INK} stroke="none" />
+      <g className="vg-blink">
+        {mood === 'happy' ? (
+          <path
+            d="M-17-1q5-9 10 0M7-1q5-9 10 0"
+            fill="none"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        ) : (
+          <>
+            <circle cx="-12" cy="-3" r="3" fill={INK} stroke="none" />
+            <circle cx="12" cy="-3" r="3" fill={INK} stroke="none" />
+          </>
+        )}
+      </g>
+      {mood === 'yuck' && (
+        <path d="m-18-13 10 4m16 0 10-4" fill="none" strokeWidth="3" strokeLinecap="round" />
+      )}
       {index === 2 ? (
         <path
           d="M-5 9v23q0 15 13 12l6-2"
@@ -232,7 +315,18 @@ function Passenger({
             d={index === 0 ? 'm-5 7 5 5 5-5Z' : 'm-7 8 7 8 7-8Z'}
             fill={index === 0 ? INK : '#f18b53'}
           />
-          <path d="M-5 19q5 4 10 0" fill="none" strokeWidth="2" strokeLinecap="round" />
+          <path
+            d={
+              mood === 'yuck'
+                ? 'M-7 24q7-10 14 0'
+                : mood === 'happy'
+                  ? 'M-8 17q8 17 16 0Z'
+                  : 'M-5 19q5 4 10 0'
+            }
+            fill={mood === 'happy' ? '#755053' : 'none'}
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
         </>
       )}
       <circle cx="-21" cy="8" r="5" fill="#f2a295" stroke="none" opacity=".7" />
@@ -241,1246 +335,1446 @@ function Passenger({
   );
 }
 
-function TransportArt({
-  vehicle,
-  loaded = 0,
-  moving = false,
-  departed = 0,
-}: {
-  vehicle: Vehicle;
-  loaded?: number;
-  moving?: boolean;
-  departed?: number;
-}) {
-  return vehicle === 'plane' ? (
-    <g stroke={INK} strokeWidth="3" strokeLinejoin="round">
-      <ellipse cx="176" cy="203" rx="113" ry="10" fill={INK} opacity=".07" stroke="none" />
-      <path d="m63 118-40-72 33 2 69 80" fill="#f3be5b" />
-      <path d="M32 132q45-18 101-28h137q25 0 46 30 6 13-9 24H74q-30-1-42-26Z" fill="#f6d571" />
-      <path d="M279 110q17 8 26 25h-40v-25Z" fill="#b1dfde" />
-      <path d="m165 133-78 62h47l104-63" fill="#ee916e" />
-      <path d="m163 108-48-37h36l65 37" fill="#ee916e" />
-      {[0, 1, 2].map((i) => (
-        <g key={i}>
-          <circle cx={117 + i * 44} cy="131" r="15" fill="#e4f3e7" />
-          {i < loaded && i >= departed && (
-            <Passenger index={i} x={117 + i * 44} y={133} size={0.34} />
-          )}
-        </g>
-      ))}
-      <path d="M316 137h18" strokeWidth="7" strokeLinecap="round" />
-      <g className={moving ? 'vg-propeller' : ''} style={{ transformOrigin: '335px 137px' }}>
-        <ellipse cx="335" cy="119" rx="6" ry="20" fill="#fff5df" />
-        <ellipse cx="335" cy="155" rx="6" ry="20" fill="#fff5df" />
+function FoodArt({ food }: { food: Food }) {
+  return (
+    <svg viewBox="-40 -40 80 80" aria-hidden="true">
+      <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
+        {food === 'apple' && (
+          <>
+            <path d="M0-18C-38-38-39 17-16 29q9 6 16 0 7 6 16 0C39 17 38-38 0-18" fill="#ed7665" />
+            <path d="M0-18q-2-14 8-17" fill="none" strokeWidth="5" />
+            <path d="M6-24q6-21 23-9-9 16-23 9" fill="#70af76" />
+            <path
+              d="M-21-6q-7 10-1 18"
+              fill="none"
+              stroke="#ffb49f"
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+          </>
+        )}
+        {food === 'banana' && (
+          <>
+            <path d="M-23-26Q-35 20 15 24 33 22 31 0 16 23-10-14Z" fill="#fbd670" />
+            <path d="M-19-18Q-17 18 24 13" fill="none" stroke="#d5a750" />
+            <path d="m-24-26 8-4 6 16-10 2" fill="#9d8259" />
+          </>
+        )}
+        {food === 'fish' && (
+          <>
+            <path d="m18 0 17-20v40Z" fill="#f0b583" />
+            <ellipse cx="-7" rx="26" ry="19" fill="#92cbd1" />
+            <path d="m-9-18 11-10 4 10m-15 36 11 10 4-10" fill="#f0b583" />
+            <circle cx="-19" cy="-3" r="3" fill={INK} />
+            <path d="M-27 7q6 4 8 0M3-12q7 12 0 24" fill="none" />
+          </>
+        )}
+        {food === 'poop' && (
+          <>
+            <path
+              d="M-29 26q-15-12 5-23-9-13 12-20-5-11 7-17 0 11 14 15 15 5 10 16 20 6 10 18 16 18-5 19Z"
+              fill="#9e775b"
+            />
+            <path d="M-22 4h39M-23 19h44" fill="none" stroke="#815e4c" />
+            <circle cx="-9" cy="6" r="3" fill={INK} />
+            <circle cx="9" cy="6" r="3" fill={INK} />
+            <path d="M-5 13q5 5 10 0" fill="none" />
+          </>
+        )}
       </g>
-      <path d="M62 163h33" fill="none" stroke="#fff3ce" strokeWidth="5" strokeLinecap="round" />
-    </g>
-  ) : (
-    <g stroke={INK} strokeWidth="3" strokeLinejoin="round">
-      <ellipse cx="181" cy="207" rx="168" ry="10" fill={INK} opacity=".07" stroke="none" />
-      <path d="M23 155h279" strokeWidth="8" />
-      {[0, 1, 2].map((i) => (
-        <g key={i} transform={`translate(${i * 72} 0)`}>
-          <rect x="10" y="112" width="66" height="69" rx="10" fill={passengerColors[i]} />
-          <path d="M17 108h52" strokeWidth="10" strokeLinecap="round" />
-          <rect x="24" y="121" width="38" height="35" rx="9" fill="#e8f1df" />
-          {i < loaded && i >= departed && <Passenger index={i} x={43} y={140} size={0.43} />}
-          <WheelArt style="round" x={26} y={183} turning={moving} />
-          <WheelArt style="round" x={60} y={183} turning={moving} />
+    </svg>
+  );
+}
+function ToyArt({ toy }: { toy: Toy }) {
+  return (
+    <svg viewBox="-40 -40 80 80" aria-hidden="true">
+      {toy === 'bubbles' ? (
+        <g fill="#d9f5f1" stroke="#6bbfc9" strokeWidth="3">
+          <circle cx="-12" cy="9" r="20" />
+          <circle cx="17" cy="-16" r="14" />
+          <circle cx="20" cy="23" r="10" />
+          <path
+            d="M-23 3q4-10 11-9M10-18q4-5 8-5"
+            fill="none"
+            stroke="white"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
         </g>
-      ))}
-      <path d="M233 161V88h54v38h35q15 0 15 16v34H234Z" fill="#6caea6" />
-      <path d="M225 89h70" strokeWidth="11" strokeLinecap="round" />
-      <rect x="244" y="100" width="29" height="29" rx="6" fill="#dcf1df" />
-      <path d="M309 126V95h17v35" fill="#f3c959" />
-      <path d="M303 95h27" strokeWidth="6" strokeLinecap="round" />
-      <circle cx="339" cy="147" r="10" fill="#f8dc7e" />
-      <path d="m335 170 17 20h-28" fill="#e78668" />
-      <WheelArt style="round" x={259} y={180} turning={moving} />
-      <WheelArt style="round" x={309} y={180} turning={moving} />
+      ) : toy === 'teddy' ? (
+        <g fill="#d7a373" stroke={INK} strokeWidth="2.5">
+          <circle cx="-20" cy="-23" r="10" />
+          <circle cx="20" cy="-23" r="10" />
+          <ellipse cy="18" rx="20" ry="20" />
+          <circle cy="-9" r="25" />
+          <ellipse cy="1" rx="12" ry="9" fill="#ffe7b9" />
+          <circle cx="-9" cy="-13" r="2.5" fill={INK} />
+          <circle cx="9" cy="-13" r="2.5" fill={INK} />
+          <path d="m-4-3 4 4 4-4" fill={INK} />
+        </g>
+      ) : (
+        <g strokeWidth="7" strokeLinecap="round">
+          {['#ed7665', '#f3cf63', '#82bfc8', '#b49bd9', '#91bf8e'].map((color, i) => (
+            <g key={color} transform={`rotate(${i * 72})`} stroke={color}>
+              <path d="M0-15v-17M0 9l6 8" />
+              <circle cx="16" cy="-15" r="3" fill={color} />
+            </g>
+          ))}
+        </g>
+      )}
+    </svg>
+  );
+}
+function DecalArt({ decal }: { decal: Decal }) {
+  return (
+    <g>
+      {decal === 'star' ? (
+        <Star size={0.7} />
+      ) : decal === 'heart' ? (
+        <path
+          d="M0 18C-46-7-12-38 0-15 12-38 46-7 0 18"
+          fill="#ffecdb"
+          stroke={INK}
+          strokeWidth="2"
+        />
+      ) : (
+        <g fill="none" strokeWidth="7">
+          <path d="M-24 17a24 24 0 0 1 48 0" stroke="#f6cc65" />
+          <path d="M-17 17a17 17 0 0 1 34 0" stroke="#ef937f" />
+          <path d="M-10 17a10 10 0 0 1 20 0" stroke="#92c9bc" />
+        </g>
+      )}
     </g>
   );
 }
-
-function ArrowIcon() {
+function RoofArt({ roof }: { roof: Roof }) {
   return (
-    <svg viewBox="0 0 70 60" aria-hidden="true">
-      <path
-        d="M12 30h42M39 13l18 17-18 17"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="10"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
+      {roof === 'flower' ? (
+        <>
+          <path d="M0 0v-24" stroke="#519477" strokeWidth="6" />
+          <g transform="translate(0 -37)" fill="#f0a0ba">
+            {[0, 60, 120, 180, 240, 300].map((n) => (
+              <ellipse key={n} cy="-11" rx="7" ry="13" transform={`rotate(${n})`} />
+            ))}
+            <circle r="9" fill="#ffe28a" />
+          </g>
+        </>
+      ) : roof === 'rocket' ? (
+        <g transform="rotate(25)">
+          <path d="m-9-10-10 14h38L9-10" fill="#ef9078" />
+          <path d="M-10 0v-27L0-42l10 15V0Z" fill="#fff1d8" />
+          <circle cy="-21" r="6" fill="#86cbd8" />
+          <path d="m-6 1 6 19L6 1" fill="#ffd373" />
+        </g>
+      ) : roof === 'party' ? (
+        <>
+          <path d="M-25 0 0-57 25 0Z" fill="#b69cdc" />
+          <path d="m-15-22 28-3M-21-9l39-4" stroke="#ffe39c" strokeWidth="7" />
+          <circle cy="-57" r="7" fill="#ecaaad" />
+        </>
+      ) : (
+        <path d="M-20-5h40" stroke="#91a3a5" strokeWidth="6" strokeLinecap="round" />
+      )}
+    </g>
   );
 }
-function ReplayIcon() {
-  return (
-    <svg viewBox="0 0 60 60" aria-hidden="true">
-      <path
-        d="M14 23a20 20 0 1 1-1 18M14 11v15h15"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-function PicnicMission() {
-  return (
-    <svg viewBox="0 0 160 65" aria-hidden="true">
-      <rect
-        x="6"
-        y="26"
-        width="42"
-        height="30"
-        rx="6"
-        fill="#d59272"
-        stroke={INK}
-        strokeWidth="2.5"
-      />
-      <path d="M17 27V17q10-16 20 0v10" stroke={INK} strokeWidth="3" fill="none" />
-      <path d="M7 35h40m-22-7v27" stroke="#f7d589" strokeWidth="5" />
-      <path
-        d="M61 35h27m-8-9 9 9-9 9"
-        stroke={INK}
-        strokeWidth="4"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M115 30q-10-29-1-29 8 0 9 29m8 0q1-29 10-27 7 3-3 28"
-        fill="#fff0d1"
-        stroke={INK}
-        strokeWidth="2.5"
-      />
-      <ellipse cx="127" cy="42" rx="25" ry="20" fill="#fff0d1" stroke={INK} strokeWidth="2.5" />
-      <circle cx="119" cy="39" r="2.4" fill={INK} />
-      <circle cx="135" cy="39" r="2.4" fill={INK} />
-      <path d="m124 45 3 3 3-3" fill="#e89590" />
-      <path d="M121 51q6 5 12 0" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function BuildProgress({ step }: { step: number }) {
-  return (
-    <div className="vg-build-progress" aria-label={`Build step ${Math.min(step + 1, 3)} of 3`}>
-      {['Shape', 'Color', 'Wheels'].map((label, index) => (
-        <div
-          key={label}
-          className={`vg-step ${step === index ? 'vg-step-current' : ''} ${step > index ? 'vg-step-done' : ''}`}
-        >
-          <span>{step > index ? '✓' : index + 1}</span>
-          <small>{label}</small>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function RoadScene({
+function CustomCar({
   body,
   color,
   wheel,
-  distance,
-  moving,
-  done,
+  roof,
+  decal,
+  moving = false,
 }: {
   body: Body;
   color: string;
   wheel: Wheel;
-  distance: number;
-  moving: boolean;
-  done: boolean;
+  roof: Roof;
+  decal: Decal;
+  moving?: boolean;
 }) {
   return (
-    <svg
-      className="vg-scene"
-      viewBox="0 0 960 430"
-      role="img"
-      aria-label={
-        done
-          ? 'Your custom car has delivered the picnic to a happy bunny'
-          : 'Drive your custom car through the countryside to the picnic'
-      }
-    >
-      <defs>
-        <linearGradient id="vg-road-sky" x2="0" y2="1">
-          <stop stopColor="#b8e3e4" />
-          <stop offset="1" stopColor="#edf4d4" />
-        </linearGradient>
-        <pattern id="vg-picnic" width="22" height="22" patternUnits="userSpaceOnUse">
-          <rect width="22" height="22" fill="#fff0ce" />
-          <path d="M0 0h11v22H0ZM0 0h22v11H0Z" fill="#e99481" opacity=".55" />
-        </pattern>
-      </defs>
-      <rect width="960" height="430" fill="url(#vg-road-sky)" />
-      <circle cx="813" cy="70" r="34" fill="#ffdc78" />
-      <path
-        d="M803 75q10 10 20 0"
-        fill="none"
-        stroke="#b9804b"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <circle cx="803" cy="65" r="3" fill="#b9804b" />
-      <circle cx="823" cy="65" r="3" fill="#b9804b" />
-      <Cloud x={70 - distance * 0.25} y={45} size={1.3} />
-      <Cloud x={451 - distance * 0.4} y={82} size={0.8} />
-      <path d="M0 230Q130 60 310 222 500 70 672 225 824 135 960 227V430H0Z" fill="#a8c897" />
-      <path d="M0 275Q150 185 343 256 580 172 756 264 885 217 960 247V430H0Z" fill="#7fb08a" />
-      <g className="vg-scenery" transform={`translate(${-distance * 5} 0)`}>
-        {[80, 490, 1010, 1340].map((x, index) => (
-          <Tree key={x} x={x} y={index % 2 ? 180 : 170} size={index % 2 ? 0.7 : 1} />
-        ))}
-        <g transform="translate(760 190)">
-          <path d="M-50 65V-10l60-45 61 45v75Z" fill="#eeae7e" stroke={INK} strokeWidth="3" />
-          <path
-            d="m-65-8 74-56L85-8"
-            stroke={INK}
-            strokeWidth="7"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <rect x="-7" y="16" width="30" height="49" rx="15" fill="#739999" />
-          <rect x="-36" y="4" width="18" height="23" rx="4" fill="#fff1bd" />
-          <rect x="36" y="4" width="18" height="23" rx="4" fill="#fff1bd" />
-        </g>
+    <g>
+      <CarArt body={body} color={color} wheel={wheel} moving={moving} />
+      <g transform={`translate(142 ${body === 'van' ? 37 : body === 'racer' ? 65 : 46})`}>
+        <RoofArt roof={roof} />
       </g>
-      <path d="M0 303Q360 285 960 303V416H0Z" fill="#dbb99a" />
-      <path d="M0 298Q360 280 960 298M0 418h960" fill="none" stroke="#f8e4be" strokeWidth="10" />
-      <path
-        d="M-100 361h1160"
-        stroke="#fff1d7"
-        strokeWidth="6"
-        strokeDasharray="38 36"
-        strokeDashoffset={distance * 13}
-      />
-      {[20, 40, 60, 80, 95].map(
-        (at, index) =>
-          distance < at && (
-            <g key={at} transform={`translate(${290 + (at - distance) * 11} 297)`}>
-              <Star size={0.65} />
-              <text y="-26" textAnchor="middle" fill={INK} fontSize="17" fontWeight="900">
-                {index + 1}
-              </text>
-            </g>
-          ),
-      )}
-      <g transform={`translate(${Math.max(460, 1330 - distance * 8.3)} 233)`}>
-        <path d="M55 80h210l-25 47H34Z" fill="url(#vg-picnic)" stroke="#fff2d9" strokeWidth="4" />
+      <g transform="translate(115 126) scale(.55)">
+        <DecalArt decal={decal} />
+      </g>
+    </g>
+  );
+}
+function WorldArt({ index, distance = 0 }: { index: number; distance?: number }) {
+  const w = worlds[index % worlds.length],
+    shift = distance % 350;
+  return (
+    <g>
+      <rect width="1000" height="450" fill={w.sky} />
+      <circle cx="862" cy="68" r="34" fill={index === 5 ? '#fff4c5' : '#ffe291'} />
+      <g fill={INK}>
+        <circle cx="851" cy="63" r="3" />
+        <circle cx="873" cy="63" r="3" />
         <path
-          d="M191 42q-6-61 9-60 13 0 8 54m19 6q1-59 15-52 13 7-2 53"
-          fill="#fff4df"
+          d="M851 75q11 10 22 0"
+          fill="none"
           stroke={INK}
           strokeWidth="3"
-        />
-        <ellipse cx="218" cy="61" rx="35" ry="32" fill="#fff4df" stroke={INK} strokeWidth="3" />
-        <circle cx="207" cy="58" r="3" fill={INK} />
-        <circle cx="229" cy="58" r="3" fill={INK} />
-        <path d="m214 67 5 4 5-4" fill="#e99796" />
-        <path
-          d="M210 76q9 8 18 0"
-          fill="none"
-          stroke={INK}
-          strokeWidth="2.5"
           strokeLinecap="round"
         />
-        <path d="M36 36V-52m0 0h84v39H36" fill="#f6d273" stroke={INK} strokeWidth="3" />
-        <path
-          d="m49-38 12 11 21-17"
-          fill="none"
-          stroke={INK}
-          strokeWidth="5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {done && (
-          <g transform="translate(135 79)">
-            <rect
-              x="-28"
-              y="-27"
-              width="56"
-              height="43"
-              rx="7"
-              fill="#e39070"
-              stroke={INK}
-              strokeWidth="3"
-            />
-            <path d="M-13-28v-12q13-19 26 0v12" stroke={INK} strokeWidth="4" fill="none" />
-            <path d="M-26-13h52" stroke="#f7d585" strokeWidth="8" />
-          </g>
-        )}
       </g>
-      <g className="vg-road-car" transform="translate(158 190) scale(.88)">
-        <CarArt body={body} color={color} wheel={wheel} moving={moving} />
-        {!done && (
-          <g transform="translate(49 82)">
-            <rect
-              x="-25"
-              y="-31"
-              width="50"
-              height="33"
-              rx="6"
-              fill="#ce9274"
-              stroke={INK}
-              strokeWidth="3"
-            />
-            <path d="M-23-21h47m-25-8V0" stroke="#f8d88c" strokeWidth="6" />
-          </g>
+      <Cloud x={80 - shift * 0.1} y={55} />
+      <Cloud x={530 - shift * 0.14} y={30} size={0.8} />
+      <path d="M0 247Q170 77 360 230 570 40 755 224 870 111 1000 206V450H0Z" fill={w.hill} />
+      <path d="M0 288Q260 192 520 267 740 191 1000 275V450H0Z" fill={w.ground} />
+      {[-1, 0, 1, 2, 3].map((n) => (
+        <g key={n} transform={`translate(${n * 350 - shift} 0)`}>
+          {index === 0 && (
+            <>
+              <Tree x={110} y={221} size={0.85} />
+              {[
+                [-18, -13],
+                [22, 9],
+                [-17, 24],
+              ].map(([x, y], i) => (
+                <circle
+                  key={i}
+                  cx={110 + x}
+                  cy={205 + y}
+                  r="9"
+                  fill="#ed8270"
+                  stroke={INK}
+                  strokeWidth="1.8"
+                />
+              ))}
+            </>
+          )}
+          {index === 1 && (
+            <>
+              <path d="M106 293V177" stroke="#f7eddf" strokeWidth="12" />
+              <circle cx="106" cy="165" r="40" fill="#edb3c3" stroke="#fcf4dc" strokeWidth="7" />
+              <path
+                d="M89 148q48-4 18 38-22 8-18-17 3-8 13-3"
+                fill="none"
+                stroke="#fff2d3"
+                strokeWidth="9"
+                strokeLinecap="round"
+              />
+            </>
+          )}
+          {index === 2 && (
+            <>
+              <path d="M107 290q-6-60 9-114" fill="none" stroke="#b39065" strokeWidth="13" />
+              <path
+                d="M115 177q-56-59-68 7 27-22 68-7 35-55 68-6-34-8-68 6 3-48 26-42"
+                fill="#78b591"
+                stroke="#59896e"
+                strokeWidth="3"
+              />
+            </>
+          )}
+          {index === 3 && (
+            <g transform="translate(90 222)">
+              <path
+                d="M-40 52q-23-73 45-55 19-77 43-52 6 18-11 32L23 30l20 29H23L7 41l-23 2-6 17h-19Z"
+                fill="#b3d480"
+                stroke={INK}
+                strokeWidth="3"
+              />
+              <circle cx="41" cy="-39" r="3" fill={INK} />
+              <path d="M-25 1 0-16l15 24" fill="#efc071" stroke={INK} strokeWidth="2" />
+            </g>
+          )}
+          {index === 4 && (
+            <>
+              <path d="M62 289v-63l44-45 51 45v63Z" fill="#d69b9b" stroke={INK} strokeWidth="3" />
+              <path
+                d="m49 231 57-58 64 59"
+                fill="none"
+                stroke="#fffbec"
+                strokeWidth="17"
+                strokeLinecap="round"
+              />
+              <rect x="95" y="245" width="25" height="44" rx="12" fill="#ffe4a3" />
+            </>
+          )}
+          {index === 5 && (
+            <>
+              <g transform="translate(114 138) rotate(-20)">
+                <circle r="43" fill="#d5afcf" />
+                <ellipse rx="71" ry="17" fill="none" stroke="#f0d8af" strokeWidth="9" />
+              </g>
+              <Star x={232} y={66} size={0.4} />
+              <Star x={290} y={151} size={0.3} />
+            </>
+          )}
+        </g>
+      ))}
+      <path d="M0 329Q500 310 1000 329v121H0Z" fill={w.road} />
+      <path d="M0 329Q500 310 1000 329" fill="none" stroke="#fff2d5" strokeWidth="8" />
+      <path
+        d="M0 399h1000"
+        stroke="#fff2d5"
+        strokeWidth="5"
+        strokeDasharray="40 40"
+        strokeDashoffset={distance * 2}
+      />
+    </g>
+  );
+}
+function Icon({ name }: { name: 'go' | 'stop' | 'home' | 'horn' | 'swap' | 'bin' }) {
+  return (
+    <svg viewBox="0 0 60 60" aria-hidden="true">
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {name === 'go' ? (
+          <path d="M22 12 46 30 22 48Z" fill="currentColor" />
+        ) : name === 'stop' ? (
+          <>
+            <path d="M21 14v32M39 14v32" strokeWidth="9" />
+          </>
+        ) : name === 'home' ? (
+          <>
+            <path d="m7 28 23-19 23 19M14 23v29h32V23" />
+            <path d="M25 52V34h11v18" />
+          </>
+        ) : name === 'horn' ? (
+          <>
+            <path d="M8 29h16l17-15v34L24 34H8Z" fill="#f8d46f" />
+            <path d="M48 21q10 10 0 20" />
+          </>
+        ) : name === 'bin' ? (
+          <>
+            <path d="M17 21v29h27V21M11 18h39M24 10h15M25 29v12M35 29v12" />
+          </>
+        ) : (
+          <>
+            <path d="M9 22h40L39 12M51 38H11l10 10" />
+          </>
         )}
-      </g>
-      <g fill="#fff0bd">
-        {[34, 131, 620, 778, 928].map((x) => (
-          <g key={x} transform={`translate(${x} 398)`}>
-            <circle cx="-6" r="4" />
-            <circle cx="6" r="4" />
-            <circle cy="-6" r="4" />
-            <circle cy="6" r="4" />
-            <circle r="3" fill="#e2a169" />
-          </g>
-        ))}
       </g>
     </svg>
   );
 }
 
 export function GarageGame({ settings, paused, onCelebrate }: GameProps) {
-  const [step, setStep] = useState(0);
-  const [body, setBody] = useState<Body>('buggy');
-  const [paint, setPaint] = useState(0);
-  const [wheel, setWheel] = useState<Wheel>('round');
-  const [phase, setPhase] = useState<'build' | 'ready' | 'drive' | 'done'>('build');
-  const [distance, setDistance] = useState(0);
-  const [holding, setHolding] = useState(false);
-  const keyChoice = useRef(0);
-  const stars = [20, 40, 60, 80, 95].filter((at) => distance >= at).length;
-  const lastStars = useRef(0);
-
-  function choose(index: number) {
-    if (paused) return;
-    playTone(step * 2 + index, settings);
-    if (step === 0) {
-      setBody(bodies[index % 3]);
-      setStep(1);
-      speak('Choose a color', settings);
-    } else if (step === 1) {
-      setPaint(index % 4);
-      setStep(2);
-      speak(paints[index % 4].name, settings);
-    } else {
-      setWheel(wheels[index % 3]);
-      setPhase('ready');
-      speak('Your car! Let’s take a picnic to bunny.', settings);
-    }
-  }
-  function drive() {
-    if (paused || phase !== 'drive') return;
-    setDistance((value) => Math.min(100, value + 7));
-    playTone(1 + stars, settings, 0.15);
-  }
-  function start() {
-    if (paused) return;
-    setDistance(0);
-    lastStars.current = 0;
-    setPhase('drive');
-    playTone(4, settings);
-    speak('Take the picnic to bunny! Tap or hold to drive.', settings);
-  }
-  function rebuild() {
-    if (paused) return;
-    setHolding(false);
-    setDistance(0);
-    setStep(0);
-    setPhase('build');
-  }
-
-  useGameKeys(paused, (key) => {
-    if (phase === 'build') choose(/^[1-4]$/.test(key) ? Number(key) - 1 : keyChoice.current++);
-    else if (phase === 'ready' || phase === 'done') start();
-    else drive();
+  const [body, setBody] = useState<Body>('buggy'),
+    [paint, setPaint] = useState(0),
+    [wheel, setWheel] = useState<Wheel>('round'),
+    [roof, setRoof] = useState<Roof>('flower'),
+    [decal, setDecal] = useState<Decal>('star');
+  const [tab, setTab] = useState(0),
+    [driving, setDriving] = useState(false),
+    [running, setRunning] = useState(false),
+    [distance, setDistance] = useState(0),
+    [toy, setToy] = useState<Toy>('bubbles'),
+    [tosses, setTosses] = useState<{ id: number; toy: Toy; age: number }[]>([]),
+    [greeting, setGreeting] = useState(false);
+  const tick = useRef({
+    distance: 0,
+    tosses: [] as { id: number; toy: Toy; age: number }[],
+    last: 0,
+    nextId: 0,
+    world: 0,
   });
+  const world = Math.floor(distance / 1100) % worlds.length,
+    stars = Math.floor(distance / 95);
+  function toss() {
+    if (paused || !driving) return;
+    const item = { id: ++tick.current.nextId, toy, age: 0 };
+    tick.current.tosses = [...tick.current.tosses.slice(-8), item];
+    setTosses([...tick.current.tosses]);
+    playTone(toy === 'teddy' ? 3 : 8, settings);
+  }
+  function greet() {
+    if (paused) return;
+    setGreeting(true);
+    playSound('horn', settings);
+    speak(`Hello, ${passengerNames[world % 3]}!`, settings, { interrupt: true });
+  }
+  function choose() {
+    if (paused) return;
+    playTone(3 + tab, settings);
+    if (tab === 0) setBody(bodies[(bodies.indexOf(body) + 1) % 3]);
+    if (tab === 1) setPaint((paint + 1) % paints.length);
+    if (tab === 2) setWheel(wheels[(wheels.indexOf(wheel) + 1) % 3]);
+    if (tab === 3) setRoof(roofs[(roofs.indexOf(roof) + 1) % 4]);
+    if (tab === 4) setDecal(decals[(decals.indexOf(decal) + 1) % 3]);
+  }
   useEffect(() => {
-    if (!holding || paused || phase !== 'drive') return;
-    const interval = window.setInterval(
-      () => setDistance((value) => Math.min(100, value + 0.85)),
-      120,
-    );
-    const stop = () => setHolding(false);
-    window.addEventListener('pointerup', stop);
-    window.addEventListener('pointercancel', stop);
-    return () => {
-      window.clearInterval(interval);
-      window.removeEventListener('pointerup', stop);
-      window.removeEventListener('pointercancel', stop);
+    if (paused) return;
+    let frame = 0;
+    tick.current.last = 0;
+    const animate = (now: number) => {
+      const t = tick.current,
+        dt = t.last ? Math.max(0, Math.min((now - t.last) / 1000, 0.05)) : 0;
+      t.last = now;
+      if (driving && running) {
+        t.distance += dt * 95;
+        setDistance(t.distance);
+        const next = Math.floor(t.distance / 1100);
+        if (next !== t.world) {
+          t.world = next;
+          setGreeting(false);
+          onCelebrate(`Road trip: ${worlds[next % worlds.length].name}`);
+          speak(`Hello, ${worlds[next % worlds.length].name}!`, settings);
+        }
+      }
+      if (t.tosses.length) {
+        t.tosses = t.tosses.map((p) => ({ ...p, age: p.age + dt })).filter((p) => p.age < 2.4);
+        setTosses([...t.tosses]);
+      }
+      frame = requestAnimationFrame(animate);
     };
-  }, [holding, paused, phase]);
-  useEffect(() => {
-    if (paused) setHolding(false);
-  }, [paused]);
-  useEffect(() => {
-    if (!paused && stars > lastStars.current) {
-      lastStars.current = stars;
-      playTone(stars + 4, settings);
-      speak(String(stars), settings);
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [paused, driving, running, onCelebrate, settings]);
+  useGameKeys(paused, (key) => {
+    if (!driving) {
+      if (key === 'Enter' || key === ' ') {
+        setDriving(true);
+        setRunning(true);
+      } else if (key === 'ArrowRight') setTab((tab + 1) % 5);
+      else choose();
+    } else if (key === 'h' || key === 'H') greet();
+    else if (key === 'ArrowUp') {
+      setRunning((v) => !v);
+    } else {
+      setRunning(true);
+      toss();
     }
-  }, [stars, settings, paused]);
-  useEffect(() => {
-    if (!paused && distance >= 100 && phase === 'drive') {
-      setHolding(false);
-      setPhase('done');
-      onCelebrate('Picnic delivered!');
-      speak('You brought the picnic! Thank you!', settings);
-    }
-  }, [distance, phase, onCelebrate, settings, paused]);
-
+  });
+  const custom = { body, color: paints[paint].color, wheel, roof, decal };
   return (
     <section
-      className={`vg-game ${settings.calm ? 'vg-calm' : ''} ${paused ? 'vg-paused' : ''}`}
-      aria-label="Build a car and deliver a picnic"
-      data-testid="garage-game"
+      className={`vg-game vg-garage ${paused ? 'vg-paused' : ''} ${settings.calm ? 'vg-calm' : ''}`}
+      data-game="garage"
+      data-driving={driving}
+      data-world={world}
+      data-distance={Math.floor(distance)}
     >
-      <div className="vg-game-heading">
+      <div className="vg-title">
         <div>
-          <span className="vg-eyebrow">YOUR CAR · YOUR ADVENTURE</span>
-          <h2>
-            {phase === 'build'
-              ? ['Pick your car', 'Make it colorful', 'Choose your wheels'][step]
-              : phase === 'ready'
-                ? 'Made by you. Ready to roll?'
-                : phase === 'done'
-                  ? 'A picnic for bunny!'
-                  : 'Take the picnic to bunny'}
-          </h2>
+          <span className="vg-kicker">
+            {driving ? 'THE ROAD GOES ON & ON' : 'A CAR THAT IS ALL YOURS'}
+          </span>
+          <h2>{driving ? worlds[world].name : 'Make your car!'}</h2>
         </div>
-        {phase === 'build' ? (
-          <BuildProgress step={step} />
-        ) : (
-          <div className="vg-star-count" aria-label={`${stars} of 5 stars collected`}>
-            <svg viewBox="0 0 50 50" aria-hidden="true">
-              <Star x={25} y={25} size={0.8} />
+        {driving ? (
+          <div className="vg-tally">
+            <svg viewBox="-30 -30 60 60">
+              <Star />
             </svg>
-            <b>
-              {stars}
-              <span> / 5</span>
-            </b>
+            <b>{stars}</b>
           </div>
+        ) : (
+          <button className="vg-mini" onClick={choose} disabled={paused} aria-label="Surprise me">
+            <svg viewBox="-30 -30 60 60">
+              <Star color="#c7a7df" />
+            </svg>
+          </button>
         )}
       </div>
-      {phase === 'build' || phase === 'ready' ? (
-        <>
-          <div className="vg-garage-stage">
-            <svg
-              viewBox="0 0 960 355"
-              role="img"
-              aria-label={`${paints[paint].name} ${body} with ${wheel} wheels`}
-            >
-              <defs>
-                <pattern id="vg-wall-dots" width="30" height="30" patternUnits="userSpaceOnUse">
-                  <circle cx="4" cy="4" r="2" fill="#dfc798" />
-                </pattern>
-              </defs>
-              <rect width="960" height="355" fill="#fae6b8" />
-              <rect
-                x="48"
-                y="23"
-                width="210"
-                height="174"
-                rx="19"
-                fill="url(#vg-wall-dots)"
-                stroke="#e7ce9f"
-                strokeWidth="5"
-              />
-              <path
-                d="M90 76v55m-13-53q12 11 26 0M155 65v68m-15-68h30"
-                stroke="#91aaa6"
-                strokeWidth="15"
-                fill="none"
-                strokeLinecap="round"
-              />
-              <path
-                d="M205 71v61m-10-66h20v27h-20Z"
-                stroke="#d3916d"
-                fill="#d3916d"
-                strokeWidth="7"
-                strokeLinecap="round"
-              />
-              <rect
-                x="735"
-                y="37"
-                width="172"
-                height="129"
-                rx="18"
-                fill="#bce1dc"
-                stroke="#fff5d9"
-                strokeWidth="10"
-              />
-              <path d="M822 42v121m-81-56h160" stroke="#fff5d9" strokeWidth="9" />
-              <circle cx="865" cy="69" r="15" fill="#f6d167" />
-              <Cloud x={745} y={75} size={0.6} />
-              <path d="M0 268h960v87H0Z" fill="#e8cda6" />
-              <path d="M0 268h960" stroke="#d8bb94" strokeWidth="5" />
-              <ellipse cx="480" cy="305" rx="252" ry="26" fill="#cdae90" opacity=".35" />
-              <g transform="translate(278 65) scale(1.4)">
-                <CarArt body={body} color={paints[paint].color} wheel={wheel} />
-              </g>
-              <g transform="translate(92 237)">
-                <rect width="85" height="53" rx="8" fill="#dc9476" stroke={INK} strokeWidth="3" />
-                <path d="M-6 15h97M31 0v53" stroke="#f4d487" strokeWidth="7" />
-                <path d="M27-1v-15h30v15" fill="none" stroke={INK} strokeWidth="5" />
-              </g>
-              <g transform="translate(813 238)">
-                <path d="m-25 53 20-63h20l20 63Z" fill="#ec9570" stroke={INK} strokeWidth="3" />
-                <path d="M-18 30h42" stroke="#fff2d3" strokeWidth="13" />
-                <path d="M-35 55h78" stroke={INK} strokeWidth="6" strokeLinecap="round" />
-              </g>
-            </svg>
-          </div>
-          {phase === 'build' ? (
-            <div
-              className="vg-choices"
-              aria-label={['Choose car shape', 'Choose car color', 'Choose wheel style'][step]}
-            >
-              {step === 0 &&
-                bodies.map((option, index) => (
-                  <button
-                    key={option}
-                    className="vg-picture-choice"
-                    onClick={() => choose(index)}
-                    disabled={paused}
-                    aria-label={`Choose ${option}`}
-                  >
-                    <svg viewBox="0 0 300 195" aria-hidden="true">
-                      <CarArt body={option} color={paints[index].color} />
-                    </svg>
-                    <span>{['Little buggy', 'Speedy racer', 'Adventure van'][index]}</span>
-                  </button>
-                ))}
-              {step === 1 &&
-                paints.map((option, index) => (
-                  <button
-                    key={option.name}
-                    className="vg-picture-choice vg-paint-choice"
-                    onClick={() => choose(index)}
-                    disabled={paused}
-                    aria-label={`Paint car ${option.name.toLowerCase()}`}
-                  >
-                    <svg viewBox="0 0 110 105" aria-hidden="true">
-                      <path
-                        d="M53 7C44 26 20 43 20 65a34 34 0 0 0 68 0C88 43 66 28 53 7Z"
-                        fill={option.color}
-                        stroke={INK}
-                        strokeWidth="3"
-                      />
-                      <path
-                        d="M34 64q-3 12 8 18"
-                        stroke="#fff9ec"
-                        strokeWidth="6"
-                        fill="none"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <span>{option.name}</span>
-                  </button>
-                ))}
-              {step === 2 &&
-                wheels.map((option, index) => (
-                  <button
-                    key={option}
-                    className="vg-picture-choice vg-wheel-choice"
-                    onClick={() => choose(index)}
-                    disabled={paused}
-                    aria-label={`Choose ${option} wheels`}
-                  >
-                    <svg viewBox="0 0 100 95" aria-hidden="true">
-                      <g transform="translate(50 45) scale(1.45)">
-                        <WheelArt style={option} x={0} y={0} />
-                      </g>
-                    </svg>
-                    <span>{['Round & round', 'Flower power', 'Super stars'][index]}</span>
-                  </button>
-                ))}
-            </div>
+      <div className="vg-main-scene vg-garage-scene" data-testid="garage-scene">
+        <svg viewBox="0 0 1000 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          {driving ? (
+            <WorldArt index={world} distance={distance} />
           ) : (
-            <div className="vg-bottom-bar">
-              <button
-                className="vg-small-action"
-                onClick={rebuild}
-                disabled={paused}
-                aria-label="Build another car"
-              >
-                <ReplayIcon />
-                <span>Build again</span>
-              </button>
-              <div className="vg-mission">
-                <PicnicMission />
-                <small>Bring bunny a picnic</small>
-              </div>
-              <button
-                className="vg-go-button"
-                onClick={start}
-                disabled={paused}
-                aria-label="Drive my car"
-              >
-                <ArrowIcon />
-                <span>Let’s go!</span>
-              </button>
-            </div>
+            <>
+              <rect width="1000" height="450" fill="#f5e3c4" />
+              <rect x="94" y="25" width="812" height="338" rx="42" fill="#eed1a6" />
+              <rect x="120" y="46" width="760" height="295" rx="30" fill="#d7e5d4" />
+              {[76, 116, 156].map((y) => (
+                <path key={y} d={`M125 ${y}h750`} stroke="#c5d7c4" strokeWidth="3" />
+              ))}
+              <rect y="349" width="1000" height="101" fill="#dbb695" />
+              <ellipse cx="504" cy="386" rx="240" ry="26" fill="#ae9076" opacity=".2" />
+              <path
+                d="M80 337V198h96v139m648 0V198h96v139"
+                fill="#dfa16f"
+                stroke={INK}
+                strokeWidth="3"
+              />
+              <path
+                d="M99 225h58m-58 38h58m692-38h58m-58 38h58"
+                stroke="#fff0d1"
+                strokeWidth="5"
+                strokeLinecap="round"
+              />
+              <circle cx="826" cy="110" r="28" fill="#fff5dc" stroke={INK} strokeWidth="3" />
+              <path d="M826 90v20l14 9" stroke={INK} strokeWidth="4" fill="none" />
+            </>
           )}
+        </svg>
+        <svg
+          className={`vg-custom-car ${driving ? 'vg-car-on-road' : ''} ${driving && running ? 'vg-car-bob' : ''}`}
+          viewBox="0 -35 290 225"
+          aria-hidden="true"
+        >
+          <CustomCar {...custom} moving={driving && running} />
+        </svg>
+        {driving &&
+          tosses.map((t) => (
+            <div
+              className="vg-flying-toy"
+              key={t.id}
+              style={{
+                left: `${40 + t.age * 19}%`,
+                bottom: `${27 + Math.sin((t.age / 2.4) * Math.PI) * 34}%`,
+                transform: `rotate(${t.age * 100}deg)`,
+                opacity: Math.min(1, (2.4 - t.age) * 2),
+              }}
+            >
+              <ToyArt toy={t.toy} />
+            </div>
+          ))}
+        {driving && (
+          <>
+            <button
+              className="vg-window-button"
+              aria-label={`Throw ${toy} from the window`}
+              onClick={toss}
+              disabled={paused}
+            >
+              <ToyArt toy={toy} />
+              <span>Throw!</span>
+            </button>
+            <button
+              className="vg-friend-button"
+              aria-label={`Say hello to ${passengerNames[world % 3]}`}
+              onClick={greet}
+              disabled={paused}
+            >
+              <svg viewBox="-70 -110 140 180" aria-hidden="true">
+                <g className={greeting ? 'vg-friend-wave' : 'vg-friend-breathe'}>
+                  <path
+                    d="M-20 40q-25-33-35-5m74 5q25-33 35-5"
+                    fill="none"
+                    stroke={passengerColors[world % 3]}
+                    strokeWidth="12"
+                    strokeLinecap="round"
+                  />
+                  <ellipse cy="34" rx="25" ry="28" fill={passengerColors[world % 3]} />
+                  <Passenger index={world % 3} size={0.85} />
+                </g>
+                {greeting && (
+                  <g transform="translate(0 -78)">
+                    <rect x="-51" y="-20" width="102" height="39" rx="19" fill="#fff9e9" />
+                    <text y="6" textAnchor="middle" fill={INK} fontWeight="900" fontSize="22">
+                      Hello!
+                    </text>
+                  </g>
+                )}
+              </svg>
+            </button>
+            <div className="vg-road-label">{world + 1} / 6 worlds · keep exploring</div>
+          </>
+        )}
+      </div>
+      {!driving ? (
+        <>
+          <div className="vg-build-tabs" role="tablist" aria-label="Car parts">
+            {['Shape', 'Color', 'Wheels', 'Hat', 'Sticker'].map((label, i) => (
+              <button
+                role="tab"
+                aria-selected={tab === i}
+                key={label}
+                onClick={() => {
+                  if (!paused) setTab(i);
+                }}
+                disabled={paused}
+              >
+                <svg viewBox="-35 -35 70 70">
+                  {i === 0 ? (
+                    <g transform="translate(-34 -21) scale(.24)">
+                      <CarArt color={paints[paint].color} />
+                    </g>
+                  ) : i === 1 ? (
+                    <>
+                      <circle r="23" fill={paints[paint].color} />
+                      <circle cx="-6" cy="-8" r="7" fill="white" opacity=".6" />
+                    </>
+                  ) : i === 2 ? (
+                    <WheelArt style={wheel} x={0} y={0} />
+                  ) : i === 3 ? (
+                    <g transform="translate(0 22) scale(.8)">
+                      <RoofArt roof={roof} />
+                    </g>
+                  ) : (
+                    <DecalArt decal={decal} />
+                  )}
+                </svg>
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+          <div className="vg-options">
+            {tab === 0
+              ? bodies.map((b) => (
+                  <button
+                    key={b}
+                    aria-label={`Choose ${b}`}
+                    aria-pressed={body === b}
+                    disabled={paused}
+                    onClick={() => {
+                      setBody(b);
+                      playTone(3, settings);
+                      speak(b, settings);
+                    }}
+                  >
+                    <svg viewBox="0 0 290 180">
+                      <CarArt body={b} color={paints[paint].color} />
+                    </svg>
+                  </button>
+                ))
+              : tab === 1
+                ? paints.map((p, i) => (
+                    <button
+                      key={p.name}
+                      aria-label={`Paint ${p.name.toLowerCase()}`}
+                      aria-pressed={paint === i}
+                      disabled={paused}
+                      onClick={() => {
+                        setPaint(i);
+                        playTone(i, settings);
+                        speak(p.name, settings);
+                      }}
+                    >
+                      <svg viewBox="-30 -30 60 60">
+                        <circle r="24" fill={p.color} stroke={INK} strokeWidth="2" />
+                        <circle cx="-7" cy="-8" r="6" fill="white" opacity=".65" />
+                      </svg>
+                    </button>
+                  ))
+                : tab === 2
+                  ? wheels.map((w) => (
+                      <button
+                        key={w}
+                        aria-label={`Choose ${w} wheels`}
+                        aria-pressed={wheel === w}
+                        disabled={paused}
+                        onClick={() => {
+                          setWheel(w);
+                          playTone(5, settings);
+                        }}
+                      >
+                        <svg viewBox="-38 -38 76 76">
+                          <WheelArt style={w} x={0} y={0} />
+                        </svg>
+                      </button>
+                    ))
+                  : tab === 3
+                    ? roofs.map((r) => (
+                        <button
+                          key={r}
+                          aria-label={`Choose ${r} hat`}
+                          aria-pressed={roof === r}
+                          disabled={paused}
+                          onClick={() => {
+                            setRoof(r);
+                            playTone(7, settings);
+                          }}
+                        >
+                          <svg viewBox="-42 -65 84 84">
+                            <RoofArt roof={r} />
+                          </svg>
+                        </button>
+                      ))
+                    : decals.map((d) => (
+                        <button
+                          key={d}
+                          aria-label={`Choose ${d} sticker`}
+                          aria-pressed={decal === d}
+                          disabled={paused}
+                          onClick={() => {
+                            setDecal(d);
+                            playTone(9, settings);
+                          }}
+                        >
+                          <svg viewBox="-40 -40 80 80">
+                            <DecalArt decal={d} />
+                          </svg>
+                        </button>
+                      ))}
+            <button
+              className="vg-start-button"
+              aria-label="Let's drive"
+              disabled={paused}
+              onClick={() => {
+                setDriving(true);
+                setRunning(true);
+                speak('Beep beep! Let’s go!', settings);
+                playTone(8, settings);
+              }}
+            >
+              <Icon name="go" />
+              <span>Let's go!</span>
+            </button>
+          </div>
         </>
       ) : (
-        <>
-          <div
-            className="vg-road-stage"
-            onPointerDown={(event) => {
-              if (event.target instanceof Element && event.target.closest('button')) return;
-              drive();
+        <div className="vg-controls">
+          <button
+            aria-label="Back to garage"
+            onClick={() => {
+              setDriving(false);
+              setRunning(false);
             }}
+            disabled={paused}
           >
-            <RoadScene
-              body={body}
-              color={paints[paint].color}
-              wheel={wheel}
-              distance={distance}
-              moving={holding && !paused}
-              done={phase === 'done'}
-            />
+            <Icon name="home" />
+            <span>Garage</span>
+          </button>
+          <button aria-label="Beep the horn" onClick={greet} disabled={paused}>
+            <Icon name="horn" />
+            <span>Beep!</span>
+          </button>
+          <div className="vg-toy-choices">
+            {toys.map((t) => (
+              <button
+                aria-label={`Choose ${t}`}
+                key={t}
+                aria-pressed={toy === t}
+                disabled={paused}
+                onClick={() => {
+                  setToy(t);
+                  playTone(6, settings);
+                }}
+              >
+                <ToyArt toy={t} />
+              </button>
+            ))}
           </div>
-          <div className="vg-route" aria-label={`Journey ${Math.round(distance)} percent complete`}>
-            <span aria-hidden="true">⌂</span>
-            <div>
-              <i style={{ width: `${distance}%` }} />
-            </div>
-            <span aria-hidden="true">⚑</span>
-          </div>
-          <div className="vg-bottom-bar">
-            <button
-              className="vg-small-action"
-              onClick={rebuild}
-              disabled={paused}
-              aria-label="Build a new car"
-            >
-              <ReplayIcon />
-              <span>New car</span>
-            </button>
-            {phase === 'done' ? (
-              <>
-                <p className="vg-play-hint">
-                  You made it.
-                  <br />
-                  <strong>Let’s go again!</strong>
-                </p>
-                <button
-                  className="vg-go-button"
-                  onClick={start}
-                  disabled={paused}
-                  aria-label="Drive again"
-                >
-                  <ReplayIcon />
-                  <span>Again!</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="vg-play-hint">
-                  <strong>Tap, hold, or press a key</strong>
-                  <br />
-                  Every little push takes you closer.
-                </p>
-                <button
-                  className="vg-go-button vg-pedal"
-                  onPointerDown={(event) => {
-                    if (paused) return;
-                    event.preventDefault();
-                    event.currentTarget.setPointerCapture(event.pointerId);
-                    drive();
-                    setHolding(true);
-                  }}
-                  onPointerUp={() => setHolding(false)}
-                  onPointerCancel={() => setHolding(false)}
-                  onClick={(event) => {
-                    if (event.detail === 0) drive();
-                  }}
-                  disabled={paused}
-                  aria-label="Accelerate. Tap or hold to drive"
-                >
-                  <ArrowIcon />
-                  <span>GO!</span>
-                </button>
-              </>
-            )}
-          </div>
-        </>
+          <button
+            className="vg-start-button"
+            aria-label={running ? 'Pause driving' : 'Keep driving'}
+            disabled={paused}
+            onClick={() => setRunning((v) => !v)}
+          >
+            <Icon name={running ? 'stop' : 'go'} />
+            <span>{running ? 'Stop' : 'Go!'}</span>
+          </button>
+        </div>
       )}
     </section>
   );
 }
 
-function Landmark({ index, large = false }: { index: number; large?: boolean }) {
+function CoachBadge({ index }: { index: number }) {
   return (
-    <svg viewBox="0 0 160 140" className={large ? 'vg-landmark-large' : ''} aria-hidden="true">
-      {index === 0 ? (
-        <>
-          <ellipse cx="80" cy="123" rx="70" ry="12" fill="#b7ca88" />
-          <path d="M20 113V62l44-33 43 33v51Z" fill="#dc8e71" stroke={INK} strokeWidth="3" />
-          <path
-            d="m13 64 51-43 51 43"
-            stroke={INK}
-            strokeWidth="6"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <rect x="51" y="76" width="26" height="37" rx="3" fill="#f8d69b" />
-          <path d="m51 76 26 37m0-37-26 37" stroke="#dc8e71" strokeWidth="3" />
-          <Tree x={128} y={51} size={0.52} />
-          <g fill="#e87c64">
-            <circle cx="112" cy="51" r="6" />
-            <circle cx="138" cy="43" r="6" />
-            <circle cx="133" cy="64" r="6" />
+    <svg viewBox="-25 -25 50 50" aria-hidden="true">
+      <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
+        {index === 0 ? (
+          <>
+            <path d="M0 20V0" stroke="#548b6d" strokeWidth="5" />
+            {[0, 72, 144, 216, 288].map((n) => (
+              <ellipse key={n} cy="-9" rx="6" ry="11" fill="#f1aec0" transform={`rotate(${n})`} />
+            ))}
+            <circle r="7" fill="#f8d772" />
+          </>
+        ) : index === 1 ? (
+          <>
+            <path d="m-3 10-5 13" stroke="#947566" strokeWidth="5" />
+            <circle cy="-4" r="15" fill="#efb1c3" />
+            <path d="M-6-8q20-2 8 11-10 1-4-8" stroke="#fff3dc" fill="none" strokeWidth="4" />
+          </>
+        ) : index === 2 ? (
+          <>
+            <path
+              d="M-20 1q10-15 20 0t20 0M-20 14q10-15 20 0t20 0"
+              stroke="#639fbb"
+              fill="none"
+              strokeWidth="6"
+            />
+            <circle cx="11" cy="-14" r="7" fill="#ffe293" stroke="none" />
+          </>
+        ) : index === 3 ? (
+          <>
+            <path d="M-15 19Q-26-17 20-20q1 41-35 39" fill="#82b783" />
+            <path d="m-15 19 28-31M-1 3l-9-6" fill="none" />
+          </>
+        ) : index === 4 ? (
+          <g stroke="#728ba9" strokeWidth="4">
+            {[0, 60, 120].map((n) => (
+              <path key={n} d="M0-20v40m-6-32 6 5 6-5m-12 24 6-5 6 5" transform={`rotate(${n})`} />
+            ))}
           </g>
-        </>
-      ) : index === 1 ? (
-        <>
-          <path
-            d="M8 120 65 20l37 54 21-35 31 81Z"
-            fill="#91b5aa"
-            stroke={INK}
-            strokeWidth="3"
-            strokeLinejoin="round"
-          />
-          <path d="m45 55 20-35 24 36-14-8-9 11-9-13Z" fill="#fff5dc" />
-          <path d="M16 82A65 65 0 0 1 143 82" fill="none" stroke="#ed987a" strokeWidth="10" />
-          <path d="M24 82a57 57 0 0 1 111 0" fill="none" stroke="#f4ce74" strokeWidth="7" />
-          <path d="M31 82a50 50 0 0 1 97 0" fill="none" stroke="#a7c891" strokeWidth="7" />
-          <Cloud x={-5} y={74} size={0.45} />
-          <Cloud x={110} y={74} size={0.45} />
-        </>
-      ) : (
-        <>
-          <circle cx="124" cy="31" r="21" fill="#f5cf67" />
-          <path d="M4 108q52-39 150 0v27H4Z" fill="#7fc5cc" />
-          <path d="M17 110q51-37 121 0Z" fill="#f5d594" />
-          <path
-            d="M74 111q16-52 6-71"
-            fill="none"
-            stroke="#9c8763"
-            strokeWidth="8"
-            strokeLinecap="round"
-          />
-          <path
-            d="M82 43Q49 7 27 48q25-7 55-5m0 0q20-40 53-12-28 0-53 12m0 0q-19 0-29 29 29-7 29-29m0 0q25-9 39 23-30-2-39-23"
-            fill="#6fa989"
-            stroke="#528d75"
-            strokeWidth="2"
-          />
-          <path d="M24 124h29m47-1h32" stroke="#e4f6e5" strokeWidth="4" strokeLinecap="round" />
-        </>
-      )}
+        ) : (
+          <Star size={0.8} />
+        )}
+      </g>
     </svg>
   );
 }
 
-function JourneyScene({
-  vehicle,
-  progress,
-  delivered,
-  arriving,
-}: {
-  vehicle: Vehicle;
-  progress: number;
-  delivered: number;
-  arriving: boolean;
-}) {
+function EngineArt({ vehicle }: { vehicle: Vehicle }) {
   return (
-    <svg
-      className={`vg-scene ${arriving ? 'vg-at-stop' : ''}`}
-      viewBox="0 0 960 430"
-      role="img"
-      aria-label={`${vehicle === 'plane' ? 'Flying' : 'Riding'} to ${places[Math.min(delivered, 2)]}`}
-    >
-      <defs>
-        <linearGradient id="vg-trip-sky" x2="0" y2="1">
-          <stop stopColor={vehicle === 'plane' ? '#a9dce3' : '#c4e4da'} />
-          <stop offset="1" stopColor="#faf0c9" />
-        </linearGradient>
-      </defs>
-      <rect width="960" height="430" fill="url(#vg-trip-sky)" />
-      <circle cx="820" cy="64" r="31" fill="#ffdb76" />
-      <Cloud x={70 - (progress % 33) * 2} y={52} size={1.2} />
-      <Cloud x={595 - (progress % 33)} y={113} size={0.8} />
-      <Cloud x={370} y={23} size={0.6} />
-      <path d="M0 259 132 115 265 283 407 148 562 305 736 185 960 279V430H0Z" fill="#acc6ae" />
-      <path d="m88 164 44-49 47 60-27-13-20 11-19-15Z" fill="#edf2de" />
-      <path d="M0 304q156-93 309 0 235-120 403-14 154-43 248 18v122H0Z" fill="#85b69b" />
-      <g className="vg-scenery" transform={`translate(${-((progress % 33) * 10)} 0)`}>
-        {[90, 620, 1160].map((x) => (
-          <Tree key={x} x={x} y={285} size={0.63} />
-        ))}
+    <svg viewBox="0 0 150 180" aria-hidden="true">
+      <g stroke={INK} strokeWidth="4" strokeLinejoin="round">
+        {vehicle === 'train' ? (
+          <>
+            <path d="M16 146V53h63v40h44q15 0 15 18v45H17Z" fill="#6aada2" />
+            <path d="M8 52h79" strokeWidth="11" strokeLinecap="round" />
+            <rect x="28" y="66" width="37" height="40" rx="9" fill="#dcf0df" />
+            <path d="M110 96V60h18v40" fill="#f1c967" />
+            <path d="M105 58h30" strokeWidth="7" strokeLinecap="round" />
+            <circle cx="139" cy="122" r="11" fill="#ffe293" />
+            <path d="m137 146 13 20h-31" fill="#ea987a" />
+            <WheelArt style="star" x={42} y={154} turning />
+            <WheelArt style="round" x={109} y={154} turning />
+            <path d="M42 91q4 9 14 0" fill="none" />
+            <circle cx="36" cy="81" r="3" fill={INK} />
+            <circle cx="57" cy="81" r="3" fill={INK} />
+          </>
+        ) : (
+          <>
+            <ellipse cx="60" cy="93" rx="32" ry="37" fill="#f7dfa0" />
+            <path d="M72 92h32" strokeWidth="10" />
+            <g
+              className="vg-wheel-turn"
+              style={{ transformOrigin: '112px 92px', transformBox: 'view-box' }}
+            >
+              <ellipse cx="112" cy="61" rx="10" ry="36" fill="#ec957b" />
+              <ellipse cx="112" cy="123" rx="10" ry="36" fill="#ec957b" />
+            </g>
+            <circle cx="112" cy="92" r="12" fill="#ffe8aa" />
+          </>
+        )}
       </g>
-      <path d="M0 371q350-44 960 0v59H0Z" fill="#c2d39a" />
-      {vehicle === 'train' ? (
-        <>
-          <path d="M0 351h960v41H0Z" fill="#d5b899" />
-          <path d="M0 358h960M0 385h960" stroke={INK} strokeWidth="6" />
-          <path
-            d="M0 370h980"
-            stroke="#8d7962"
-            strokeWidth="50"
-            strokeDasharray="8 29"
-            strokeDashoffset={progress * 8}
-          />
-          <path d="M0 356h960M0 385h960" stroke="#e7e4c8" strokeWidth="3" />
-          <g className="vg-journey-train" transform="translate(172 155) scale(1.08)">
-            <TransportArt vehicle={vehicle} loaded={3} departed={delivered} moving={!arriving} />
-          </g>
-        </>
-      ) : (
-        <g
-          className="vg-journey-plane"
-          transform={`translate(170 ${100 - Math.sin(progress / 12) * 18}) scale(1.15)`}
-        >
-          <TransportArt vehicle={vehicle} loaded={3} departed={delivered} moving={!arriving} />
+    </svg>
+  );
+}
+function CatArt({ meow = false }: { meow?: boolean }) {
+  return (
+    <svg viewBox="-45 -55 90 105" aria-hidden="true">
+      <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
+        <path
+          d="M25 31q33 6 13-27"
+          fill="none"
+          stroke="#d59b77"
+          strokeWidth="9"
+          strokeLinecap="round"
+        />
+        <ellipse cy="23" rx="25" ry="22" fill="#d59b77" />
+        <path d="m-26-9-3-36L-9-28q10-4 18 0l21-17-4 37" fill="#d59b77" />
+        <ellipse cy="-10" rx="30" ry="25" fill="#d59b77" />
+        <path d="M-15-30v13M0-34v15m15-13v15" stroke="#a27055" strokeWidth="5" />
+        <g className="vg-blink">
+          <circle cx="-12" cy="-8" r="3" fill={INK} />
+          <circle cx="12" cy="-8" r="3" fill={INK} />
         </g>
-      )}
-      <g
-        className="vg-journey-destination"
-        transform={`translate(${arriving ? 678 : 980 - (progress % (100 / 3)) * 7.8} 231) scale(1.4)`}
-      >
-        <LandmarkDrawing index={Math.min(delivered, 2)} />
+        <path d="m-4 0 4 4 4-4" fill="#e7aba6" />
+        {meow ? (
+          <ellipse cy="10" rx="6" ry="7" fill="#6f5452" />
+        ) : (
+          <path d="M-8 8q8 9 16 0" fill="none" />
+        )}
+        <path d="M-20 1-37-3m18 11-17 3M20 1l17-4M19 8l17 3" strokeWidth="2" />
       </g>
-      {arriving && (
-        <g transform="translate(698 125)">
-          <rect
-            x="-25"
-            y="-25"
-            width="105"
-            height="49"
-            rx="20"
-            fill="#fff8e4"
-            stroke={INK}
-            strokeWidth="3"
-          />
-          <path d="m7 24 8 16 8-16" fill="#fff8e4" />
-          <text x="27" y="11" textAnchor="middle" fill={INK} fontSize="30" fontWeight="900">
-            {['A', 'B', 'C'][Math.min(delivered, 2)]}
-          </text>
-        </g>
-      )}
     </svg>
   );
 }
 
-function LandmarkDrawing({ index }: { index: number }) {
-  return (
-    <g>
-      {index === 0 ? (
-        <>
-          <path d="M12 80V27L57-8l47 35v53Z" fill="#d99073" stroke={INK} strokeWidth="3" />
-          <path d="m4 28 53-44 55 44" stroke={INK} strokeWidth="6" fill="none" />
-          <rect x="43" y="43" width="30" height="37" fill="#f2d39f" />
-          <path d="m43 43 30 37m0-37L43 80" stroke="#d99073" strokeWidth="3" />
-          <Tree x={125} y={16} size={0.65} />
-          <g fill="#e67f63">
-            <circle cx="105" cy="13" r="6" />
-            <circle cx="140" cy="25" r="6" />
-          </g>
-        </>
-      ) : index === 1 ? (
-        <>
-          <path d="M-15 89 42-30l41 65 26-39 42 93Z" fill="#759c9d" stroke={INK} strokeWidth="3" />
-          <path d="m26 4 16-34L62 2 48-6 42 5l-7-12Z" fill="#f8f1d9" />
-          <path d="M-15 55A80 80 0 0 1 145 55" fill="none" stroke="#ef9e7e" strokeWidth="10" />
-          <path d="M-7 55A72 72 0 0 1 137 55" fill="none" stroke="#f7d379" strokeWidth="7" />
-        </>
-      ) : (
-        <>
-          <ellipse cx="68" cy="80" rx="103" ry="20" fill="#7cc7cb" />
-          <ellipse cx="68" cy="72" rx="66" ry="15" fill="#f5d292" />
-          <path d="M65 72q14-42 3-75" stroke="#9a8160" strokeWidth="8" fill="none" />
-          <path
-            d="M70 4Q34-29 11 17q30-10 59-13 33-42 66-3-33-12-66 3Q49 6 38 35q24-7 32-31 28 1 44 28-33-1-44-28"
-            fill="#639e81"
-            stroke="#447e66"
-            strokeWidth="2"
-          />
-        </>
-      )}
-    </g>
-  );
-}
-
+type PassengerReaction = { kind: 'happy' | 'yuck'; age: number; label: string };
 export function TransportGame({ settings, paused, onCelebrate }: GameProps) {
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [phase, setPhase] = useState<'choose' | 'load' | 'travel' | 'arrive' | 'done'>('choose');
-  const [loaded, setLoaded] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [delivered, setDelivered] = useState(0);
-  const [holding, setHolding] = useState(false);
-  const [hint, setHint] = useState('');
-  const goal = (delivered + 1) * (100 / 3);
-
-  function choose(next: Vehicle) {
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null),
+    [seats, setSeats] = useState<(number | null)[]>([null, null, null]),
+    [selected, setSelected] = useState<number | null>(0),
+    [travelling, setTravelling] = useState(false),
+    [distance, setDistance] = useState(0);
+  const [inventory, setInventory] = useState<Record<Food, number>>({
+      apple: 0,
+      banana: 0,
+      fish: 0,
+      poop: 0,
+    }),
+    [heldFood, setHeldFood] = useState<Food | null>(null),
+    [meals, setMeals] = useState(0),
+    [reactions, setReactions] = useState<Record<number, PassengerReaction>>({}),
+    [meowing, setMeowing] = useState(false),
+    [binMessage, setBinMessage] = useState(false);
+  const [drag, setDrag] = useState<{ id: number; x: number; y: number; pointer: number } | null>(
+    null,
+  );
+  const gesture = useRef<{
+      id: number;
+      pointer: number;
+      startX: number;
+      startY: number;
+      moved: boolean;
+      target: HTMLButtonElement;
+    } | null>(null),
+    justDragged = useRef(false);
+  const sim = useRef({
+    distance: 0,
+    last: 0,
+    world: 0,
+    meowTime: 0,
+    binTime: 0,
+    reactions: {} as Record<number, PassengerReaction>,
+  });
+  const world = Math.floor(distance / 1400) % worlds.length,
+    boarded = seats.filter((n) => n !== null).length;
+  function board(id: number, seat: number) {
     if (paused) return;
-    setVehicle(next);
-    setLoaded(0);
-    setDelivered(0);
-    setProgress(0);
-    setHint('');
-    setPhase('load');
-    playTone(next === 'plane' ? 6 : 2, settings);
-    speak('Three friends need a ride. Find fox.', settings);
+    setSeats((old) => {
+      const next = old.map((v) => (v === id ? null : v));
+      next[seat] = id;
+      return next;
+    });
+    setSelected(null);
+    playTone(id + 5, settings);
+    speak(`Hello ${passengerNames[id]}! All aboard!`, settings, { interrupt: true });
   }
-  function load(index: number) {
-    if (paused || phase !== 'load') return;
-    if (index !== loaded) {
-      setHint(`Find ${passengerNames[loaded].toLowerCase()}`);
-      speak(passengerNames[index], settings);
-      playTone(index, settings);
+  function collect(food: Food) {
+    if (paused) return;
+    setInventory((old) => ({ ...old, [food]: Math.min(9, old[food] + 1) }));
+    setHeldFood(food);
+    playTone(food === 'poop' ? 1 : 6, settings);
+    speak(food === 'poop' ? 'Oops! Poop goes in the bin.' : `${food}! Who is hungry?`, settings, {
+      interrupt: true,
+    });
+  }
+  function feed(seat: number) {
+    if (paused) return;
+    const friend = seats[seat];
+    if (friend === null) return;
+    if (!heldFood || inventory[heldFood] === 0) {
+      speak(`${passengerNames[friend]} wants ${favorites[friend]}.`, settings, { interrupt: true });
+      playTone(5, settings);
       return;
     }
-    setLoaded(loaded + 1);
-    setHint('');
-    playTone(loaded * 2 + 3, settings);
-    if (loaded === 2) {
-      setPhase('travel');
-      speak('All aboard! Take our friends on an adventure.', settings);
-    } else speak(`${loaded + 1}. Now find ${passengerNames[loaded + 1]}.`, settings);
-  }
-  function travel() {
-    if (paused || phase !== 'travel') return;
-    setProgress((value) => Math.min(goal, value + 7));
-    playTone(delivered + 2, settings, 0.16);
-  }
-  function deliver() {
-    if (paused || phase !== 'arrive') return;
-    const next = delivered + 1;
-    setDelivered(next);
-    playTone(7 + delivered, settings);
-    setHolding(false);
-    if (next === 3) {
-      setPhase('done');
-      onCelebrate('Three happy friends!');
-      speak('Three happy friends! What an adventure!', settings);
-    } else {
-      setPhase('travel');
-      speak(`Goodbye ${passengerNames[delivered]}. Next stop, ${places[next]}.`, settings);
-    }
-  }
-  function act() {
-    if (phase === 'choose') choose('train');
-    else if (phase === 'load') load(loaded);
-    else if (phase === 'travel') travel();
-    else if (phase === 'arrive') deliver();
-    else if (vehicle) choose(vehicle);
-  }
-  useGameKeys(paused, (key) => {
-    if (phase === 'choose') choose(key.toLowerCase() === 'p' || key === '2' ? 'plane' : 'train');
-    else if (phase === 'load' && /^[1-3]$/.test(key)) load(Number(key) - 1);
-    else act();
-  });
-  useEffect(() => {
-    if (!paused && phase === 'travel' && progress >= goal - 0.01) {
-      setPhase('arrive');
-      setHolding(false);
-      speak(`${places[delivered]}. ${passengerNames[delivered]} is here!`, settings);
-    }
-  }, [progress, goal, phase, delivered, settings, paused]);
-  useEffect(() => {
-    if (!holding || paused || phase !== 'travel') return;
-    const interval = window.setInterval(
-      () => setProgress((value) => Math.min(goal, value + 0.8)),
-      120,
-    );
-    const stop = () => setHolding(false);
-    window.addEventListener('pointerup', stop);
-    window.addEventListener('pointercancel', stop);
-    return () => {
-      window.clearInterval(interval);
-      window.removeEventListener('pointerup', stop);
-      window.removeEventListener('pointercancel', stop);
+    const food = heldFood,
+      good = food === favorites[friend];
+    setInventory((old) => ({ ...old, [food]: Math.max(0, old[food] - 1) }));
+    setHeldFood(null);
+    const r: PassengerReaction = {
+      kind: good ? 'happy' : 'yuck',
+      age: 0,
+      label: good ? 'Yummy!' : food === 'poop' ? 'Poo! No!' : 'No, thank you!',
     };
-  }, [holding, paused, phase, goal]);
+    sim.current.reactions = { ...sim.current.reactions, [friend]: r };
+    setReactions({ ...sim.current.reactions });
+    playSound(good ? 'giggle' : 'yuck', settings);
+    speak(
+      good
+        ? `Yummy ${food}! Thank you!`
+        : food === 'poop'
+          ? 'Yuck! Poop is not food. In the bin!'
+          : `No, thank you! I like ${favorites[friend]}.`,
+      settings,
+      { interrupt: true },
+    );
+    if (good) {
+      setMeals((n) => n + 1);
+      if ((meals + 1) % 3 === 0) onCelebrate('Three happy travelling friends!');
+    }
+  }
+  function cat() {
+    if (paused) return;
+    sim.current.meowTime = 1.8;
+    setMeowing(true);
+    playSound('meow', settings);
+  }
+  function compost() {
+    if (paused) return;
+    if (heldFood) {
+      setInventory((old) => ({ ...old, [heldFood]: Math.max(0, old[heldFood] - 1) }));
+      setHeldFood(null);
+    }
+    sim.current.binTime = 1.8;
+    setBinMessage(true);
+    playSound('pop', settings);
+    speak('In the bin! Thank you!', settings, { interrupt: true });
+  }
+  function seatTap(seat: number) {
+    if (paused) return;
+    if (selected !== null) {
+      board(selected, seat);
+      return;
+    }
+    if (travelling) {
+      feed(seat);
+      return;
+    }
+    const friend = seats[seat];
+    if (friend !== null) {
+      setSelected(friend);
+      speak(`Hello ${passengerNames[friend]}`, settings, { interrupt: true });
+    } else {
+      const missing = [0, 1, 2].find((n) => !seats.includes(n));
+      if (missing !== undefined) board(missing, seat);
+    }
+  }
+  function startDrag(event: ReactPointerEvent<HTMLButtonElement>, id: number) {
+    if (paused || gesture.current) return;
+    event.preventDefault();
+    gesture.current = {
+      id,
+      pointer: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
+      target: event.currentTarget,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDrag({ id, x: event.clientX, y: event.clientY, pointer: event.pointerId });
+  }
+  function moveDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+    const g = gesture.current;
+    if (!g || g.pointer !== event.pointerId || paused) return;
+    if (Math.hypot(event.clientX - g.startX, event.clientY - g.startY) > 7) g.moved = true;
+    setDrag({ id: g.id, x: event.clientX, y: event.clientY, pointer: g.pointer });
+  }
+  function endDrag(event: ReactPointerEvent<HTMLButtonElement>, cancel = false) {
+    const g = gesture.current;
+    if (!g || g.pointer !== event.pointerId) return;
+    gesture.current = null;
+    setDrag(null);
+    if (g.target.hasPointerCapture(event.pointerId))
+      g.target.releasePointerCapture(event.pointerId);
+    if (cancel || paused) return;
+    justDragged.current = true;
+    const target = document
+      .elementFromPoint(event.clientX, event.clientY)
+      ?.closest<HTMLElement>('[data-coach-seat]');
+    if (target) {
+      board(g.id, Number(target.dataset.coachSeat));
+    } else if (!g.moved) {
+      setSelected(g.id);
+      setHeldFood(null);
+      playTone(g.id + 3, settings);
+    }
+    queueMicrotask(() => {
+      justDragged.current = false;
+    });
+  }
   useEffect(() => {
-    if (paused) setHolding(false);
+    if (!paused) return;
+    const g = gesture.current;
+    if (g && g.target.hasPointerCapture(g.pointer)) g.target.releasePointerCapture(g.pointer);
+    gesture.current = null;
+    setDrag(null);
   }, [paused]);
-
+  useEffect(() => {
+    if (paused) return;
+    let frame = 0;
+    sim.current.last = 0;
+    const animate = (now: number) => {
+      const s = sim.current,
+        dt = s.last ? Math.max(0, Math.min((now - s.last) / 1000, 0.05)) : 0;
+      s.last = now;
+      if (travelling) {
+        s.distance += dt * 74;
+        setDistance(s.distance);
+        const next = Math.floor(s.distance / 1400);
+        if (next !== s.world) {
+          s.world = next;
+          speak(`Next stop! ${worlds[next % worlds.length].name}!`, settings);
+          onCelebrate(`All aboard: ${worlds[next % worlds.length].name}`);
+        }
+      }
+      if (s.meowTime > 0) {
+        s.meowTime -= dt;
+        if (s.meowTime <= 0) setMeowing(false);
+      }
+      if (s.binTime > 0) {
+        s.binTime -= dt;
+        if (s.binTime <= 0) setBinMessage(false);
+      }
+      if (Object.keys(s.reactions).length) {
+        s.reactions = Object.fromEntries(
+          Object.entries(s.reactions)
+            .map(([key, r]) => [key, { ...r, age: r.age + dt }])
+            .filter(([, r]) => (r as PassengerReaction).age < 2),
+        );
+        setReactions({ ...s.reactions });
+      }
+      frame = requestAnimationFrame(animate);
+    };
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [paused, travelling, settings, onCelebrate]);
+  useGameKeys(paused, (key) => {
+    if (!vehicle) {
+      setVehicle(key === 'p' ? 'plane' : 'train');
+      return;
+    }
+    if (key === 'm') {
+      cat();
+      return;
+    }
+    if (!travelling) {
+      const missing = [0, 1, 2].find((n) => !seats.includes(n));
+      const empty = seats.findIndex((n) => n === null);
+      if (missing !== undefined && empty >= 0) board(missing, empty);
+      else {
+        setSelected(null);
+        setTravelling(true);
+        playSound('horn', settings);
+      }
+      return;
+    }
+    if (heldFood) {
+      const seat = seats.findIndex((friend) => friend !== null && favorites[friend] === heldFood);
+      if (heldFood === 'poop') compost();
+      else feed(seat >= 0 ? seat : seats.findIndex((n) => n !== null));
+    } else {
+      const friends = seats.filter((friend): friend is number => friend !== null);
+      if (friends.length) collect(favorites[friends[meals % friends.length]]);
+    }
+  });
+  const coachThemes = [worlds[world], worlds[(world + 1) % 6], worlds[(world + 2) % 6]];
   return (
     <section
-      className={`vg-game vg-transport ${settings.calm ? 'vg-calm' : ''} ${paused ? 'vg-paused' : ''}`}
-      aria-label="Trains and planes adventure"
-      data-testid="transport-game"
+      className={`vg-game vg-transport ${paused ? 'vg-paused' : ''} ${settings.calm ? 'vg-calm' : ''}`}
+      data-game="transport"
+      data-vehicle={vehicle ?? 'choice'}
+      data-boarded={boarded}
+      data-distance={Math.floor(distance)}
+      data-meals={meals}
     >
-      <div className="vg-game-heading">
+      <div className="vg-title">
         <div>
-          <span className="vg-eyebrow">LITTLE FRIENDS · BIG ADVENTURES</span>
-          <h2>
-            {phase === 'choose'
-              ? 'How shall we go?'
-              : phase === 'load'
-                ? 'Three friends need a ride'
-                : phase === 'done'
-                  ? 'Three very happy friends!'
-                  : phase === 'arrive'
-                    ? `Hello, ${places[delivered].toLowerCase()}!`
-                    : `Next stop: ${places[delivered]}`}
-          </h2>
+          <span className="vg-kicker">
+            {vehicle
+              ? travelling
+                ? 'A JOURNEY WITH YOUR FRIENDS'
+                : 'DRAG A FRIEND INTO A WINDOW'
+              : 'WHERE SHALL WE GO?'}
+          </span>
+          <h2>{vehicle ? (travelling ? worlds[world].name : 'All aboard!') : 'Away we go!'}</h2>
         </div>
-        {phase !== 'choose' && (
-          <div className="vg-passenger-count">
-            <b>{phase === 'load' ? loaded : delivered}</b>
-            <span>
-              / 3<br />
-              {phase === 'load' ? 'aboard' : 'arrived'}
-            </span>
+        {vehicle && (
+          <div className="vg-tally">
+            <svg viewBox="-35 -35 70 70">
+              <path d="M0 24C-51-9-13-41 0-17 13-41 51-9 0 24" fill="#efaba9" />
+            </svg>
+            <b>{meals}</b>
           </div>
         )}
       </div>
-      {phase === 'choose' ? (
-        <div className="vg-transport-choices">
-          <button
-            onClick={() => choose('train')}
-            disabled={paused}
-            className="vg-vehicle-card vg-train-card"
-            aria-label="Choose the train"
-          >
-            <svg viewBox="0 0 390 295" aria-hidden="true">
-              <circle cx="194" cy="137" r="120" fill="#e6ecc8" />
-              <Cloud x={41} y={33} size={0.7} />
-              <path d="M0 236h390m-390 20h390" stroke="#c9b093" strokeWidth="7" />
-              <g transform="translate(16 14)">
-                <TransportArt vehicle="train" loaded={3} />
-              </g>
-            </svg>
-            <span>Choo-choo train</span>
-            <small>Toot! A trip through the countryside.</small>
-            <i>
-              <ArrowIcon />
-            </i>
-          </button>
-          <button
-            onClick={() => choose('plane')}
-            disabled={paused}
-            className="vg-vehicle-card vg-plane-card"
-            aria-label="Choose the plane"
-          >
-            <svg viewBox="0 0 390 295" aria-hidden="true">
-              <circle cx="194" cy="137" r="120" fill="#c6e6e6" />
-              <Cloud x={213} y={26} size={1.1} />
-              <Cloud x={14} y={171} size={0.8} />
-              <g transform="translate(16 11)">
-                <TransportArt vehicle="plane" loaded={3} />
-              </g>
-            </svg>
-            <span>Sunny little plane</span>
-            <small>Whoosh! An adventure in the clouds.</small>
-            <i>
-              <ArrowIcon />
-            </i>
-          </button>
-        </div>
-      ) : phase === 'load' ? (
-        <>
-          <div className="vg-boarding-stage">
-            <div className="vg-boarding-vehicle">
-              <svg viewBox="0 0 370 245" aria-label={`${loaded} passengers aboard`} role="img">
-                <TransportArt vehicle={vehicle!} loaded={loaded} />
-              </svg>
-            </div>
-            <div className="vg-seats" aria-label="Three passenger seats">
-              {[0, 1, 2].map((index) => (
-                <div
-                  key={index}
-                  className={`vg-seat ${index === loaded ? 'vg-seat-next' : ''} ${index < loaded ? 'vg-seat-filled' : ''}`}
-                  style={{ '--vg-seat-color': passengerColors[index] } as React.CSSProperties}
-                >
-                  <b>{index + 1}</b>
-                  <svg viewBox="0 0 100 100" aria-hidden="true">
-                    <g opacity={index < loaded ? 1 : 0.23}>
-                      <Passenger index={index} x={50} y={49} size={0.82} />
-                    </g>
-                  </svg>
-                  {index < loaded && <i>✓</i>}
-                </div>
-              ))}
-            </div>
-          </div>
-          <p className="vg-loading-caption" aria-live="polite">
-            {hint || `Find ${passengerNames[loaded].toLowerCase()} for seat ${loaded + 1}`}
-          </p>
-          <div className="vg-choices vg-passengers">
-            {[0, 1, 2].map((index) => (
-              <button
-                key={index}
-                className={`vg-picture-choice ${index < loaded ? 'vg-already-boarded' : ''}`}
-                onClick={() => load(index)}
-                disabled={paused || index < loaded}
-                aria-label={`Board ${passengerNames[index]}`}
-              >
-                <svg viewBox="0 0 120 110" aria-hidden="true">
-                  <circle cx="60" cy="57" r="48" fill={`${passengerColors[index]}33`} />
-                  <Passenger index={index} x={60} y={57} size={1.05} />
-                </svg>
-                <span>{index < loaded ? 'Aboard!' : passengerNames[index]}</span>
-              </button>
-            ))}
-          </div>
-        </>
-      ) : phase === 'done' ? (
-        <>
-          <div className="vg-trip-complete">
-            <div className="vg-arrival-friends">
-              {[0, 1, 2].map((index) => (
-                <div key={index}>
-                  <Landmark index={index} large />
-                  <svg viewBox="0 0 110 110" aria-hidden="true">
-                    <Passenger index={index} x={55} y={53} size={1.1} />
-                  </svg>
-                  <b>{['A', 'B', 'C'][index]}</b>
-                </div>
-              ))}
-            </div>
-            <p>
-              Farm, mountain, beach.
-              <br />
-              <strong>You took everyone where they wanted to go.</strong>
-            </p>
-          </div>
-          <div className="vg-bottom-bar">
+      {!vehicle ? (
+        <div className="vg-transport-choose">
+          {(['train', 'plane'] as Vehicle[]).map((v) => (
             <button
-              className="vg-small-action"
+              className="vg-vehicle-pick"
+              key={v}
+              aria-label={`Choose ${v}`}
               onClick={() => {
-                if (!paused) setPhase('choose');
+                setVehicle(v);
+                speak(
+                  v === 'train' ? 'Choo choo! All aboard!' : 'Let’s fly! All aboard!',
+                  settings,
+                  { interrupt: true },
+                );
+                playSound(v === 'train' ? 'horn' : 'whoosh', settings);
               }}
               disabled={paused}
-              aria-label="Choose another vehicle"
             >
-              <ReplayIcon />
-              <span>New ride</span>
+              <svg viewBox="0 0 350 290">
+                <Cloud x={170} y={24} size={0.9} />
+                {v === 'train' ? (
+                  <g transform="translate(205 54) scale(1.05)">
+                    <foreignObject width="150" height="180">
+                      <EngineArt vehicle="train" />
+                    </foreignObject>
+                  </g>
+                ) : (
+                  <>
+                    <path d="M29 127 5 63h35l60 75" fill="#f2bd70" stroke={INK} strokeWidth="3" />
+                    <path
+                      d="M24 147q40-27 80-29h170q46 7 55 41-3 26-43 24H83q-37-5-59-36Z"
+                      fill="#f4d479"
+                      stroke={INK}
+                      strokeWidth="3"
+                    />
+                    <path
+                      d="m160 156-88 71h56l112-73M157 118l-47-52h39l81 54"
+                      fill="#eea18b"
+                      stroke={INK}
+                      strokeWidth="3"
+                    />
+                    {[100, 158, 216].map((x) => (
+                      <circle
+                        key={x}
+                        cx={x}
+                        cy="145"
+                        r="16"
+                        fill="#e1efe5"
+                        stroke={INK}
+                        strokeWidth="3"
+                      />
+                    ))}
+                  </>
+                )}
+                {v === 'train' &&
+                  [0, 1].map((i) => (
+                    <g key={i} transform={`translate(${15 + i * 98} 120)`}>
+                      <rect
+                        width="86"
+                        height="85"
+                        rx="13"
+                        fill={passengerColors[i]}
+                        stroke={INK}
+                        strokeWidth="3"
+                      />
+                      <rect x="16" y="12" width="54" height="44" rx="9" fill="#e6efd7" />
+                      <Passenger index={i} x={43} y={37} size={0.53} />
+                      <WheelArt style="round" x={21} y={88} />
+                      <WheelArt style="star" x={66} y={88} />
+                    </g>
+                  ))}
+              </svg>
+              <strong>{v === 'train' ? 'Happy train' : 'Little plane'}</strong>
+              <span>{v === 'train' ? 'Choo choo!' : 'Up, up, and away!'}</span>
+              <Icon name="go" />
             </button>
-            <button
-              className="vg-go-button"
-              onClick={() => choose(vehicle!)}
-              disabled={paused}
-              aria-label="Take another trip"
-            >
-              <ArrowIcon />
-              <span>Again!</span>
-            </button>
-          </div>
-        </>
+          ))}
+        </div>
       ) : (
         <>
-          <div
-            className="vg-journey-stage"
-            onPointerDown={(event) => {
-              if (event.target instanceof Element && event.target.closest('button')) return;
-              if (phase === 'travel') travel();
-            }}
-          >
-            <JourneyScene
-              vehicle={vehicle!}
-              progress={progress}
-              delivered={delivered}
-              arriving={phase === 'arrive'}
-            />
-          </div>
-          <div className="vg-trip-map" aria-label="Trip destinations">
-            {places.map((place, index) => (
-              <div
-                key={place}
-                className={
-                  index === delivered ? 'vg-map-current' : index < delivered ? 'vg-map-done' : ''
-                }
-              >
-                <span>{index < delivered ? '✓' : ['A', 'B', 'C'][index]}</span>
-                <Landmark index={index} />
-                <small>{place}</small>
+          <div className="vg-main-scene vg-transport-stage" data-testid="transport-scene">
+            <svg viewBox="0 0 1000 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <WorldArt index={world} distance={distance} />
+              {vehicle === 'train' && (
+                <g stroke="#465b61">
+                  <path d="M0 407h1000" strokeWidth="10" />
+                  <path
+                    d="M0 419h1000"
+                    strokeWidth="13"
+                    strokeDasharray="12 25"
+                    strokeDashoffset={distance * 2}
+                  />
+                </g>
+              )}
+            </svg>
+            {!travelling && (
+              <div className="vg-boarding-instruction">Pick a friend · pop them in a window</div>
+            )}
+            {travelling &&
+              foods.map((f, i) => (
+                <button
+                  key={f}
+                  className="vg-floating-food"
+                  style={{ left: `${7 + i * 23}%` }}
+                  disabled={paused}
+                  aria-label={`Collect ${f}`}
+                  onClick={() => {
+                    setSelected(null);
+                    collect(f);
+                  }}
+                >
+                  <FoodArt food={f} />
+                </button>
+              ))}
+            <div
+              className={`vg-train-layout ${vehicle === 'plane' ? 'vg-plane-layout' : ''} ${travelling ? 'vg-moving' : ''}`}
+            >
+              {seats.map((friend, i) => (
+                <button
+                  key={i}
+                  data-coach-seat={i}
+                  data-empty={friend === null}
+                  data-ready={selected !== null || heldFood !== null}
+                  className={`vg-coach ${friend !== null && reactions[friend] ? `vg-${reactions[friend].kind}` : ''}`}
+                  style={{ '--coach': coachThemes[i].color } as React.CSSProperties}
+                  aria-label={`${coachThemes[i].coach} coach ${i + 1}${friend === null ? ', empty' : `, ${passengerNames[friend]}`}`}
+                  onClick={() => seatTap(i)}
+                  disabled={paused}
+                >
+                  <span className="vg-coach-window">
+                    {friend === null ? (
+                      <span className="vg-seat-nudge">+</span>
+                    ) : (
+                      <svg viewBox="-52 -55 104 110" aria-hidden="true">
+                        <g className="vg-friend-breathe">
+                          <ellipse cy="36" rx="26" ry="23" fill={passengerColors[friend]} />
+                          <Passenger
+                            index={friend}
+                            size={0.88}
+                            mood={reactions[friend]?.kind ?? 'neutral'}
+                          />
+                        </g>
+                        {reactions[friend]?.kind === 'happy' && (
+                          <g fill="#eb929e">
+                            <path
+                              d="M-32-29q-15-16-20-3-3 9 20 22 23-13 20-22-5-13-20 3"
+                              transform="translate(24 -10) scale(.6)"
+                            />
+                          </g>
+                        )}
+                      </svg>
+                    )}
+                  </span>
+                  <span className="vg-seat-label">
+                    <CoachBadge index={(world + i) % 6} />
+                    {coachThemes[i].coach}
+                  </span>
+                  {friend !== null && travelling && !reactions[friend] && (
+                    <span className="vg-feed-wish">
+                      <FoodArt food={favorites[friend]} />
+                    </span>
+                  )}
+                  {friend !== null && reactions[friend] && (
+                    <span className="vg-reaction">{reactions[friend].label}</span>
+                  )}
+                </button>
+              ))}
+              <div className="vg-engine">
+                <EngineArt vehicle={vehicle} />
+                <button
+                  className="vg-cat"
+                  aria-label="Pet the rooftop cat"
+                  onClick={cat}
+                  disabled={paused}
+                >
+                  <CatArt meow={meowing} />
+                </button>
+                {meowing && <span className="vg-cat-speech">Meow!</span>}
               </div>
-            ))}
+            </div>
+            {binMessage && <div className="vg-boarding-instruction">All tidy! Thank you!</div>}
           </div>
-          <div className="vg-bottom-bar">
+          {!travelling ? (
+            <div className="vg-passenger-dock">
+              {passengerNames.map((name, i) => (
+                <button
+                  key={name}
+                  className="vg-passenger-button"
+                  data-boarded={seats.includes(i)}
+                  aria-label={`Board ${name}`}
+                  aria-pressed={selected === i}
+                  onPointerDown={(e) => startDrag(e, i)}
+                  onPointerMove={moveDrag}
+                  onPointerUp={(e) => endDrag(e)}
+                  onPointerCancel={(e) => endDrag(e, true)}
+                  onLostPointerCapture={() => {
+                    if (gesture.current?.id === i) {
+                      gesture.current = null;
+                      setDrag(null);
+                    }
+                  }}
+                  onClick={(e) => {
+                    if (e.detail === 0 && !paused && !justDragged.current) {
+                      setSelected(i);
+                      setHeldFood(null);
+                    }
+                  }}
+                  disabled={paused}
+                >
+                  <svg viewBox="-57 -60 114 112">
+                    <Passenger index={i} />
+                  </svg>
+                  <span>{name}</span>
+                </button>
+              ))}
+              <button
+                className="vg-passenger-button vg-start-button"
+                aria-label={vehicle === 'train' ? 'Start train journey' : 'Start plane journey'}
+                onClick={() => {
+                  setSelected(null);
+                  if (boarded === 0) {
+                    setSeats([0, 1, 2]);
+                  }
+                  setTravelling(true);
+                  playSound(vehicle === 'train' ? 'horn' : 'whoosh', settings);
+                  speak('Let’s go!', settings, { interrupt: true });
+                }}
+                disabled={paused}
+              >
+                <Icon name="go" />
+                <span>Let's go!</span>
+              </button>
+            </div>
+          ) : (
+            <div className="vg-controls">
+              <button
+                aria-label="Change passengers"
+                disabled={paused}
+                onClick={() => {
+                  setTravelling(false);
+                  setHeldFood(null);
+                }}
+              >
+                <Icon name="stop" />
+                <span>Station</span>
+              </button>
+              <div className="vg-inventory" aria-label="Collected food">
+                {foods.map((f) => (
+                  <button
+                    key={f}
+                    data-empty={inventory[f] === 0}
+                    aria-label={`Feed with ${f}, ${inventory[f]} collected`}
+                    aria-pressed={heldFood === f}
+                    disabled={paused || inventory[f] === 0}
+                    onClick={() => {
+                      setSelected(null);
+                      setHeldFood(f);
+                      playTone(4, settings);
+                    }}
+                  >
+                    <FoodArt food={f} />
+                    <small>{inventory[f]}</small>
+                  </button>
+                ))}
+              </div>
+              <button aria-label="Put it in the bin" disabled={paused} onClick={compost}>
+                <Icon name="bin" />
+                <span>Bin</span>
+              </button>
+            </div>
+          )}
+          <div className="vg-transport-foot">
             <button
-              className="vg-small-action"
+              className="vg-swap-button"
+              aria-label="Choose a different vehicle"
               onClick={() => {
-                if (!paused) {
-                  setHolding(false);
-                  setPhase('choose');
-                }
+                setTravelling(false);
+                setVehicle(null);
+                setHeldFood(null);
+                setSelected(null);
               }}
               disabled={paused}
-              aria-label="Choose another vehicle"
             >
-              <ReplayIcon />
-              <span>New ride</span>
+              <Icon name="swap" />
             </button>
-            {phase === 'arrive' ? (
-              <>
-                <p className="vg-play-hint">
-                  <strong>A little stop for {passengerNames[delivered].toLowerCase()}</strong>
-                  <br />
-                  Tap your friend to say goodbye.
-                </p>
-                <button
-                  className="vg-deliver-button"
-                  onClick={deliver}
-                  disabled={paused}
-                  aria-label={`Let ${passengerNames[delivered]} off at ${places[delivered]}`}
-                >
-                  <svg viewBox="0 0 115 100" aria-hidden="true">
-                    <Passenger index={delivered} x={48} y={50} size={0.8} />
-                    <path
-                      d="M87 44h20m-8-8 8 8-8 8"
-                      stroke={INK}
-                      strokeWidth="5"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <span>Here we are!</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="vg-play-hint">
-                  <strong>Tap, hold, or press a key</strong>
-                  <br />
-                  {vehicle === 'plane'
-                    ? 'Off to discover somewhere new.'
-                    : 'A little farther down the track.'}
-                </p>
-                <button
-                  className="vg-go-button vg-pedal"
-                  onPointerDown={(event) => {
-                    if (paused) return;
-                    event.preventDefault();
-                    event.currentTarget.setPointerCapture(event.pointerId);
-                    travel();
-                    setHolding(true);
-                  }}
-                  onPointerUp={() => setHolding(false)}
-                  onPointerCancel={() => setHolding(false)}
-                  onClick={(event) => {
-                    if (event.detail === 0) travel();
-                  }}
-                  disabled={paused}
-                  aria-label={
-                    vehicle === 'plane' ? 'Fly. Tap or hold to fly' : 'Go. Tap or hold to ride'
-                  }
-                >
-                  <ArrowIcon />
-                  <span>{vehicle === 'plane' ? 'FLY!' : 'GO!'}</span>
-                </button>
-              </>
+            <span>
+              {travelling
+                ? heldFood
+                  ? 'Tap a friend to share!'
+                  : 'Pick a snack. Feed a friend.'
+                : selected === null
+                  ? 'Ready? Off we go!'
+                  : `${passengerNames[selected]} is ready for a seat`}
+            </span>
+            {travelling && (
+              <button
+                className="vg-swap-button"
+                aria-label="Say choo choo"
+                onClick={() => {
+                  if (!paused) playSound('horn', settings);
+                }}
+                disabled={paused}
+              >
+                <Icon name="horn" />
+              </button>
             )}
           </div>
         </>
+      )}
+      {drag && (
+        <div className="vg-drag-ghost" style={{ left: drag.x, top: drag.y }}>
+          <svg viewBox="-55 -60 110 110">
+            <Passenger index={drag.id} />
+          </svg>
+        </div>
       )}
     </section>
   );
