@@ -58,10 +58,14 @@ test('space: hidden flight freezes and resumes without a time jump', async ({ pa
 test('runner: peekaboo gives a friend, a letter and a helpful jump', async ({ page }) => {
   await open(page, 'Jungle dash');
   const peek = page.getByRole('button', { name: 'Play peekaboo with cat', exact: true });
-  await peek.click();
-  await expect(peek).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('.runner-peek-friend b')).toHaveText('C');
-  await expect(page.locator('.runner-heading p')).toHaveText('Peekaboo! C is for cat!');
+  // Observe the short greeting before tapping: CI trace capture can outlast it
+  // when assertions are sent sequentially after the input has already happened.
+  await Promise.all([
+    expect(page.locator('.runner-heading p')).toHaveText('Peekaboo! C is for cat!'),
+    expect(peek).toHaveAttribute('aria-pressed', 'true'),
+    expect(page.locator('.runner-peek-friend b')).toHaveText('C'),
+    peek.click(),
+  ]);
   await expect
     .poll(async () => Number(await page.getByTestId('runner-game').getAttribute('data-treasures')))
     .toBeGreaterThan(0);
