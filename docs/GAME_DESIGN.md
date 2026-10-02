@@ -40,7 +40,7 @@ The mischievous yellow spray uses a fully clothed cartoon character obscured bel
 
 ## Review and validation
 
-Separate implementation passes covered vehicles, runner/space, and food/meadow/picnic. Independent reviewers played the games and checked touch use, visible consequences, preserving work, and pause behavior. Review fixes included hidden Home focus targets, sparse-passenger food selection, pointer press movement in Firefox, portrait car cropping, overlapping controls, and the representation of large desserts.
+Separate implementation passes covered vehicles, runner/space, and food/meadow/picnic. Independent reviewers played the games and checked touch use, visible consequences, preserving work, and pause behavior. Review fixes included hidden Home focus targets, sparse-passenger food selection, pointer press movement in Firefox, portrait car cropping, overlapping controls, the representation of large desserts, and input/progression when rendering is slow.
 
 Browser checks cover Chromium desktop/mobile, Firefox, and WebKit in two iPad orientations. Shared checks exercise the chooser, real game actions, keyboard after pointer input, speech fallback, settings, pauses, and small screens. Offline tests warm a dedicated origin, stop its server, and reload/play all nine cached adventures.
 

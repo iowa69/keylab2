@@ -211,3 +211,34 @@ export function advanceRunner(state: RunnerState, delta: number, baby: boolean, 
   }
   return events;
 }
+
+/** Keep travel speed independent of rendering speed without tunnelling through treasures.
+ * At most half a second is recovered after an active-frame stall. Hidden or paused
+ * time is excluded by the component's clock, rather than fed to this integrator.
+ */
+export function advanceRunnerFrame(
+  state: RunnerState,
+  elapsed: number,
+  baby: boolean,
+  calm: boolean,
+) {
+  const events = {
+    collected: 0,
+    prizes: [] as RunnerPrize[],
+    bumped: false,
+    openedGate: false,
+    newIsland: false,
+  };
+  let remaining = Number.isFinite(elapsed) ? Math.max(0, Math.min(elapsed, 0.5)) : 0;
+  while (remaining > 1e-8) {
+    const step = Math.min(remaining, 1 / 60);
+    const next = advanceRunner(state, step, baby, calm);
+    events.collected += next.collected;
+    events.prizes.push(...next.prizes);
+    events.bumped ||= next.bumped;
+    events.openedGate ||= next.openedGate;
+    events.newIsland ||= next.newIsland;
+    remaining -= step;
+  }
+  return events;
+}

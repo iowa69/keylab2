@@ -364,7 +364,7 @@ export function SplashGame({ settings, paused, onCelebrate }: GameProps) {
   const [view, setView] = useState(() => takePicture(state.current));
   const [caption, setCaption] = useState('Wash, splash, and make a mess!');
   const publish = () => setView(takePicture(state.current));
-  const squirt = (index?: number) => {
+  const squirt = (index?: number, discrete = false) => {
     const current = latest.current,
       model = state.current;
     if (current.paused || document.hidden) return;
@@ -383,7 +383,9 @@ export function SplashGame({ settings, paused, onCelebrate }: GameProps) {
       });
     }
     model.sprayUntil = model.time + 0.42;
-    if (model.time - model.lastHit < 0.32) return;
+    // Every new tap or key press gets a response, even on a slow device.
+    // Only a held stream is limited by the animation clock.
+    if (!discrete && model.time - model.lastHit < 0.32) return;
     model.lastHit = model.time;
     setPond(sprays.find((item) => item.id === current.spray)!.color);
     const laughing =
@@ -428,7 +430,7 @@ export function SplashGame({ settings, paused, onCelebrate }: GameProps) {
     const model = state.current;
     let index = model.friends.findIndex((friend) => friend.washed < 4);
     if (index < 0) index = Math.floor(model.time) % 3;
-    squirtRef.current(index);
+    squirtRef.current(index, true);
   });
   useEffect(() => {
     let frame = 0,
@@ -522,7 +524,7 @@ export function SplashGame({ settings, paused, onCelebrate }: GameProps) {
           event.currentTarget.setPointerCapture(event.pointerId);
           const target =
             event.target instanceof Element ? event.target.closest('[data-friend]') : null;
-          squirt(target ? Number(target.getAttribute('data-friend')) : undefined);
+          squirt(target ? Number(target.getAttribute('data-friend')) : undefined, true);
         }}
         onPointerMove={(event) => {
           if (held.current === event.pointerId && !paused) {
@@ -613,7 +615,7 @@ export function SplashGame({ settings, paused, onCelebrate }: GameProps) {
                   transform: `translate(-50%, -50%) scale(${friend.scale})`,
                 }}
                 onClick={(event) => {
-                  if (event.detail === 0) squirt(i);
+                  if (event.detail === 0) squirt(i, true);
                 }}
               >
                 <Animal kind={friends[i].kind} />

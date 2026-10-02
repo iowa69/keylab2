@@ -4,7 +4,7 @@ import { Animal, Cone, Face, Planet, Star } from './Art';
 import { playTone, speak } from './audio';
 import type { GameProps } from './types';
 import {
-  advanceRunner,
+  advanceRunnerFrame,
   createRunnerState,
   jumpRunner,
   runnerIslands,
@@ -588,6 +588,7 @@ function FlatWorld({ view }: { view: RunnerView }) {
 export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
   const worldHost = useRef<HTMLDivElement>(null);
   const model = useRef(createRunnerState());
+  const lastFrameTime = useRef<number | null>(null);
   const latest = useRef({ settings, paused, onCelebrate });
   latest.current = { settings, paused, onCelebrate };
   const [view, setView] = useState(() => snapshot(model.current));
@@ -595,14 +596,20 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
   const [caption, setCaption] = useState('Find five little treasures!');
   const [finds, setFinds] = useState<RunnerPrize[]>([]);
   const [peekUntil, setPeekUntil] = useState(0);
-  const friendIndex = (Math.floor(view.time / 16) + view.trips) % 5;
+  const [peekFriend, setPeekFriend] = useState(0);
+  const greetingUntil = useRef(0);
+  const messageUntil = useRef(0);
+  const revealed = view.time < peekUntil;
+  const friendIndex = revealed ? peekFriend : (Math.floor(view.time / 16) + view.trips) % 5;
   const friends = ['cat', 'duck', 'bunny', 'bear', 'pig'] as const;
   const friend = friends[friendIndex];
   const friendName = friend === 'bunny' ? 'rabbit' : friend;
-  const revealed = view.time < peekUntil;
   const peek = () => {
     if (paused || document.hidden) return;
+    setPeekFriend(friendIndex);
     setPeekUntil(model.current.time + 5);
+    greetingUntil.current = model.current.time + 2.3;
+    messageUntil.current = greetingUntil.current;
     model.current.magnet = 5;
     jumpRunner(model.current);
     setCaption(`Peekaboo! ${friendName[0].toUpperCase()} is for ${friendName}!`);
@@ -615,6 +622,7 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
   };
   useEffect(() => {
     if (paused) pointer.current = null;
+    lastFrameTime.current = null;
   }, [paused]);
   const pointer = useRef<{ x: number; y: number; id: number } | null>(null);
 
@@ -645,9 +653,7 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
       setFlat(true);
     }
     let raf = 0;
-    let previous = performance.now();
     let lastPaint = 0;
-    let messageUntil = 0;
     const loseContext = (event: Event) => {
       event.preventDefault();
       world?.dispose();
@@ -658,12 +664,13 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
     canvas?.addEventListener('webglcontextlost', loseContext);
     const tick = (now: number) => {
       if (disposed) return;
-      const dt = Math.min((now - previous) / 1000, 0.05);
-      previous = now;
+      const dt =
+        lastFrameTime.current === null ? 0 : Math.max(0, (now - lastFrameTime.current) / 1000);
+      lastFrameTime.current = now;
       const current = latest.current;
       if (!current.paused && !document.hidden) {
         const state = model.current;
-        const event = advanceRunner(
+        const event = advanceRunnerFrame(
           state,
           dt,
           current.settings.mode === 'baby',
@@ -674,13 +681,15 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
           const prize = event.prizes[event.prizes.length - 1];
           const word = prizeWords[prize];
           setFinds((previous) => [...previous, ...event.prizes].slice(-5));
-          setCaption(`${word.letter} is for ${word.word}!`);
-          speak(`${word.letter} is for ${word.word}.`, current.settings);
-          messageUntil = state.time + 1.6;
+          if (state.time >= greetingUntil.current) {
+            setCaption(`${word.letter} is for ${word.word}!`);
+            speak(`${word.letter} is for ${word.word}.`, current.settings);
+            messageUntil.current = state.time + 1.6;
+          }
         }
         if (event.openedGate) {
           setCaption('Rainbow ready!');
-          messageUntil = state.time + 6;
+          messageUntil.current = state.time + 6;
           current.onCelebrate('Five treasures! A new island!');
           speak('Five treasures! Through the rainbow!', current.settings);
         }
@@ -688,14 +697,14 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
           setFinds([]);
           setCaption(runnerIslands[state.island].name);
           speak(runnerIslands[state.island].name, current.settings);
-          messageUntil = state.time + 2.5;
+          messageUntil.current = state.time + 2.5;
         }
-        if (event.bumped) {
+        if (event.bumped && state.time >= greetingUntil.current) {
           setCaption('Boing! Keep exploring!');
-          messageUntil = state.time + 1.7;
+          messageUntil.current = state.time + 1.7;
         }
-        if (messageUntil > 0 && state.time > messageUntil) {
-          messageUntil = 0;
+        if (messageUntil.current > 0 && state.time > messageUntil.current) {
+          messageUntil.current = 0;
           setCaption(state.gate === null ? 'Find five little treasures!' : 'Through the rainbow!');
         }
         world?.render(state, current.settings.calm);
@@ -703,7 +712,7 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
           setView(snapshot(state));
           lastPaint = now;
         }
-      }
+      } else lastFrameTime.current = null;
       raf = requestAnimationFrame(tick);
     };
     world?.render(model.current, latest.current.settings.calm);
@@ -730,11 +739,17 @@ export function RunnerGame({ settings, paused, onCelebrate }: GameProps) {
         actionRef.current('jump');
       }
     };
+    const resetClock = () => {
+      lastFrameTime.current = null;
+    };
+    document.addEventListener('visibilitychange', resetClock);
     window.addEventListener('keydown', keyDown);
     return () => {
       disposed = true;
       cancelAnimationFrame(raf);
       window.removeEventListener('keydown', keyDown);
+      document.removeEventListener('visibilitychange', resetClock);
+      lastFrameTime.current = null;
       canvas?.removeEventListener('webglcontextlost', loseContext);
       world?.dispose();
     };

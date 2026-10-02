@@ -115,3 +115,36 @@ test('picnic friends respond and the fruit still reaches Bear', async ({ page })
   await page.getByRole('button', { name: 'Next fruit picnic', exact: true }).click();
   await expect(page.getByTestId('arcade-game')).toHaveAttribute('data-phase', 'catch');
 });
+
+test('meadow responds once to each deliberate key or tap when animation runs at five fps', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    // A slow graphics loop must not discard real input events.
+    window.requestAnimationFrame = (callback) =>
+      window.setTimeout(() => callback(performance.now()), 200);
+    window.cancelAnimationFrame = (handle) => window.clearTimeout(handle);
+  });
+  await open(page, 'Mischief meadow');
+  const pig = page.getByRole('button', { name: /^Pig,/ });
+  await pig.focus();
+  for (let remaining = 3; remaining >= 0; remaining--) {
+    await page.keyboard.press('Enter');
+    await expect(pig).toHaveAttribute(
+      'aria-label',
+      remaining ? `Pig, ${remaining} mud patches left` : 'Pig, all clean',
+    );
+  }
+  const duck = page.getByRole('button', { name: /^Duck,/ });
+  for (let remaining = 3; remaining >= 0; remaining--) {
+    // Native pointerdown/up also must not double-count the following click.
+    const bounds = await duck.boundingBox();
+    expect(bounds).toBeTruthy();
+    await page.mouse.click(bounds!.x + bounds!.width / 2, bounds!.y + bounds!.height / 2);
+    await expect(duck).toHaveAttribute(
+      'aria-label',
+      remaining ? `Duck, ${remaining} mud patches left` : 'Duck, all clean',
+    );
+  }
+  await expect(page.getByTestId('splash-game')).toHaveAttribute('data-clean', '2');
+});

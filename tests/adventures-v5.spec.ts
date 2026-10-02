@@ -130,3 +130,36 @@ test('runner remains playable when WebGL is unavailable', async ({ page }) => {
     .toBeGreaterThan(0);
   await expect(page.locator('.runner-word')).toBeVisible();
 });
+test('runner keeps travel speed with sparse animation frames and excludes a pause', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    // A slow-device cadence, without depending on the CI machine's GPU workload.
+    window.requestAnimationFrame = (callback) =>
+      window.setTimeout(() => callback(performance.now()), 125);
+    window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      ...args: Parameters<typeof getContext>
+    ) {
+      if (String(args[0]).includes('webgl')) return null;
+      return getContext.apply(this, args);
+    } as typeof getContext;
+  });
+  await open(page, 'Jungle dash');
+  const game = page.getByTestId('runner-game');
+  await expect(page.locator('.runner-flat-world')).toBeVisible();
+  const before = Number(await game.getAttribute('data-time'));
+  await page.waitForTimeout(1800);
+  expect(Number(await game.getAttribute('data-time')) - before).toBeGreaterThan(1.3);
+  await frozen(page, true);
+  const stopped = await game.getAttribute('data-time');
+  await page.waitForTimeout(800);
+  await expect(game).toHaveAttribute('data-time', stopped!);
+  await frozen(page, false);
+  await expect
+    .poll(async () => Number(await game.getAttribute('data-time')))
+    .toBeGreaterThan(Number(stopped));
+  expect(Number(await game.getAttribute('data-time')) - Number(stopped)).toBeLessThan(0.6);
+});
